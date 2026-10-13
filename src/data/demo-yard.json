@@ -1,0 +1,13 @@
+{
+  "about": "Marks for the generated demo yard photo (public/art/demo-yard.webp, 1536x1024). All points are image coordinates 0..1 (u right, v down), placed by hand on the photo once. The scale line is the front edge of the patio slab, taken as 1.0 m (an estimate - it is a demo).",
+  "image": "/art/demo-yard.webp",
+  "region": "pnw",
+  "soil": "loam",
+  "downspout": [0.127, 0.771],
+  "wall": [[0.045, 0.42], [0.095, 0.66], [0.03, 0.82], [0.075, 0.28]],
+  "outlet": [0.985, 0.6],
+  "scale": { "a": [0.17, 0.955], "b": [0.345, 0.86], "meters": 1.0 },
+  "yard": [[0.215, 0.385], [0.42, 0.37], [0.62, 0.375], [0.84, 0.45], [1.0, 0.56], [1.0, 1.0], [0.34, 1.0], [0.25, 0.74], [0.205, 0.52]],
+  "septic": null,
+  "roofAreaM2": 120
+}
