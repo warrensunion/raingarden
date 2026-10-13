@@ -160,3 +160,24 @@ test('ellipse with a zero or negative axis is a RangeError', () => {
   assert.throws(() => gardenCells(t, { cx: 2, cy: 2, lenM: 0, widM: 1, rot: 0 }), RangeError);
   assert.throws(() => ellipseRho({ cx: 0, cy: 0, lenM: 2, widM: -1, rot: 0 }, 0, 0), RangeError);
 });
+
+test('the pond spills at its lip (floor + depth + berm) through one notch; the rest of the crest is higher', async () => {
+  const { priorityFlood } = await import('../src/sim/flood.js');
+  const { edgeMask } = await import('../src/sim/grid.js');
+  const { BERM_CREST_M } = await import('../src/garden/constraints.js');
+  for (const [sx, sy] of [[0.04, 0], [0, -0.03], [0.02, 0.03]]) {
+    const t = flat(60, 60, 0.25, (x, y) => sx * x + sy * y + 0.02 * Math.cos(x));
+    const g = { cx: 7.5, cy: 7.5, lenM: 2.5, widM: 1.6, rot: 0.4, depthM: 0.12, bermM: 0.06 };
+    const { terrain, mask, bermMask, floorZ } = applyGarden(t, g);
+    const lip = floorZ + g.depthM + g.bermM;
+    const { fill } = priorityFlood(terrain, edgeMask(60, 60));
+    for (let i = 0; i < mask.length; i++) if (mask[i]) assert.ok(Math.abs(fill[i] - lip) < 1e-9, `pond fills to the lip (slope ${sx},${sy})`);
+    let notch = 0;
+    for (let i = 0; i < mask.length; i++) {
+      if (!bermMask[i]) continue;
+      if (Math.abs(terrain.z[i] - lip) < 1e-12) notch++;
+      else assert.ok(terrain.z[i] >= lip + BERM_CREST_M - 1e-12);
+    }
+    assert.ok(notch >= 1 && notch <= 8, `a narrow notch (${notch} cells)`);
+  }
+});

@@ -25,6 +25,12 @@ export const FENCE_BUFFER_M = 0.5;
 export const SEPTIC_DOWNHILL_M = 10 * 0.3048;
 export const SEPTIC_UPHILL_M = 50 * 0.3048;
 export const BERM_WIDTH_M = 0.6;
+/**
+ * Berm crest above the overflow notch (m). 5 mm is invisible on a yard but
+ * far above priority-flood's 1e-6 m per-cell flat increments, so ties never
+ * send uphill water along the crest past the pond.
+ */
+export const BERM_CREST_M = 0.005;
 /** Within this height of the septic system's lowest point counts as level (downhill buffer). */
 export const SEPTIC_LEVEL_TOL_M = 0.05;
 
@@ -156,13 +162,14 @@ export function applyGarden(terrain, g) {
   const mask = gardenCells(terrain, g);
   const bermMask = new Uint8Array(nx * ny);
   let rimMin = Infinity;
+  let rimCell = -1;
   for (let y = 0; y < ny; y++) {
     for (let x = 0; x < nx; x++) {
       const i = y * nx + x;
       if (!mask[i]) continue;
       const rim = x === 0 || y === 0 || x === nx - 1 || y === ny - 1
         || !mask[i - 1] || !mask[i + 1] || !mask[i - nx] || !mask[i + nx];
-      if (rim && terrain.z[i] < rimMin) rimMin = terrain.z[i];
+      if (rim && terrain.z[i] < rimMin) { rimMin = terrain.z[i]; rimCell = i; }
     }
   }
   if (rimMin === Infinity) return { terrain: out, mask, bermMask, floorZ: NaN };
@@ -190,6 +197,36 @@ export function applyGarden(terrain, g) {
       }
     }
   }
-  for (let i = 0; i < z.length; i++) if (bermMask[i] && z[i] < bermTop) z[i] = bermTop;
+  // Overflow notch: a one-cell channel at bermTop from the lowest rim cell
+  // through the berm cell on the lowest natural ground and out the far side
+  // of the berm (where a real garden's overflow goes). The rest of the crest
+  // sits BERM_CREST_M higher. A crest exactly at the lip would be a flat at
+  // spill level, and priority-flood routes water arriving from uphill along
+  // that flat and round the garden instead of into it.
+  const notch = new Uint8Array(nx * ny);
+  let low = -1;
+  for (let i = 0; i < z.length; i++) if (bermMask[i] && (low < 0 || z[i] < z[low])) low = i;
+  if (low >= 0) {
+    const x0 = rimCell % nx;
+    const y0 = (rimCell - x0) / nx;
+    const ddx = (low % nx) - x0;
+    const ddy = Math.floor(low / nx) - y0;
+    const steps = Math.max(Math.abs(ddx), Math.abs(ddy), 1);
+    // 8-connected walk (DDA) along the ray until it leaves the berm
+    for (let k = 1; k <= steps + 2 * R + 2; k++) {
+      const xx = Math.round(x0 + (ddx * k) / steps);
+      const yy = Math.round(y0 + (ddy * k) / steps);
+      if (xx < 0 || yy < 0 || xx >= nx || yy >= ny) break;
+      const j = yy * nx + xx;
+      if (mask[j]) continue;
+      if (!bermMask[j]) { if (k > steps) break; continue; }
+      notch[j] = 1;
+    }
+  }
+  for (let i = 0; i < z.length; i++) {
+    if (!bermMask[i]) continue;
+    const top = notch[i] ? bermTop : bermTop + BERM_CREST_M;
+    if (z[i] < top) z[i] = top;
+  }
   return { terrain: out, mask, bermMask, floorZ };
 }

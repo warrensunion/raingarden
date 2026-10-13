@@ -13,11 +13,17 @@
  *   out {type:'frame', id, t, depth: Float32Array}  (depth.buffer transferred)
  *   out {type:'done', id, result: {ledger, drainH, drained, peakStoredL, closure}}
  *   out {type:'error', id, error}
- *   in  {type:'optimize', id, params}  -> stub until Task 6 (garden optimizer)
+ *   in  {type:'optimize', id, params}  (garden optimizer, src/garden/optimizer.js)
+ *   out {type:'try', id, i, garden, outAfterL, drainH, accepted, best}  (<= 20/s, plain objects)
+ *   out {type:'done', id, result}  (optimize's return value)
  */
 import { createSim, runStorm } from './sim.js';
 import { SOILS } from './infiltration.js';
 import { hyetograph, fromHourly } from './storm.js';
+import { optimize } from '../garden/optimizer.js';
+
+/** Minimum gap between posted optimizer tries (ms): <= 20 per second. */
+const TRY_GAP_MS = 50;
 
 function resolveSoil(soil) {
   if (typeof soil === 'string') {
@@ -74,17 +80,55 @@ function runJob(id, params, post) {
 }
 
 /**
+ * Optimizer job. The UI animates the tries, but a fast desktop can make a
+ * hundred a second, so posting is throttled to 20/s; every try carries only
+ * small plain objects (no grids). The final answer always arrives in 'done'.
+ */
+function optimizeJob(id, params, post, now) {
+  if (!params || !params.terrain) throw new Error('params.terrain missing');
+  const stepS = params.stepS || 300;
+  const mm = resolveRain(params, stepS);
+  let lastPost = -Infinity;
+  const result = optimize({
+    terrain: params.terrain,
+    forbidden: params.forbidden,
+    site: params.site,
+    simParams: {
+      soil: resolveSoil(params.soil),
+      Se: params.Se,
+      imperv: params.imperv,
+      outlet: params.outlet,
+      roof: params.roof,
+      manningN: params.manningN,
+    },
+    storm: { mm, stepS },
+    limits: params.limits,
+    prior: params.prior,
+    prices: params.prices,
+    iters: params.iters,
+    seed: params.seed,
+    onTry: (t) => {
+      const tNow = now();
+      if (tNow - lastPost < TRY_GAP_MS) return;
+      lastPost = tNow;
+      post({ type: 'try', id, ...t });
+    },
+  });
+  post({ type: 'done', id, result });
+}
+
+/**
  * Handle one message. `post(message, transferList?)` sends a reply.
  * @param {{type:string, id:any, params:object}} msg
  * @param {(m:object, transfer?:ArrayBuffer[]) => void} post
+ * @param {() => number} [now] clock in ms (tests pass a fake one)
  */
-export function handle(msg, post) {
+export function handle(msg, post, now = Date.now) {
   const id = msg && msg.id;
   try {
     if (msg.type === 'run') runJob(id, msg.params, post);
-    else if (msg.type === 'optimize') {
-      post({ type: 'error', id, error: 'optimize not implemented yet (Task 6)' });
-    } else post({ type: 'error', id, error: `unknown message type ${msg.type}` });
+    else if (msg.type === 'optimize') optimizeJob(id, msg.params, post, now);
+    else post({ type: 'error', id, error: `unknown message type ${msg.type}` });
   } catch (err) {
     post({ type: 'error', id, error: String((err && err.message) || err) });
   }
