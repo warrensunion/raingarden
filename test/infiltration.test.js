@@ -7,6 +7,9 @@ import {
 // Chow, Maidment & Mays (1988) Example 4.3.1 uses its own inputs:
 // psi = 16.7 cm, K = 0.65 cm/h, thetaE = 0.486, Se = 0.3 (dTheta = 0.340).
 // Published answers at t = 1 h: F = 3.17 cm, f = 1.81 cm/h.
+// psi is 167 mm here, not SOILS.siltLoam's 166.8 mm: the book rounds psi to
+// 16.7 cm (psi*dTheta = 5.68 cm) and its answers follow that rounding, so the
+// test uses the example's own inputs to compare like with like.
 const CHOW_431 = { name: 'silt loam (Chow Ex. 4.3.1)', porosity: 0.501, thetaE: 0.486, psiMm: 167, kMmH: 6.5 };
 
 test('Green-Ampt matches Chow Example 4.3.1', () => {

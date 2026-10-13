@@ -127,3 +127,21 @@ All of these come from `C:\Users\Warren\Downloads\raingarden\docs\research\hydro
    - `priorityFlood` also returns `fill`.
 4. **Hourly Type IA flattens the peak.** The real peak is between 7.5 and 8 h; hourly interpolation spreads it over 7–8 h, so peak intensity is understated by about 1.5×. The half-hour table is available in the research file if Task 6 wants sharper peaks.
 5. **Physical simplification:** routing within a step is instantaneous, and there is no ponding on slopes. This is fine for yard scale at 5-minute steps. Display depth on slopes is a Manning estimate, not a simulated state.
+
+## Fix round 1 (task review)
+
+I wrote the new tests first and ran them. The two behaviour tests (1 and 3) failed for the expected reasons. The tests that only strengthen existing coverage (2 and 4) passed straight away against the existing code.
+
+| # | What changed | RED → GREEN |
+|---|---|---|
+| 1 (Important) | **Bug:** a garden inside a hollow never drained its amended-soil store once the hollow was dry. Lake cells only called `infiltrate` when water arrived, and `settleLake` only touched submerged cells. **Fix:** at the end of `settleLake`, each lake cell with `gCap > 0` that has not been processed this step now gets an `infiltrate(S, c, 0, dt)` call. Cost is O(lake cells). This drains the store into the native soil and moves no surface water, so the ledger is unchanged. New test: `a garden in a hollow drains its store into native soil once the hollow is dry` (1-cell 2 cm pit, clay, 0.3 m store, 72 dry steps after the pit empties). | RED: `F 0.02060470204375311 -> 0.02060470204375311` (no drainage). GREEN: F rises; closure < 1e-9. |
+| 2 | `runStorm` JSDoc now states that `drainH` is Infinity (with `drained: false`) when ponds are not losing water: impervious ground, a no-outlet sink, or `tailH` 0 with water still standing. The clay-bowl test now asserts `drained === false` and `drainH > 48` (finite, extrapolated). New tests: a loam bowl with `tailH` 72 really drains (`drained: true`, 0 < drainH ≤ 72), and an impervious no-outlet pond gives `drainH === Infinity`. | Passed on first run; these only strengthen coverage. |
+| 3 | `createSim` throws `RangeError` when `roof.cell` is not an integer in [0, n). This check applies even when the roof area is 0. New test covers -1, n and 2.5. | RED: `Missing expected exception (RangeError)`. GREEN. |
+| 4 | Replaced the vague "nested pits" test with `two pits in series` (13×3 profile, outlet at (0,1)). It asserts exactly 2 lakes with lips at 0.3 and 0.5, and that following `dir` from the upper lake's `outCell` enters the lower lake. New sim test `two lakes in series on impervious ground hold exactly both lip volumes`: stored = 900 L (lower 3 × 0.2 m³ plus upper 3 × 0.1 m³), out = rain − 900 L, infiltrated = 0, closure < 1e-12. | Passed on first run; the existing code already handled it. |
+| 5 | Added a comment on the Chow test explaining that ψ = 167 mm is the book's own rounding (16.7 cm, ψΔθ = 5.68 cm), which its published answers follow. That is why the test does not use `SOILS.siltLoam`'s 166.8 mm. | n/a |
+
+**Command:** `node --test test/sim.test.js test/flood.test.js test/infiltration.test.js`
+
+**Output:** `ℹ tests 25 / ℹ pass 25 / ℹ fail 0`
+
+**Full suite (`npm test`):** `ℹ tests 43 / ℹ pass 43 / ℹ fail 0`

@@ -131,10 +131,85 @@ test('drainH', () => {
     terrain, soil: SOILS.clay, imperv: allZero(441), outlet: edgeMask(21, 21),
     roof: { areaM2: 0, cell: 0 }, garden: null,
   });
+  // Clay (K 0.3 mm/h) cannot empty this bowl in 48 h: drainH is then
+  // extrapolated from the last loss rate and flagged drained: false.
   const res = runStorm(sim, hyetograph(40, 'II', 24, 300), 300, { tailH: 48 });
   assert.ok(res.peakStoredL > 0);
-  assert.ok(res.drainH > 0 && Number.isFinite(res.drainH), `drainH ${res.drainH}`);
+  assert.equal(res.drained, false);
+  assert.ok(res.drainH > 48 && Number.isFinite(res.drainH), `drainH ${res.drainH}`);
   assert.ok(sim.closure() < 1e-9);
+});
+
+test('drainH: a loam bowl really drains inside the tail', () => {
+  const terrain = make(21, 21, 0.5, (x, y) => 0.01 * ((x - 10) ** 2 + (y - 10) ** 2));
+  const sim = createSim({
+    terrain, soil: SOILS.loam, imperv: allZero(441), outlet: edgeMask(21, 21),
+    roof: { areaM2: 50, cell: 220 }, garden: null,
+  });
+  const res = runStorm(sim, hyetograph(40, 'IA', 24, 300), 300, { tailH: 72 });
+  assert.equal(res.drained, true);
+  assert.ok(res.drainH > 0 && res.drainH <= 72, `drainH ${res.drainH}`);
+});
+
+test('drainH is Infinity when a pond can never drain (impervious, no outlet)', () => {
+  const terrain = make(8, 8, 1, (x, y) => 0.01 * (x + y));
+  const sim = createSim({
+    terrain, soil: SOILS.loam, imperv: new Uint8Array(64).fill(1), outlet: allZero(64),
+    roof: { areaM2: 0, cell: 0 }, garden: null,
+  });
+  const res = runStorm(sim, hyetograph(10, 'uniform', 1, 300), 300, { tailH: 1 });
+  assert.equal(res.drained, false);
+  assert.equal(res.drainH, Infinity);
+  assert.ok(sim.closure() < 1e-12);
+});
+
+test('a garden in a hollow drains its store into native soil once the hollow is dry', () => {
+  // One-cell pit (2 cm) on a gentle loam slope, with a deep amended layer.
+  const terrain = make(9, 9, 0.5, (x) => -0.01 * x);
+  const g = 4 * 9 + 4;
+  terrain.z[g] -= 0.02;
+  const mask = new Uint8Array(81);
+  mask[g] = 1;
+  const sim = createSim({
+    terrain, soil: SOILS.clay, imperv: allZero(81), outlet: edgeMask(9, 9),
+    roof: { areaM2: 4, cell: g }, garden: { mask, storageM: 0.3 },
+  });
+  assert.ok(sim.lakeCount >= 1);
+  for (const mm of hyetograph(20, 'uniform', 2, 300)) sim.step(mm, 300);
+  let k = 0;
+  while (sim.pondedM3() > 0 && k++ < 2000) sim.step(0, 300);
+  assert.equal(sim.pondedM3(), 0, 'pit dried');
+  const F0 = sim.infiltrationM[g];
+  for (let s = 0; s < 72; s++) sim.step(0, 300);
+  assert.ok(sim.infiltrationM[g] > F0 + 1e-5, `F ${F0} -> ${sim.infiltrationM[g]}`);
+  assert.ok(sim.closure() < 1e-9);
+});
+
+test('two lakes in series on impervious ground hold exactly both lip volumes', () => {
+  const SERIES = [0, 0.3, 0.1, 0.5, 0.4, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4];
+  const terrain = make(13, 3, 1, (x) => SERIES[x]);
+  const outlet = allZero(39);
+  outlet[1 * 13 + 0] = 1;
+  const sim = createSim({
+    terrain, soil: SOILS.loam, imperv: new Uint8Array(39).fill(1), outlet,
+    roof: { areaM2: 0, cell: 0 }, garden: null,
+  });
+  assert.equal(sim.lakeCount, 2);
+  const res = runStorm(sim, hyetograph(100, 'uniform', 1, 300), 300, { tailH: 0 });
+  // lower: 3 cells x 0.2 m; upper: 3 cells x 0.1 m (cell area 1 m2)
+  assert.ok(Math.abs(res.ledger.storedL - 900) < 1e-6, `stored ${res.ledger.storedL}`);
+  assert.ok(Math.abs(res.ledger.outL - (res.ledger.rainL - 900)) < 1e-6);
+  assert.equal(res.ledger.infiltratedL, 0);
+  assert.ok(sim.closure() < 1e-12);
+});
+
+test('roof.cell out of range throws RangeError', () => {
+  const terrain = make(4, 4, 1, () => 0);
+  for (const cell of [-1, 16, 2.5]) {
+    assert.throws(() => createSim({
+      terrain, soil: SOILS.loam, outlet: edgeMask(4, 4), roof: { areaM2: 10, cell },
+    }), RangeError);
+  }
 });
 
 test('flat yard: no NaN, water leaves or ponds, closure holds', () => {

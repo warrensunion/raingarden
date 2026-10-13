@@ -70,12 +70,31 @@ test('flat yard', () => {
   assert.equal(lakes(t, pf.fill, pf).list.length, 0);
 });
 
-test('two nested pits: lower lake spills into the pit, no NaN', () => {
-  const t = make(12, 3, 1, (x) => [1, 0.5, 0.8, 0.9, 0.2, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5][x]);
-  const outlet = new Uint8Array(36);
-  outlet[1 * 12 + 0] = 1;
+/** Two pits in series: upper (x=4, lip 0.5) spills into lower (x=2, lip 0.3), which drains to the outlet at (0,1). */
+const SERIES = [0, 0.3, 0.1, 0.5, 0.4, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4];
+
+test('two pits in series: two lakes, upper spills into lower', () => {
+  const t = make(13, 3, 1, (x) => SERIES[x]);
+  const outlet = new Uint8Array(39);
+  outlet[1 * 13 + 0] = 1;
   const pf = priorityFlood(t, outlet);
   const L = lakes(t, pf.fill, pf);
+  assert.equal(L.list.length, 2);
   for (const lk of L.list) assert.ok(Number.isFinite(lk.spill));
-  assert.ok(L.list.length >= 1);
+  const lower = L.id[1 * 13 + 2];
+  const upper = L.id[1 * 13 + 4];
+  assert.ok(lower >= 0 && upper >= 0 && lower !== upper);
+  assert.ok(Math.abs(L.list[lower].spill - 0.3) < 1e-12);
+  assert.ok(Math.abs(L.list[upper].spill - 0.5) < 1e-12);
+  // Follow dir from the upper lake's outCell: it must enter the lower lake.
+  let i = L.list[upper].outCell;
+  let hit = false;
+  for (let k = 0; k < 39 && i >= 0; k++) {
+    if (L.id[i] === lower) { hit = true; break; }
+    const d = pf.dir[i];
+    if (d < 0) break;
+    i += DIRS[d][1] * 13 + DIRS[d][0];
+  }
+  assert.ok(hit, 'upper lake spill reaches the lower lake');
+  assert.ok(L.list[lower].outCell >= 0 && L.id[L.list[lower].outCell] === -1);
 });

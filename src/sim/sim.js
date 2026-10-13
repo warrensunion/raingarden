@@ -91,6 +91,13 @@ function settleLake(S, l, dt) {
     V -= took;
     if (V < 0) V = 0;
   }
+  // Garden cells in a hollow that got no surface water this step still
+  // drain their amended layer into the native soil (O(lake cells)).
+  const { gCap } = S;
+  for (let k = lakeStart[l], e = lakeStart[l + 1]; k < e; k++) {
+    const c = lakeCells[k];
+    if (gCap[c] > 0 && stamp[c] !== S.stepId) S.infV += infiltrate(S, c, 0, dt) * area;
+  }
   let spill = 0;
   const cap = S.lakeVspill[l];
   if (V > cap) { spill = V - cap; V = cap; }
@@ -182,6 +189,12 @@ export function createSim(p) {
   const manningN = p.manningN ?? 0.24;
   const roof = p.roof || { areaM2: 0, cell: 0 };
   const garden = p.garden || null;
+
+  // An out-of-range downspout index would drop roof water outside the
+  // ledger and silently break closure, so refuse it up front.
+  if (!(Number.isInteger(roof.cell) && roof.cell >= 0 && roof.cell < n)) {
+    throw new RangeError(`roof.cell ${roof.cell} is outside the ${nx}x${ny} grid`);
+  }
 
   const pf = priorityFlood(terrain, p.outlet);
   const { dir, order } = pf;
@@ -313,6 +326,10 @@ export function createSim(p) {
  * @returns {{ledger:object, drainH:number, drained:boolean, peakStoredL:number, frames?:Array}}
  *   drainH: hours after the rain stops until ponds hold < 1 L. If the tail
  *   ends first it is extrapolated from the last loss rate (drained=false).
+ *   drainH is Infinity (drained=false) when ponds are not losing water at the
+ *   end of the run: water held on impervious ground, a no-outlet sink on
+ *   impervious cells, or tailH 0 with a pond still standing. Callers must
+ *   treat Infinity as a valid "never drains" answer, not an error.
  */
 export function runStorm(sim, mmSteps, stepS, opts = {}) {
   const tailH = opts.tailH ?? 48;
