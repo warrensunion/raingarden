@@ -101,3 +101,73 @@ Tests:
    - Real Depth Anything errors are not exactly affine (especially wall vs ground), so the wall closed form may be less exact on real photos than in the synthetic tests.
    - `depth.js` imports `onnxruntime-web/webgpu` or `onnxruntime-web/wasm` (the smaller WASM-only build) and sets `wasmPaths = '/ort/'`. Under a non-root Vite `base`, those absolute `/models/` and `/ort/` paths would need `import.meta.env.BASE_URL`.
 5. A `fetch-models` npm script and DECISIONS.md lines were not added (to avoid conflicts). Suggested DECISIONS line: "Depth shift (affine t) is unobservable from planarity; fixed by gravity + wall taps, else a 1.4 m camera-height prior with a 1.2-1.6 m band."
+
+---
+
+# Fix round 1
+
+Commits: f3d0f97 (band, notes, mask, saddle, solve, package.json), then the worker and browser-check commit (see `git log`). Points 1 and 5 of the concerns above are superseded by what follows.
+
+## Changes
+
+1. **Level-assumed band** is now `[0, max(|slope| + 3, 12)]` pp, per the ruling.
+   - TDD: the old level-assumed test was updated to assert the ruling. A new test covers a 5 % yard with collinear wall taps, which gives `source: 'level-assumed'`, a band containing 5, and a "wall unusable" note. RED (3 failing: high 3.0, band 0..3.0, no mask) → GREEN.
+2. **Missing-model errors are now clear.** `src/depth/models.js` is the single source of the model files, pinned sizes and SHA-256 values, plus `SIZE`. `scripts/fetch-models.mjs` imports the pins from it, and only runs `main()` when invoked as a script.
+   - `checkModelResponse()` rejects `!ok`, `content-type: text/html` (an SPA fallback page), and any byte count other than the pinned one, with `err.code = 'model-missing'`.
+   - Session and inference failures get `err.code = 'backend'`. When WebGPU fails and WASM is tried next, the message lists each backend's error.
+   - Tests: `test/models.test.js` (5), including "fetch-models pins equal the browser pins". These were written together with `models.js`, not strictly test-first.
+3. **Inference runs in a worker, with a per-backend input size.**
+   - `SIZE = { webgpu: 518, wasm: 308 }`.
+   - `src/depth/depth-worker.js` is a module Worker (`new Worker(new URL('./depth-worker.js', import.meta.url), { type: 'module' })`). Its protocol is `load` / `progress` / `ready` / `estimate` / `result` / `error`. The ImageBitmap is transferred in and the depth buffer is transferred out.
+   - `depth.js` keeps `loadDepth({ onProgress }) → { estimate, backend }` and adds `size`, `dispose` and an optional `backend` force (for testing).
+   - Multiple `onProgress` listeners are supported, one shared load. Concurrent `estimate()` calls are serialised through a promise queue. A failed load can be retried.
+4. **Minor fixes:**
+   - `terrain.mask` (a Uint8Array of the in-yard cells) is returned, with a test.
+   - Wall taps are dropped with a "wall unusable: …" note when they are collinear (minor/major spread < 2 %), when the plane is singular, when there is no depth gradient, or when |g| ≈ 0.
+   - Contour saddle test: 2×2 `[1,0;0,1]` at 0.5 gives two segments at the edge midpoints. It passed immediately, because the code was already right.
+   - `fetch-models` hashes each ORT file in `node_modules` before copying it, so a mismatched file is never copied.
+   - `manualTerrain`'s `solve` is no longer exported.
+5. **package.json:** `"test": "node --test \"test/**/*.test.js\""` and `"fetch-models": "node scripts/fetch-models.mjs"`. `npm test` now runs 31 tests and all pass. `npm run fetch-models` prints "ok: 2 model files and 4 ORT 1.22.0 runtime files verified".
+
+## Real browser check (Playwright Chromium, headed, `--enable-unsafe-webgpu --use-angle=d3d11`)
+
+Commands: `npx vite --port 5199 --strictPort`, then `node dev/run-depth-check.mjs` and `node dev/run-depth-check.mjs "http://localhost:5199/dev/depth.html?backend=wasm" docs/reports/depth-shots/demo-yard-wasm`. The photo is `dev/demo-yard.png` (1536×1024, the same blob as `art-src/gen/demo-yard.png` on main).
+
+The check found two real bugs, both now fixed:
+
+- **A `/ort/` directory as `wasmPaths`.** With a directory, ORT does `import('/ort/ort-wasm-simd-threaded.mjs')`, and the Vite dev server refuses to import files from `public/` ("Failed to fetch dynamically imported module …/ort/ort-wasm-simd-threaded.mjs?import"). The fix is `wasmPaths = { wasm: '/ort/ort-wasm-simd-threaded.jsep.wasm' }`, so the .mjs glue comes from the bundle.
+- **`onnxruntime-web/wasm` does not inline its glue.** Its bundle imports `ort-wasm-simd-threaded.mjs` next to itself, which broke under Vite's dep pre-bundling (`/node_modules/.vite/deps/ort-wasm-simd-threaded.mjs`). The worker now uses the `onnxruntime-web/webgpu` build, which inlines its glue, for both execution providers.
+  - **Cost:** non-WebGPU devices download the 22 MB JSEP .wasm instead of the 11 MB plain one.
+  - **Side effect:** `public/ort/ort-wasm-simd-threaded.{wasm,mjs}` and the `.jsep.mjs` are no longer used at runtime. They are still fetched and pinned, and can be dropped later.
+
+Final run (heavily loaded laptop; the load time includes compiling the WebGPU shaders):
+
+| backend | input | load | estimate (worker) | rAF frames during estimate | output | inverse depth (bottom row mean / top row mean) |
+|---|---|---|---|---|---|---|
+| webgpu | 518 | 17.1 s | 3.88 s (3.87 s) | 532 | 518×518 float32, 0..7.98 | 5.98 / 0.82 (near > far, as expected) |
+| wasm (forced) | 308 | 6.9 s | 6.48 s (6.48 s) | 923 | 308×308 float32, 0..5.90 | 4.84 / 0.66 |
+
+The main thread kept painting the whole time; the frame counts above are the evidence. The first-ever WebGPU run took 41.9 s to load and 8.8 s to estimate, with a cold cache and shader compile.
+
+Shots:
+
+- `docs/reports/depth-shots/demo-yard-depth.png` (WebGPU depth map)
+- `demo-yard-wasm-depth.png`
+- `demo-yard-page.jpg` and `demo-yard-wasm-page.jpg` (page with the log)
+
+The depth maps look right: the house wall and downspout are nearest, the lawn grades smoothly into the distance, and the trees and sky are farthest.
+
+**Heightfield on the real depth** (no gravity in a desktop page; lawn polygon; a 1 m line guessed on the lawn): level-assumed reads 1.2 %, band 0–12. With three wall taps (source `wall`) it reads 13.9 %, band 5.6–22.1 (WebGPU), or 20.3 % (WASM). The note "no shift puts the camera at the assumed height" shows the guessed 1 m line is too long for this photo. Offline, with 0.5 m, the camera comes out at 1.40 m and the yard at 27.6 m². This confirms the earlier concern: the wall-only route, with derived gravity and a height prior, is poorly conditioned on real photos, and gravity from the sensors is needed.
+
+That run also found a third bug:
+
+- **Bug:** a scale line the depth disagrees with made the height solve push the shift to the horizon limit. The yard became about 2.4e10 m² and was clipped.
+- **Fix:** shifts now start at 0.1 × the inverse-depth range above the horizon limit, so the yard's far edge is at most ~11× as far as its near edge. The polygon vertices are also included in the limit. A "no shift" result now sets `manualSuggested`.
+- **Regression test:** it uses the real depth, `test/fixtures/demo-yard-depth-128.f32` (64 KB, 128×128 nearest-sampled from the WebGPU output). RED: "yard wider/deeper than 80 m, clipped". GREEN: area 340 m², not clipped.
+
+## Remaining concerns
+
+- **Production build (not checked):** it was not run. `vite build` with a worker that does dynamic `import()` needs `worker: { format: 'es' }` in `vite.config.js`, and there is no Vite config on main yet.
+- **Inline glue may not survive a build:** whether ORT's inlined glue holds up under the production bundler is also unverified.
+- **Pins still name unused runtime files:** `fetch-models` still pins the plain WASM runtime files that the app no longer loads.
+- **Unrelated 404:** one 404 appears in the page console. It is most likely `/favicon.ico`.

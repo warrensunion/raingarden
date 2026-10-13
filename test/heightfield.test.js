@@ -222,3 +222,22 @@ test('a tiny yard polygon stays finite and widens the band', () => {
   assert.ok(allFinite(deg.terrain));
   assert.ok(deg.confidence.manualSuggested);
 });
+
+test('real depth (demo yard, WebGPU run) with a too-long scale line: yard stays bounded, not stretched to the horizon', async () => {
+  // test/fixtures/demo-yard-depth-128.f32: Depth Anything V2 Small output for
+  // dev/demo-yard.png (1536x1024), 518 input, nearest-sampled to 128x128.
+  const { readFileSync } = await import('node:fs');
+  const buf = readFileSync(new URL('./fixtures/demo-yard-depth-128.f32', import.meta.url));
+  const data = new Float32Array(buf.buffer, buf.byteOffset, buf.length / 4);
+  const depth = { w: 128, h: 128, data, aspect: 1.5 };
+  const yard = [[0.24, 0.56], [0.6, 0.5], [0.97, 0.62], [0.98, 0.95], [0.4, 0.95], [0.22, 0.72]];
+  for (const wallPts of [null, [[0.04, 0.3], [0.08, 0.62], [0.02, 0.55]]]) {
+    const r = toHeightfield({ depth, yard, wallPts, scale: { a: [0.5, 0.8], b: [0.6, 0.8], meters: 1.5 }, n: 64 });
+    const notes = r.confidence.notes.join('; ');
+    assert.ok(allFinite(r.terrain));
+    assert.ok(r.confidence.notes.some((s) => /no shift/.test(s)), notes);
+    assert.ok(!/clipped/.test(notes), notes);
+    assert.ok(r.meta.yardAreaM2 < 6400, `area ${r.meta.yardAreaM2}`);
+    assert.ok(r.confidence.manualSuggested);
+  }
+});

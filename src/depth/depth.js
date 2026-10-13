@@ -1,141 +1,145 @@
 /**
- * Depth Anything V2 Small in the browser, via onnxruntime-web (browser only).
+ * Depth Anything V2 Small in the browser: the main-thread face of
+ * depth-worker.js (browser only).
  *
- * Why this file is tiny and lazy: the model is 27-50 MB and ORT is ~0.4 MB of
- * JS plus 11-22 MB of WASM, so nothing here may load before the user reaches
- * the photo step (the intro must paint without it). Everything is fetched from
- * our own origin (public/models/, public/ort/, put there by
- * scripts/fetch-models.mjs); the photo and its depth never leave the device.
+ * Why so thin: the model (27-50 MB) and ORT (~0.4 MB JS + 11-22 MB WASM) may
+ * not load before the user reaches the photo step, and inference must not
+ * block the main thread. So this module only creates a module Worker on the
+ * first loadDepth() call and talks to it (protocol in depth-worker.js). All
+ * files come from our own origin (public/models/, public/ort/, put there by
+ * `npm run fetch-models`); the photo and its depth never leave the device.
  *
- * Backend: WebGPU when navigator.gpu gives an adapter (onnxruntime-web/webgpu,
- * fp16 model, 50 MB), else WASM (onnxruntime-web/wasm, int8 model, 27 MB). If
- * the WebGPU session fails to build we fall back to WASM once. WASM threads
- * need cross-origin isolation (COOP/COEP headers), which a plain static host
- * does not send, so we use one thread unless crossOriginIsolated is true.
+ * Backend and size: WebGPU (fp16 model, 518 x 518 input) when available, else
+ * WASM (int8 model, 308 x 308). See models.js.
  *
- * Input: the photo is STRETCHED to 518 x 518 (see preprocess.js for why not
- * letterboxed), so normalised coords are shared: (u, v) on the photo is (u, v)
- * on the returned depth map. The photo's aspect (width / height) is returned
- * as `aspect` and must be used for back-projection (heightfield.js reads
- * depth.aspect). EXIF orientation is the caller's job: pass an ImageBitmap
- * made with createImageBitmap(blob, { imageOrientation: 'from-image' }).
- *
- * Output: { w: 518, h: 518, data: Float32Array, aspect, mapping } where data
- * is relative INVERSE depth (larger = nearer, affine-ambiguous), row-major.
- * Verified in Node by scripts/smoke-depth.mjs: input `pixel_values` float32
- * [1, 3, 518, 518], output `predicted_depth` float32 [1, 518, 518], for both
- * the int8 and the fp16 export.
+ * API (unchanged from the plan):
+ *   loadDepth({ onProgress }) -> Promise<{ estimate(source), backend, size, dispose() }>
+ *     - Every call may pass its own onProgress; all listeners get the events
+ *       of the single shared load ({ phase, loaded, total, fraction }).
+ *     - Rejects with err.code 'model-missing' (file absent, HTML from an SPA
+ *       fallback, wrong size) or 'backend' (no WebGPU/WASM session could be
+ *       built). A failed load can be retried by calling loadDepth() again.
+ *   estimate(source: ImageBitmap|HTMLCanvasElement|HTMLImageElement|OffscreenCanvas|Blob)
+ *     -> Promise<{ w, h, data: Float32Array, aspect, mapping, ms }>
+ *     - data is relative INVERSE depth (larger = nearer), row-major w x h
+ *       (518 or 308 square); aspect is the PHOTO's width / height, which
+ *       heightfield.js uses for back-projection; mapping is the stretch
+ *       mapping (normalised (u, v) are identical on photo and depth map).
+ *     - Calls are serialised: a second estimate waits for the first.
+ *     - An ImageBitmap passed in is transferred to the worker (and so
+ *       detached); pass a copy if you still need it. Other sources are copied
+ *       into a new ImageBitmap first.
+ *     - EXIF orientation is the caller's job: make the bitmap with
+ *       createImageBitmap(blob, { imageOrientation: 'from-image' }).
  */
 
-import { preprocess, MODEL_SIZE } from './preprocess.js';
-
-const MODEL_BASE = '/models/depth-anything-v2-small/';
-const MODELS = { webgpu: 'model_fp16.onnx', wasm: 'model_quantized.onnx' };
-
+let worker = null;
 let loading = null;
+const listeners = new Set();
+let queue = Promise.resolve();
+let nextId = 1;
+const pending = new Map();
 
-/**
- * @param {{ onProgress?: (p: { phase: 'download'|'init', loaded: number, total: number, fraction: number }) => void }} [opts]
- * @returns {Promise<{ estimate: (source: ImageBitmap|HTMLCanvasElement|OffscreenCanvas|HTMLImageElement) => Promise<{ w:number, h:number, data:Float32Array, aspect:number, mapping:object }>, backend: 'webgpu'|'wasm', dispose: () => Promise<void> }>}
- */
-export function loadDepth({ onProgress } = {}) {
-  if (!loading) {
-    loading = load(onProgress || (() => {})).catch((err) => {
-      loading = null; // allow a retry after a failed load
-      throw err;
-    });
-  }
-  return loading;
+function codeError(code, message) {
+  const err = new Error(message);
+  err.code = code;
+  return err;
 }
 
-async function hasWebGpu() {
-  try {
-    if (typeof navigator === 'undefined' || !navigator.gpu) return false;
-    return !!(await navigator.gpu.requestAdapter());
-  } catch {
-    return false;
-  }
-}
-
-async function load(onProgress) {
-  const order = (await hasWebGpu()) ? ['webgpu', 'wasm'] : ['wasm'];
-  let lastErr = null;
-  for (const backend of order) {
-    try {
-      const ort = backend === 'webgpu' ? await import('onnxruntime-web/webgpu') : await import('onnxruntime-web/wasm');
-      ort.env.wasm.wasmPaths = '/ort/';
-      const isolated = typeof crossOriginIsolated !== 'undefined' && crossOriginIsolated;
-      const cores = (typeof navigator !== 'undefined' && navigator.hardwareConcurrency) || 1;
-      ort.env.wasm.numThreads = isolated ? Math.min(4, cores) : 1;
-      const bytes = await fetchWithProgress(MODEL_BASE + MODELS[backend], onProgress);
-      onProgress({ phase: 'init', loaded: 0, total: 1, fraction: 1 });
-      const session = await ort.InferenceSession.create(bytes, {
-        executionProviders: [backend],
-        graphOptimizationLevel: 'all',
-      });
-      return { backend, estimate: makeEstimate(ort, session), dispose: () => session.release() };
-    } catch (err) {
-      lastErr = err;
+function startWorker() {
+  worker = new Worker(new URL('./depth-worker.js', import.meta.url), { type: 'module' });
+  worker.onmessage = (e) => {
+    const msg = e.data || {};
+    if (msg.type === 'progress') {
+      for (const fn of listeners) {
+        try {
+          fn({ phase: msg.phase, loaded: msg.loaded, total: msg.total, fraction: msg.fraction });
+        } catch {
+          /* a listener's bug must not break the load */
+        }
+      }
+    } else if ((msg.type === 'result' || msg.type === 'error') && msg.id != null && pending.has(msg.id)) {
+      const p = pending.get(msg.id);
+      pending.delete(msg.id);
+      if (msg.type === 'result') p.resolve(msg);
+      else p.reject(codeError(msg.code, msg.message));
+    } else if (msg.type === 'ready' || (msg.type === 'error' && msg.id == null)) {
+      const p = pending.get('load');
+      pending.delete('load');
+      if (!p) return;
+      if (msg.type === 'ready') p.resolve(msg);
+      else p.reject(codeError(msg.code, msg.message));
     }
-  }
-  throw new Error(`depth model unavailable: ${lastErr?.message || lastErr}`);
-}
-
-async function fetchWithProgress(url, onProgress) {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
-  const total = Number(res.headers.get('content-length')) || 0;
-  if (!res.body || !res.body.getReader) {
-    const buf = new Uint8Array(await res.arrayBuffer());
-    onProgress({ phase: 'download', loaded: buf.length, total: buf.length, fraction: 1 });
-    return buf;
-  }
-  const reader = res.body.getReader();
-  const chunks = [];
-  let loaded = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value);
-    loaded += value.length;
-    onProgress({ phase: 'download', loaded, total, fraction: total ? Math.min(1, loaded / total) : 0 });
-  }
-  const out = new Uint8Array(loaded);
-  let o = 0;
-  for (const c of chunks) {
-    out.set(c, o);
-    o += c.length;
-  }
-  return out;
+  };
+  worker.onerror = (e) => {
+    const err = codeError('backend', `depth worker failed: ${e.message || 'unknown error'}`);
+    for (const p of pending.values()) p.reject(err);
+    pending.clear();
+  };
 }
 
 function sourceSize(src) {
   const w = src.naturalWidth || src.videoWidth || src.width;
   const h = src.naturalHeight || src.videoHeight || src.height;
-  if (!(w > 0 && h > 0)) throw new Error('depth: source has no size');
   return [w, h];
 }
 
-function makeEstimate(ort, session) {
-  const inputName = session.inputNames[0];
-  const outputName = session.outputNames[0];
-  return async function estimate(source) {
-    const [sw, sh] = sourceSize(source);
-    const S = MODEL_SIZE;
-    // The browser's own resampler does the big downscale (and filters it).
-    const canvas = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(S, S) : Object.assign(document.createElement('canvas'), { width: S, height: S });
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(source, 0, 0, S, S);
-    const { data: rgba } = ctx.getImageData(0, 0, S, S);
-    const { tensor, dims, mapping } = preprocess(rgba, S, S, S);
-    const feeds = { [inputName]: new ort.Tensor('float32', tensor, dims) };
-    const out = await session.run(feeds);
-    const t = out[outputName];
-    const h = t.dims[t.dims.length - 2];
-    const w = t.dims[t.dims.length - 1];
-    const data = t.data instanceof Float32Array ? t.data.slice() : Float32Array.from(t.data);
-    t.dispose?.();
-    return { w, h, data, aspect: sw / sh, mapping: { ...mapping, aspect: sw / sh } };
+function makeEstimate(info) {
+  return function estimate(source) {
+    const run = async () => {
+      let bitmap = source;
+      if (typeof ImageBitmap === 'undefined' || !(source instanceof ImageBitmap)) bitmap = await createImageBitmap(source);
+      const [sw, sh] = sourceSize(bitmap);
+      if (!(sw > 0 && sh > 0)) throw codeError('backend', 'depth: source has no size');
+      if (!worker) throw codeError('backend', 'depth: disposed');
+      const id = nextId++;
+      const msg = await new Promise((resolve, reject) => {
+        pending.set(id, { resolve, reject });
+        worker.postMessage({ type: 'estimate', id, bitmap }, [bitmap]);
+      });
+      const aspect = sw / sh;
+      return {
+        w: msg.w,
+        h: msg.h,
+        data: msg.data,
+        aspect,
+        ms: msg.ms,
+        mapping: { mode: 'stretch', aspect, inputSize: info.size, toModel: (uv) => [uv[0], uv[1]], toSource: (uv) => [uv[0], uv[1]] },
+      };
+    };
+    const p = queue.then(run, run);
+    queue = p.catch(() => {});
+    return p;
   };
+}
+
+/**
+ * @param {{ onProgress?: (p: { phase: 'download'|'init', loaded: number, total: number, fraction: number }) => void,
+ *           backend?: 'webgpu'|'wasm' }} [opts] backend forces one (testing only; only the first load's choice counts)
+ */
+export function loadDepth({ onProgress, backend } = {}) {
+  if (typeof onProgress === 'function') listeners.add(onProgress);
+  if (!loading) {
+    if (!worker) startWorker();
+    loading = new Promise((resolve, reject) => {
+      pending.set('load', { resolve, reject });
+      worker.postMessage({ type: 'load', backend });
+    })
+      .then((info) => ({
+        backend: info.backend,
+        size: info.size,
+        estimate: makeEstimate(info),
+        dispose: () => {
+          worker?.terminate();
+          worker = null;
+          loading = null;
+          listeners.clear();
+        },
+      }))
+      .catch((err) => {
+        loading = null; // allow a retry
+        throw err;
+      });
+  }
+  return loading;
 }

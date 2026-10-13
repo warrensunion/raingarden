@@ -26,7 +26,8 @@
 import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { MODEL_FILES } from '../src/depth/models.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const MODEL_DIR = join(ROOT, 'public', 'models', 'depth-anything-v2-small');
@@ -34,20 +35,8 @@ const ORT_DIR = join(ROOT, 'public', 'ort');
 const ORT_DIST = join(ROOT, 'node_modules', 'onnxruntime-web', 'dist');
 
 const HF = 'https://huggingface.co/onnx-community/depth-anything-v2-small/resolve/main';
-export const MODELS = [
-  {
-    file: 'model_quantized.onnx',
-    url: `${HF}/onnx/model_quantized.onnx`,
-    bytes: 27258801,
-    sha256: 'fcf51f1b230362b28690bb9d1809bf0431f29cad20534e3f589bd7285547f20d',
-  },
-  {
-    file: 'model_fp16.onnx',
-    url: `${HF}/onnx/model_fp16.onnx`,
-    bytes: 49642442,
-    sha256: '2df6223f206b5164e21f664ace61dabeb9bb6a49b8b5a3e00510b4807d0f5b04',
-  },
-];
+// Files, sizes and hashes live in src/depth/models.js so the browser checks the same pins.
+export const MODELS = Object.values(MODEL_FILES).map((m) => ({ ...m, url: `${HF}/onnx/${m.file}` }));
 
 export const ORT_VERSION = '1.22.0';
 export const ORT_FILES = {
@@ -91,9 +80,12 @@ async function main() {
     if (!existsSync(pkgPath)) throw new Error('node_modules/onnxruntime-web is missing: run npm install first');
     const version = JSON.parse(readFileSync(pkgPath, 'utf8')).version;
     if (version !== ORT_VERSION) problems.push(`onnxruntime-web is ${version}, pinned ${ORT_VERSION}`);
-    for (const name of Object.keys(ORT_FILES)) {
+    for (const [name, pin] of Object.entries(ORT_FILES)) {
       const from = join(ORT_DIST, name);
-      if (!existsSync(from)) problems.push(`node_modules/onnxruntime-web/dist has no ${name}`);
+      // verify the source before it reaches public/: a wrong file is never served
+      const h = hashFile(from);
+      if (!h) problems.push(`node_modules/onnxruntime-web/dist has no ${name}`);
+      else if (h !== pin) problems.push(`node_modules/onnxruntime-web/dist/${name}: sha256 ${h} is not the pinned ${pin}; not copied`);
       else copyFileSync(from, join(ORT_DIR, name));
     }
   }
@@ -132,7 +124,10 @@ async function main() {
   }
 }
 
-main().catch((err) => {
-  console.error(err.message || err);
-  process.exit(1);
-});
+// Run only when invoked as a script (tests import the pins).
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  main().catch((err) => {
+    console.error(err.message || err);
+    process.exit(1);
+  });
+}

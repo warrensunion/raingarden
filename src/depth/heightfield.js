@@ -71,6 +71,7 @@
 const DEG = Math.PI / 180;
 const HEIGHT_RANGE = [1.2, 1.6]; // m, phone held at waist..eye height
 const RELIEF_CLAMP = 1; // m
+const MIN_SHIFT = 0.1; // see solveHeight: the yard spans at most ~11x in distance (horizon kept out)
 const MAX_PLAUSIBLE_SLOPE = 60; // %, ~31 deg: steeper than any lawn you would dig a rain garden in
 const MAX_EXTENT = 80; // m, a yard bigger than this is a misread horizon
 
@@ -167,6 +168,13 @@ export function toHeightfield({ depth, fovYDeg = 65, gravity = null, wallPts = n
     maxAr = Math.max(maxAr, v);
   }
   if (scaleOk) for (const r of [sa, sb]) minAr = Math.min(minAr, dot(a, r));
+  for (const p of poly) {
+    const v = dot(a, ray(p));
+    if (Number.isFinite(v)) {
+      minAr = Math.min(minAr, v);
+      maxAr = Math.max(maxAr, v);
+    }
+  }
   if (!Number.isFinite(minAr)) {
     minAr = 0;
     maxAr = 1;
@@ -212,7 +220,14 @@ export function toHeightfield({ depth, fovYDeg = 65, gravity = null, wallPts = n
   const solveHeight = (target) => {
     const steps = 241;
     const taus = [];
-    for (let i = 0; i < steps; i++) taus.push(tauMin + range * 10 ** (-4 + (8 * i) / (steps - 1)));
+    // Shifts start at MIN_SHIFT * range above the horizon limit: closer than
+    // that, the yard's far edge would be > ~11x as far as its near edge (a yard
+    // from 2 m to 22 m away is about the limit of a phone photo of one), i.e.
+    // the horizon runs through the yard. Without this floor a bad scale line
+    // (found on the real demo photo) picked a shift that put the yard's far
+    // edge kilometres away. Upper end 1e4 * range: a fronto-parallel yard.
+    const e0 = Math.log10(MIN_SHIFT);
+    for (let i = 0; i < steps; i++) taus.push(tauMin + range * 10 ** (e0 + ((4 - e0) * i) / (steps - 1)));
     const f = taus.map((t) => model(t).height - target);
     const roots = [];
     for (let i = 0; i + 1 < steps; i++) {
@@ -404,7 +419,7 @@ export function toHeightfield({ depth, fovYDeg = 65, gravity = null, wallPts = n
   if (confidence.highPct - confidence.lowPct > 8) flags.push('slope band wider than 8 pp');
   confidence.manualSuggested =
     source === 'level-assumed' || !scaleOk || yardArea < 4 || samples.length < 12 || confidence.highPct - confidence.lowPct > 8 ||
-    flags.some((f) => /degenerate|infinity|clipped/.test(f));
+    flags.some((f) => /degenerate|infinity|clipped|no shift/.test(f));
   confidence.notes = flags;
 
   return {
