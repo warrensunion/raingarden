@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   regionFromLon, round2, gravityFromOrientation, flatDepth, groundMarks, wallLine, houseMask,
   outletMask, snapCell, siteInputs, plantRows, fmtL, fmtHours, fmtNum, slopeSentence, directionWords,
-  clockLabel, rainRateAt, lerpFrames, frameIndexAt, wrapText, sparkPath, gardenDims, manualDir, polyAreaM2, clipSegment, rendererMarks, niceInterval, ledgerAt, failureWords,
+  clockLabel, rainRateAt, lerpFrames, frameIndexAt, wrapText, sparkPath, gardenDims, manualDir, polyAreaM2, clipSegment, rendererMarks, niceInterval, ledgerAt, failureWords, latestOnly, playSpan, stormPhrase, planPdfLines, PDF_TEXT_LINES,
 } from '../src/designer/model.js';
 import { toHeightfield } from '../src/depth/heightfield.js';
 import { manualTerrain } from '../src/depth/manualTerrain.js';
@@ -262,4 +262,40 @@ test('lerpFrames can fade the last frame out after a run that ended early (ponds
   assert.deepEqual([...out], [1, 2]);
   lerpFrames(frames, 5000, out, 900);
   assert.deepEqual([...out], [0, 0]);
+});
+
+test('latestOnly: only the newest request is current; stale results get cleaned up', () => {
+  const g = latestOnly();
+  const a = g.next();
+  const b = g.next();
+  assert.equal(g.isCurrent(a), false);
+  assert.equal(g.isCurrent(b), true);
+  g.cancel();
+  assert.equal(g.isCurrent(b), false);
+});
+
+test('playSpan runs past the last frame of a drained run so the end state is dry', () => {
+  const f = (t) => ({ t });
+  assert.equal(playSpan(86400, [{ frames: [f(900), f(86400)], drained: true }]), 86400 + 3600);
+  assert.equal(playSpan(86400, [{ frames: [f(900), f(200000)], drained: false }]), 200000);
+  assert.equal(playSpan(86400, [{ frames: [f(86400)], drained: true }, { frames: [f(150000)], drained: true }]), 150000 + 3600);
+  assert.equal(playSpan(86400, []), 86400);
+});
+
+test('stormPhrase never doubles parentheses', () => {
+  assert.equal(stormPhrase('Design storm (90th percentile)', 23.3), 'design storm (90th percentile, 23.3 mm)');
+  assert.equal(stormPhrase('A typical rainy day', 7.4), 'a typical rainy day (7.4 mm)');
+});
+
+test('planPdfLines keeps every source line and fits the page under the plan image', () => {
+  const lines = planPdfLines({
+    head: 'Your rain garden - 13 October 2026 - Pacific Northwest',
+    summary: '8.2 m2 garden: catches about 2,756 L of the 23.3 mm storm; 0 L still leaves the yard.',
+    safety: 'Call before you dig: BC 1 Call (bc1c.ca) in BC, Ontario One Call (ontarioonecall.ca) in Ontario, or your local service. Keep it at least 3 m from foundations and away from septic fields. Check your local bylaws. This plan is guidance, not engineering.',
+    sources: ['Sizing: WSU Extension, Rain Garden Handbook for Western Washington (2013).', 'Plants: Washington State University Extension / Washington State Department of Ecology (Pub. 13-10-027) 2013; King County, Washington.', 'Storm: Open-Meteo (open-meteo.com) archive 2016-2025: 90th-percentile wet day, the rain-garden / LID capture criterion, Type IA 24 h shape.', 'Siting: WSU 2013; Metro Vancouver 2023. Made with Raingarden.'],
+  });
+  assert.ok(lines.length <= PDF_TEXT_LINES, `${lines.length} lines`);
+  assert.ok(lines.every((l) => l.length <= 105));
+  const joined = lines.join(' ');
+  for (const w of ['Metro Vancouver 2023', 'Type IA 24 h shape', 'King County', 'guidance, not engineering']) assert.ok(joined.includes(w), w);
 });

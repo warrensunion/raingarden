@@ -6,7 +6,7 @@
 
 import { drawPlan, PLAN_W, PLAN_H, SAFETY } from '../plan-canvas.js';
 import { makePdf } from '../../plan/pdf.js';
-import { plantRows, wrapText, fmtL, fmtNum } from '../model.js';
+import { plantRows, planPdfLines, stormPhrase, fmtL, fmtNum } from '../model.js';
 import { PLANTS, SOURCES, REGIONS } from '../../data/plants.js';
 
 const SIZING_NAME = {
@@ -73,14 +73,13 @@ export default function plan(sheet, ctx) {
   async function pdfBytes() {
     const jpegBlob = await new Promise((r) => canvas.toBlob(r, 'image/jpeg', 0.9));
     const jpeg = new Uint8Array(await jpegBlob.arrayBuffer());
-    const lines = [
-      `Your rain garden - ${date} - ${region}`,
-      `${fmtNum(data.areaM2, 1)} m2 garden: catches about ${fmtL(data.capturedL)} of the ${storm.totalMm.toFixed(1)} mm storm; ${fmtL(outAfter)} still leaves the yard.`,
-      '',
-      ...wrapText(SAFETY, 92),
-      '',
-      ...sources.flatMap((s) => wrapText(s, 110)).slice(0, 6),
-    ];
+    // every source line goes into the PDF (planPdfLines drops spacers before text, never text)
+    const lines = planPdfLines({
+      head: `Your rain garden - ${date} - ${region}`,
+      summary: `${fmtNum(data.areaM2, 1)} m2 garden: catches about ${fmtL(data.capturedL)} of the ${stormPhrase(storm.label, storm.totalMm)}; ${fmtL(outAfter)} still leaves the yard.`,
+      safety: SAFETY,
+      sources,
+    });
     return makePdf({ jpeg, imgW: PLAN_W, imgH: PLAN_H, title: 'Your rain garden', lines });
   }
 

@@ -8,7 +8,7 @@
 import { applyGarden } from '../../garden/constraints.js';
 import { GARDEN_STORAGE_M } from '../../garden/optimizer.js';
 import { createPlayback } from '../playback.js';
-import { lerpFrames, fmtL, fmtNum } from '../model.js';
+import { lerpFrames, fmtL, fmtNum, playSpan } from '../model.js';
 import { easeReveal } from '../../core/ease.js';
 
 export default function compare(sheet, ctx) {
@@ -19,7 +19,8 @@ export default function compare(sheet, ctx) {
   b.innerHTML = `
     <h2 class="dz-h2">Before and after</h2>
     <p class="dz-progress-line" role="status"></p>
-    <div class="dz-big" hidden>
+    <p class="vh dz-big-say" role="status"></p>
+    <div class="dz-big" hidden aria-hidden="true">
       <div><p class="dz-big-n n-cap">0 L</p><p class="dz-big-l">captured</p></div>
       <div><p class="dz-big-n n-out">0 L</p><p class="dz-big-l">leave the yard <span class="dz-muted n-was"></span></p></div>
       <div><p class="dz-big-n n-h">0 h</p><p class="dz-big-l">water stands</p></div>
@@ -64,8 +65,7 @@ export default function compare(sheet, ctx) {
     placeSplit();
     pb && pb.seek(pb.progress);
   });
-  const onResize = () => placeSplit();
-  addEventListener('resize', onResize);
+  const offResize = ctx.observeYard(() => placeSplit());
 
   function countUp(el, to, fmt) {
     if (ctx.reducedMotion) { el.textContent = fmt(to); return; }
@@ -104,13 +104,17 @@ export default function compare(sheet, ctx) {
     big.querySelector('.n-was').textContent = `(${fmtNum(outBefore)} L before)`;
     const hFmt = (v) => (!Number.isFinite(drainH) ? 'over 48 h' : drainH > 0 && drainH < 1 ? 'under 1 h' : `${Math.round(v)} h`);
     countUp(big.querySelector('.n-h'), Number.isFinite(drainH) ? drainH : 48, hFmt);
+    // screen readers get the settled numbers once, not every count-up frame
+    setTimeout(() => {
+      if (alive) b.querySelector('.dz-big-say').textContent = `With the garden: ${fmtL(captured)} captured, ${fmtL(outAfter)} leave the yard (${fmtL(outBefore)} before), water stands ${hFmt(drainH)}.`;
+    }, ctx.reducedMotion ? 0 : 1700);
     b.querySelector('.dz-split-hint').hidden = false;
     handle.hidden = false;
     placeSplit();
     const n = ctx.terrain().nx * ctx.terrain().ny;
     const dA = new Float32Array(n);
     const dB = new Float32Array(n);
-    const spanS = Math.max(storm.mm.length * storm.stepS, bf.length ? bf[bf.length - 1].t : 0, af.length ? af[af.length - 1].t : 0);
+    const spanS = playSpan(storm.mm.length * storm.stepS, [{ frames: bf, drained: state.before.result.drained }, { frames: af, drained: state.after.result.drained }]);
     pb = createPlayback(b.querySelector('.dz-play-host'), {
       spanS, mm: storm.mm, stepS: storm.stepS, reducedMotion: ctx.reducedMotion,
       onTime(t, rate) {
@@ -133,7 +137,7 @@ export default function compare(sheet, ctx) {
   return {
     destroy() {
       alive = false;
-      removeEventListener('resize', onResize);
+      offResize();
       pb?.destroy();
       if (ctx.playback === pb) ctx.playback = null;
       handle.remove();

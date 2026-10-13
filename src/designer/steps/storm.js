@@ -7,6 +7,7 @@
 
 import { getStorms } from '../../weather/openmeteo.js';
 import { hyetograph } from '../../sim/storm.js';
+import { radioKeys } from '../radio.js';
 import { regionFromLon, round2, sparkPath, fmtNum } from '../model.js';
 
 const RICHMOND = { lat: 49.17, lon: -123.14, label: 'Richmond, BC' };
@@ -55,22 +56,24 @@ export default function storm(sheet, ctx) {
     render();
   }
 
+  function pickStorm(id) {
+    if (state.stormId !== id) ctx.resetFrom('storm');
+    state.stormId = id;
+    render();
+  }
+
   function render() {
+    // the source link sits outside the radio button: no interactive element inside role="radio"
     list.innerHTML = state.storms.map((s) => `
-      <button type="button" class="dz-card dz-storm" role="radio" data-id="${s.id}" aria-checked="${s.id === state.stormId}">
-        <span class="dz-card-name">${s.label}</span>
-        <span class="dz-storm-mm"><strong>${fmtNum(s.totalMm, 1)}</strong> mm</span>
-        <svg class="dz-spark" viewBox="0 0 120 28" preserveAspectRatio="none" aria-hidden="true"><path d="${sparkPath(s.mm, 120, 26)}" transform="translate(0 1)"/></svg>
-        <span class="dz-card-src">${s.source.text} <a href="${s.source.url}" target="_blank" rel="noopener">Data</a></span>
-      </button>`).join('');
-    for (const c of list.querySelectorAll('.dz-storm')) {
-      c.addEventListener('click', (e) => {
-        if (e.target.closest('a')) return;
-        if (state.stormId !== c.dataset.id) ctx.resetFrom('storm');
-        state.stormId = c.dataset.id;
-        render();
-      });
-    }
+      <div class="dz-storm-item">
+        <button type="button" class="dz-card dz-storm" role="radio" data-id="${s.id}" aria-checked="${s.id === state.stormId}">
+          <span class="dz-card-name">${s.label}</span>
+          <span class="dz-storm-mm"><strong>${fmtNum(s.totalMm, 1)}</strong> mm</span>
+          <svg class="dz-spark" viewBox="0 0 120 28" preserveAspectRatio="none" aria-hidden="true"><path d="${sparkPath(s.mm, 120, 26)}" transform="translate(0 1)"/></svg>
+        </button>
+        <p class="dz-card-src">${s.source.text} <a href="${s.source.url}" target="_blank" rel="noopener">Data</a></p>
+      </div>`).join('');
+    for (const c of list.querySelectorAll('.dz-storm')) c.addEventListener('click', () => pickStorm(c.dataset.id));
     sheet.setPrimary({ label: 'Run the storm', onClick: () => ctx.next() });
   }
 
@@ -92,6 +95,8 @@ export default function storm(sheet, ctx) {
     );
   });
 
+  radioKeys(list, '.dz-storm', (x) => pickStorm(x.dataset.id));
+  radioKeys(b.querySelector('.dz-region'), '[data-r]', (x) => x.click());
   b.querySelector('.dz-region').addEventListener('click', (e) => {
     const r = e.target.closest('[data-r]');
     if (!r || r.dataset.r === state.region) return;

@@ -9,6 +9,7 @@ import { layoutPlants } from '../../garden/layout.js';
 import { PLANTS, SOURCES } from '../../data/plants.js';
 import { plantRows } from '../model.js';
 import { easeUi } from '../../core/ease.js';
+import { radioKeys } from '../radio.js';
 
 const ZONES = [['wet', 'Wet', 'The bottom: fills first, drains last.'], ['middle', 'Middle', 'The sloped sides: wet, then dry.'], ['edge', 'Edge', 'The rim and berm: mostly dry.']];
 const SEASONS = [['Planting day', 0.3], ['Year 1', 0.7], ['Year 3', 1]];
@@ -69,8 +70,10 @@ export default function plant(sheet, ctx) {
     };
     anim = requestAnimationFrame(step);
   }
+  radioKeys(b.querySelector('.dz-seasons'), '[data-i]', (x) => x.click());
   b.querySelector('.dz-seasons').addEventListener('click', (e) => {
     const x = e.target.closest('[data-i]');
+    if (x) clearTimeout(timer); // the user's pick ends the timelapse
     if (x) setSeason(SEASONS[Number(x.dataset.i)][1], Number(x.dataset.i));
   });
 

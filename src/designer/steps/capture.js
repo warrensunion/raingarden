@@ -8,7 +8,7 @@
  * the next step stand in for it.
  */
 
-import { gravityFromOrientation } from '../model.js';
+import { gravityFromOrientation, latestOnly } from '../model.js';
 
 const PRIVACY = 'Your photo and its depth stay on this device. Nothing is uploaded.';
 
@@ -69,18 +69,25 @@ export default function capture(sheet, ctx) {
   const preview = b.querySelector('.dz-preview');
   const fileInput = b.querySelector('input[type=file]');
   let stream = null;
+  let gone = false;
+  // one camera request at a time: a second tap, a file, the demo or leaving the step makes the pending one stale
+  const camReq = latestOnly();
+  const stopTracks = (st) => { if (st) st.getTracks().forEach((t) => t.stop()); };
   let orient = null;
   const onOrient = (e) => { orient = { beta: e.beta, gamma: e.gamma }; };
 
   function stopCamera() {
-    if (stream) stream.getTracks().forEach((t) => t.stop());
+    camReq.cancel();
+    stopTracks(stream);
     stream = null;
+    video.srcObject = null;
     removeEventListener('deviceorientation', onOrient);
     camBox.hidden = true;
   }
 
   async function usePhoto(blob, source, gravity) {
     const bitmap = await bitmapFromBlob(blob);
+    if (gone) { bitmap.close(); return; }
     if (state.photo?.url) URL.revokeObjectURL(state.photo.url);
     state.photo = { bitmap, url: URL.createObjectURL(blob), w: bitmap.width, h: bitmap.height, source };
     state.gravity = gravity || null;
@@ -107,14 +114,21 @@ export default function capture(sheet, ctx) {
       msg.textContent = 'This browser can’t open the camera. Upload a photo or try the demo yard instead.';
       return;
     }
+    stopTracks(stream);
+    stream = null;
+    const ticket = camReq.next();
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false });
+      const got = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false });
+      if (gone || !camReq.isCurrent(ticket)) { stopTracks(got); return; } // superseded or the step closed during the prompt
+      stopTracks(stream);
+      stream = got;
       video.srcObject = stream;
       camBox.hidden = false;
       preview.hidden = true;
       await video.play().catch(() => {});
       msg.textContent = 'Hold the phone steady, then tap the shutter.';
     } catch (e) {
+      if (gone || !camReq.isCurrent(ticket)) return;
       stopCamera();
       msg.textContent = e && e.name === 'NotAllowedError'
         ? 'The camera is blocked for this site. Upload a photo or try the demo yard instead.'
@@ -131,8 +145,13 @@ export default function capture(sheet, ctx) {
     const angle = (screen.orientation && screen.orientation.angle) || 0;
     const gravity = orient ? gravityFromOrientation(orient.beta, orient.gamma, angle) : null;
     stopCamera();
-    const blob = await new Promise((r) => c.toBlob(r, 'image/jpeg', 0.92));
-    await usePhoto(blob, 'camera', gravity);
+    try {
+      const blob = await new Promise((r) => c.toBlob(r, 'image/jpeg', 0.92));
+      if (!blob) throw new Error('no image');
+      await usePhoto(blob, 'camera', gravity);
+    } catch {
+      if (!gone) msg.textContent = 'That photo could not be saved on this device. Try again, or upload a photo instead.';
+    }
   });
 
   fileInput.addEventListener('change', async () => {
@@ -161,5 +180,5 @@ export default function capture(sheet, ctx) {
     sheet.setPrimary({ label: 'Use this photo', disabled: true });
   }
 
-  return { destroy: stopCamera };
+  return { destroy() { gone = true; stopCamera(); } };
 }

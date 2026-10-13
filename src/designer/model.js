@@ -518,3 +518,60 @@ export function failureWords(reason) {
   if (/too small/.test(r)) return { say: 'The yard is too small for a garden with a berm and a 0.5 m gap from the fence.', tips: ['Outline the yard again, including all of the lawn.'] };
   return { say: 'We couldn’t find a garden that fits these limits.', tips: ['Raise the budget or the maximum area.', 'Check the yard outline.'] };
 }
+
+/**
+ * Latest-request guard for async UI (the camera prompt): each next() makes
+ * every earlier ticket stale, cancel() makes all of them stale. A result that
+ * comes back on a stale ticket must be cleaned up (e.g. its camera stopped).
+ */
+export function latestOnly() {
+  let cur = 0;
+  return {
+    next: () => ++cur,
+    isCurrent: (id) => id === cur,
+    cancel: () => { cur++; },
+  };
+}
+
+/**
+ * Playback span (s): at least the storm, and past the last frame of every
+ * run. A drained run stops sending frames once its ponds are empty; its
+ * sheet flow then fades out (lerpFrames fadeS), so the span runs an hour past
+ * that last frame and the end of playback shows the yard dry.
+ */
+export function playSpan(stormS, runs) {
+  let s = stormS;
+  for (const r of runs) {
+    const f = r.frames;
+    if (!f || !f.length) continue;
+    const last = f[f.length - 1].t;
+    s = Math.max(s, last + (r.drained ? 3600 : 0));
+  }
+  return s;
+}
+
+/** "design storm (90th percentile, 23.3 mm)": the depth joins an existing parenthesis. */
+export function stormPhrase(label, mm) {
+  const l = label.charAt(0).toLowerCase() + label.slice(1);
+  const v = `${mm.toFixed(1)} mm`;
+  return /\)$/.test(l) ? l.replace(/\)$/, `, ${v})`) : `${l} (${v})`;
+}
+
+/** Text lines the PDF writer can fit under the plan image (makePdf: 9 pt, 12 pt leading). */
+export const PDF_TEXT_LINES = 17;
+const PDF_WRAP = 105;
+
+/**
+ * The PDF's text: head, summary, the safety note and EVERY source line,
+ * wrapped to the page. Blank spacer lines go first if room is short, then the
+ * summary; the safety note and the sources are never dropped.
+ */
+export function planPdfLines({ head, summary, safety, sources }) {
+  const safe = wrapText(safety, PDF_WRAP);
+  const src = sources.flatMap((s) => wrapText(s, PDF_WRAP));
+  const sum = wrapText(summary, PDF_WRAP);
+  let lines = [head, ...sum, '', ...safe, '', ...src];
+  if (lines.length > PDF_TEXT_LINES) lines = [head, ...sum, ...safe, ...src];
+  if (lines.length > PDF_TEXT_LINES) lines = [head, ...safe, ...src];
+  return lines;
+}

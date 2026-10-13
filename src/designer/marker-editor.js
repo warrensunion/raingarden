@@ -99,9 +99,11 @@ export function createMarkerEditor(host, { photoUrl, aspect, marks, onChange }) 
       el('circle', { r: 9 * s, class: 'dz-dot' }, g);
     }
     let dragging = false;
+    let start = null;
     g.addEventListener('pointerdown', (e) => {
       e.stopPropagation();
       remember();
+      start = [...get()];
       dragging = true;
       g.setPointerCapture(e.pointerId);
       g.classList.add('is-drag');
@@ -116,10 +118,14 @@ export function createMarkerEditor(host, { photoUrl, aspect, marks, onChange }) 
       if (!dragging) return;
       dragging = false;
       g.classList.remove('is-drag');
-      // a tap on the first yard corner closes the outline
-      if ((kind === 'yard' || kind === 'septic') && idx === 0 && task === kind && !closed[kind] && (marks[kind] || []).length >= 3) closed[kind] = true;
-      changed();
       e.stopPropagation();
+      const p = get();
+      const moved = p[0] !== start[0] || p[1] !== start[1];
+      // a tap (no move) on the first corner of an open outline closes it
+      const closes = !moved && (kind === 'yard' || kind === 'septic') && idx === 0 && task === kind && !closed[kind] && (marks[kind] || []).length >= 3;
+      if (closes) closed[kind] = true;
+      if (!moved && !closes) { history.pop(); return; } // nothing changed: no undo step, no downstream reset
+      changed();
     };
     g.addEventListener('pointerup', up);
     g.addEventListener('pointercancel', up);
@@ -181,8 +187,36 @@ export function createMarkerEditor(host, { photoUrl, aspect, marks, onChange }) 
     if (marks.outlet) handle('outlet', () => marks.outlet, (v) => { marks.outlet = v; }, { icon: 'outlet' });
     if (marks.downspout) handle('downspout', () => marks.downspout, (v) => { marks.downspout = v; }, { icon: 'downspout' });
     svg.classList.toggle('is-placing', !!task && task !== 'view');
+    if (crossOn && task && task !== 'view') {
+      const s = k();
+      const c = el('g', { class: 'dz-cross', transform: `translate(${X(cross)} ${Y(cross)})`, 'aria-hidden': 'true' });
+      el('circle', { r: 14 * s, class: 'dz-cross-ring' }, c);
+      el('path', { d: `M${-24 * s} 0H${-6 * s}M${6 * s} 0H${24 * s}M0 ${-24 * s}V${-6 * s}M0 ${6 * s}V${24 * s}`, class: 'dz-cross-line' }, c);
+    }
     if (focusedKey) svg.querySelector(`[data-key="${focusedKey}"]`)?.focus();
   }
+
+  // ---- keyboard placement: with the photo focused, arrows move a crosshair and Enter places ----
+  let cross = [0.5, 0.6];
+  let crossOn = false;
+  svg.setAttribute('tabindex', '0');
+  svg.setAttribute('aria-label', 'Your photo. Arrow keys move a crosshair (Shift for bigger steps); Enter places the mark.');
+  svg.addEventListener('focus', (e) => { if (e.target === svg) { crossOn = true; draw(); } });
+  svg.addEventListener('blur', (e) => { if (e.target === svg) { crossOn = false; draw(); } });
+  svg.addEventListener('keydown', (e) => {
+    if (e.target !== svg || !task || task === 'view') return;
+    const st = e.shiftKey ? 0.05 : 0.01;
+    const d = { ArrowLeft: [-st, 0], ArrowRight: [st, 0], ArrowUp: [0, -st], ArrowDown: [0, st] }[e.key];
+    if (d) {
+      e.preventDefault();
+      cross = [clamp01(cross[0] + d[0]), clamp01(cross[1] + d[1])];
+      draw();
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      place([...cross]);
+      svg.focus();
+    }
+  });
 
   // ---- tap on the photo places the active task's mark ----
   let down = null;

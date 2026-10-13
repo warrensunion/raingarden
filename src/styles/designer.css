@@ -528,3 +528,13 @@ polygon.dz-poly-septic { fill: var(--clay); fill-opacity: .14; }
   .dz-pane, .dz-canvas, .dz-sheet, .dz-backdrop { transition-duration: .01s; }
   .dz-pane.is-in-right, .dz-pane.is-in-left, .dz-pane.is-out-left, .dz-pane.is-out-right { transform: none; }
 }
+
+/* fix round 1 */
+.dz-seg button { min-height: 44px; }
+.dz-storm-item { display: grid; gap: 4px; }
+.dz-storm-item .dz-card-src { margin: 0 14px 4px; }
+.dz-cross { pointer-events: none; }
+.dz-cross-ring { fill: none; stroke: var(--marigold); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+.dz-cross-line { stroke: var(--paper); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.dz-cross-target { outline: none; }
+.dz-marks:focus-visible { outline: 2px solid var(--marigold); outline-offset: 2px; }

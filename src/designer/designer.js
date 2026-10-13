@@ -107,6 +107,8 @@ export function openDesigner(root, { mode = 'capture' } = {}) {
   let destroyed = false;
   const sim = createSimClient();
   let depthModule = null;
+  let depthLoad = null; // the loaded depth model (worker + ORT session + GPU device), disposed on close
+  const opener = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : null;
 
   const sheet = createSheet(el, { count: STEPS.length, reducedMotion, onBack: () => go(state.step - 1, -1) });
 
@@ -233,11 +235,19 @@ export function openDesigner(root, { mode = 'capture' } = {}) {
       if (state.photo?.url) URL.revokeObjectURL(state.photo.url);
       teardownYard();
       state = freshState('capture');
+      root.dataset.mode = 'capture';
       showBackdrop(null);
       go(1, -1);
     },
     setResult(r) { lastResult = r; },
     depthModule: () => (depthModule ??= import('../depth/depth.js')),
+    keepDepth(p) { depthLoad = p; },
+    /** Call fn whenever the yard's area changes size (the compare divider follows it). */
+    observeYard(fn) {
+      const ro = new ResizeObserver(() => fn());
+      ro.observe(yardHost);
+      return () => ro.disconnect();
+    },
     resetFrom(kind) {
       for (const k of DOWNSTREAM[kind] || []) {
         if (k === 'hf') { state.hf = null; state.gm = null; state.si = null; state.slope = { manual: false, preset: 'gentle', dir: null, pins: [], source: null }; } else state[k] = null;
@@ -338,10 +348,16 @@ export function openDesigner(root, { mode = 'capture' } = {}) {
   }
 
   // ------------------------------------------------------------------ close + test hook
-  el.querySelector('.dz-close').addEventListener('click', () => {
+  function close() {
     handle.destroy();
     root.closest('.designer')?.classList.remove('is-open');
-  });
+    // back to whatever opened the designer; a scripted open (no focused opener) lands on the header's "Design yours"
+    const back = opener && opener.isConnected ? opener : document.querySelector('.hdr a[data-design]');
+    if (back) back.focus();
+  }
+  el.querySelector('.dz-close').addEventListener('click', close);
+  const onKey = (e) => { if (e.key === 'Escape' && !e.defaultPrevented) { e.preventDefault(); close(); } };
+  addEventListener('keydown', onKey);
 
   const hook = {
     get step() { return state.step; },
@@ -360,7 +376,9 @@ export function openDesigner(root, { mode = 'capture' } = {}) {
       destroyed = true;
       try { current && current.destroy && current.destroy(); } catch { /* already gone */ }
       cancelAnimationFrame(overlayRaf);
+      removeEventListener('keydown', onKey);
       sim.destroy();
+      if (depthLoad) depthLoad.then((m) => m.dispose()).catch(() => {});
       teardownYard();
       sheet.destroy();
       if (state.photo?.url) URL.revokeObjectURL(state.photo.url);

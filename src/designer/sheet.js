@@ -75,6 +75,8 @@ export function createSheet(root, { count = 10, reducedMotion = false, onBack } 
     drag = null;
   };
   handle.addEventListener('pointerup', endDrag);
+  // keyboard (Enter / Space fire a click with no pointer: detail 0) toggles too
+  handle.addEventListener('click', (e) => { if (e.detail === 0) setCollapsed(!collapsed); });
   handle.addEventListener('pointercancel', endDrag);
 
   return {

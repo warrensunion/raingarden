@@ -18,7 +18,7 @@
       "source": "photo",
       "backend": "webgpu"
     },
-    "slopeMs": 27835,
+    "slopeMs": 20795,
     "hscroll": 0,
     "storms": [
       {
@@ -47,7 +47,8 @@
       "drainH": 0,
       "frames": 96
     },
-    "fpsStorm": 128.18686763670104,
+    "fpsStorm": 116.59541310702593,
+    "clockBeforeEnd": "next day 1:00 am, dry",
     "design": {
       "step": "design",
       "ok": true,
@@ -101,12 +102,13 @@
       "areaM2": 8.234865368021563,
       "plants": 26
     },
-    "fpsCompare": 133.4915450067326,
+    "fpsCompare": 44.79840829483517,
+    "clockCompareEnd": "day 3, 6:00 pm, dry",
     "plan": {
       "step": "plan",
       "pngW": 2480,
       "pngH": 3508,
-      "pngBytes": 9620225
+      "pngBytes": 10201544
     },
     "png": {
       "w": 2480,
@@ -114,11 +116,15 @@
       "format": "png"
     },
     "pdf": {
-      "bytes": 1394734,
+      "bytes": 1478714,
       "header": "%PDF-",
       "eof": "%%EOF"
     },
-    "hscrollEnd": 0
+    "hscrollEnd": 0,
+    "escape": {
+      "open": false,
+      "focus": "capture"
+    }
   },
   "1440": {
     "errors": [],
@@ -139,7 +145,7 @@
       "source": "photo",
       "backend": "webgpu"
     },
-    "slopeMs": 33347,
+    "slopeMs": 13252,
     "hscroll": 0,
     "storms": [
       {
@@ -168,7 +174,8 @@
       "drainH": 0,
       "frames": 96
     },
-    "fpsStorm": 116.64074673144071,
+    "fpsStorm": 132.0810091128808,
+    "clockBeforeEnd": "next day 1:00 am, dry",
     "design": {
       "step": "design",
       "ok": true,
@@ -222,12 +229,13 @@
       "areaM2": 8.234865368021563,
       "plants": 26
     },
-    "fpsCompare": 119.8881043140171,
+    "fpsCompare": 136.30168042411069,
+    "clockCompareEnd": "day 3, 6:00 pm, dry",
     "plan": {
       "step": "plan",
       "pngW": 2480,
       "pngH": 3508,
-      "pngBytes": 9620225
+      "pngBytes": 10201544
     },
     "png": {
       "w": 2480,
@@ -235,11 +243,15 @@
       "format": "png"
     },
     "pdf": {
-      "bytes": 1394734,
+      "bytes": 1478714,
       "header": "%PDF-",
       "eof": "%%EOF"
     },
-    "hscrollEnd": 0
+    "hscrollEnd": 0,
+    "escape": {
+      "open": false,
+      "focus": "capture"
+    }
   },
   "camera": {
     "errors": [],

@@ -86,3 +86,85 @@ Compared with the comps:
 4. **The first cold load of the depth model was very slow** on this loaded machine (minutes). The progress line keeps the user informed, but real-phone timing is untested.
 5. **The 3D yard's ground frame stretches the photo** when the reading is wild (camera run, 34%). This is cosmetic and comes from the heightfield's frame.
 6. **The last plan bottom-margin fix** (sources line clear of the border) landed after the final screenshot run. The PNG in the shots predates it; the code is covered by the build only.
+
+---
+
+# Fix round 1
+
+Commands:
+
+```
+git merge main
+npm test
+npm run build
+node scripts/verify-designer.mjs http://localhost:5191 docs/reports/designer-shots
+node scripts/verify-designer.mjs http://localhost:5191 docs/reports/designer-shots static
+```
+
+- **Merge:** main merged cleanly except for `DECISIONS.md`. Both sides' lines were kept: main's first, then the designer's.
+- **Tests:** `npm test` gives 174 pass, 0 fail. That includes 4 new tests in `test/designer-model.test.js` (`latestOnly`, `playSpan`, `stormPhrase`, `planPdfLines`) plus 1 for the `lerpFrames` fade.
+- **Build:** `npm run build` is clean, with no warnings.
+
+## Changes
+
+1. **Camera stream can no longer stay on** (`steps/capture.js`).
+   - Every "Use my camera" tap takes a ticket from a new pure guard, `latestOnly()` (`model.js`, tested).
+   - The old stream is stopped before a new request.
+   - When `getUserMedia` resolves, the new tracks are stopped at once if the step was closed (`gone`) or another tap superseded the request.
+   - `stopCamera()` cancels the pending ticket and clears `video.srcObject`.
+   - Leaving the step sets `gone`.
+   - If `usePhoto` fails after the shutter, the user now sees "That photo could not be saved on this device…".
+   - A bitmap decoded after the step closed is closed again.
+2. **Depth model is disposed.**
+   - The slope step hands the `loadDepth()` promise to the designer (`ctx.keepDepth`). `handle.destroy()` calls `model.dispose()`, which terminates the worker and releases the ORT session and GPU device.
+   - The step's progress listener is now a named function. It is removed on destroy through a new `removeProgressListener(fn)` in `src/depth/depth.js`.
+   - `dispose()` now rejects every in-flight estimate with `code: 'backend'`, "depth: disposed", so nothing hangs.
+3. **"dry" now shows dry.**
+   - **Cause:** the before run drains, so `runStorm` exits early and the last frame is at the rain end (24:00). The playback span was `max(storm, last.t)`, so playback ended exactly on that last frame. That frame still held the final step's Manning sheet flow (the teal ribbon), while the clock already read "dry". In compare, the before side held that same frame for the rest of the 72 h playback.
+   - **Fix:** `playSpan()` runs playback one hour past the last frame of a drained run. `lerpFrames(..., fadeS = 900)` fades a drained run's last frame to nothing over 15 minutes. Before and compare both use them, and both renderers get the same arrays.
+   - **Verified:** after scrubbing to the end, the clock reads "next day 1:00 am, dry" (before) and "day 3, 6:00 pm, dry" (compare), and the ribbon is gone in WebGL and static (`*-06-before-end.jpg`, `*-09-compare-end.jpg`).
+
+## Minor fixes
+
+- **Marker editor:**
+  - A press on a marker that doesn't move it no longer adds an undo step or resets later steps. A tap (not a drag) on the first corner closes an outline.
+  - Keyboard placement: the photo is focusable. Arrows move a crosshair (Shift for 5% steps) and Enter or Space places the current mark.
+- **Slope:** Next first applies a pending debounced slope change.
+- **Storm:** the source link now sits outside the `role="radio"` button.
+- **Arrow keys:** the storm, region, slope preset and season radio groups respond to arrow keys (`src/designer/radio.js`). Soil already did.
+- **Sheet handle:** works from the keyboard (Enter or Space toggles it).
+- **Touch targets:** `.dz-seg` buttons are now at least 44 px tall.
+- **Compare:**
+  - The settled numbers are announced once through a `role="status"` summary. The animated numbers are `aria-hidden`.
+  - The divider re-places itself through a ResizeObserver on the yard host.
+- **Escape** closes the designer, and focus returns to whatever opened it. For a scripted open with no focused opener, focus goes to the header's "Design yours" link (the verify run confirms focus lands on `data-design="capture"`).
+- **Timelapse:** picking a season yourself cancels the running timelapse.
+- **Plan:**
+  - Every species fits in the table: rows shrink, with proportional fonts, up to the 15-species maximum. The "+N more" line is gone, and the table no longer collides with "Build steps".
+  - The sources line is wrapped in pixels, drops to 19 px if it needs 3 lines, and stays inside the border.
+  - The PDF text now comes from `planPdfLines()` (tested). It drops spacer lines before any text and keeps every source line within the 17 lines that fit under the image. All of "King County", "Type IA 24 h shape", "Metro Vancouver 2023" and "guidance, not engineering" are present in the downloaded PDF.
+  - The doubled parentheses are fixed by `stormPhrase()`: "the design storm (90th percentile, 23.3 mm)".
+- **Labels and state:**
+  - The counter now reads "Rain on roof and ground".
+  - `restart()` resets `root.dataset.mode` to `capture`.
+
+**Regression found and fixed during this round:** a scripted edit turned the plan's word-wrap regex into `/s+/`, which dropped every letter "s" (visible in the first rerun's plan). It is fixed to `/\s+/`, and the final plan shot reads correctly (`1440-plan-1240.jpg`).
+
+## New run (main merged, real plant art)
+
+Demo numbers are unchanged:
+- before: 2,756 L leave the yard
+- garden: 8.2 m² (3.6 × 2.9 m, 15 cm deep, berm 5 cm, 3.6 m from the house), about CAD 919
+- captured: 2,756 L; out after: 0 L; drainH: 41 h
+- plants: 26 plants, 10 species
+
+| Run | Console errors | Storm fps | Compare fps | PNG | PDF | h-scroll | Escape |
+|---|---|---|---|---|---|---|---|
+| 1440 | 0 | 132 | 136 | 2480×3508 | `%PDF-` … `%%EOF`, 1.48 MB | 0 | closed, focus on opener |
+| 390 | 0 | 117 | 45 * | 2480×3508 | same | 0 | same |
+| static + reduced motion | 0 (one `static fallback: yard` info log) | 60 | 60 | 2480×3508 | same | 0 | same |
+| camera (fake y4m) | 0 | — | — | photo 1272×848 from the camera | — | — | — |
+
+\* **390 compare fps:** this is the 390 run's compare playback, taken on the shared, loaded machine. It applies `setSplit` with a fresh before-depth upload on every frame. In the run just before this one it measured 113 fps, and storm playback at 390 measured 117 fps in this run. It should be re-checked on a quiet machine or a real phone.
+
+With the 42 real plant cut-outs, the plant and compare views look as designed (`1440-08-plant.jpg`, `1440-09-compare.jpg`). The serviceberry and red-flowering currant are large but read as shrubs at the rim. The plan draws the real cut-outs inside canopy discs.

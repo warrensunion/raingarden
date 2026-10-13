@@ -13,6 +13,7 @@ import { toHeightfield } from '../../depth/heightfield.js';
 import { manualTerrain } from '../../depth/manualTerrain.js';
 import { contours } from '../../depth/contours.js';
 import { logFallback } from '../../core/env.js';
+import { radioKeys } from '../radio.js';
 import { flatDepth, slopeSentence, manualDir, directionWords, niceInterval, groundMarks } from '../model.js';
 
 const PRESETS = [['flat', 'Flat'], ['gentle', 'Gentle (2%)'], ['steep', 'Steep (8%)']];
@@ -60,9 +61,19 @@ export default function slope(sheet, ctx) {
   let alive = true;
   let timer = null;
   let placingPin = false;
-  sheet.setPrimary({ label: 'Next', disabled: true, onClick: () => ctx.next() });
+  /** Next never leaves a slope change behind: a pending (debounced) terrain is applied first. */
+  async function next() {
+    if (applyPending) await apply(true);
+    if (alive) ctx.next();
+  }
+  sheet.setPrimary({ label: 'Next', disabled: true, onClick: next });
 
   // ---------------------------------------------------------------- reading
+  const onProg = (p) => {
+    if (alive && p.phase === 'download' && p.fraction >= 0) line.textContent = `Loading the depth model… ${Math.round(p.fraction * 100)}%`;
+    else if (alive && p.phase === 'init') line.textContent = 'Starting the depth model…';
+  };
+
   async function read() {
     if (state.hf) return;
     let depth = null;
@@ -70,12 +81,9 @@ export default function slope(sheet, ctx) {
     try {
       line.textContent = 'Loading the depth model…';
       const { loadDepth } = await ctx.depthModule();
-      const model = await loadDepth({
-        onProgress: (p) => {
-          if (alive && p.phase === 'download' && p.fraction >= 0) line.textContent = `Loading the depth model… ${Math.round(p.fraction * 100)}%`;
-          else if (alive && p.phase === 'init') line.textContent = 'Starting the depth model…';
-        },
-      });
+      const loading = loadDepth({ onProgress: onProg });
+      ctx.keepDepth(loading); // the designer disposes the model (worker, ORT session, GPU device) when it closes
+      const model = await loading;
       const t0 = performance.now();
       const tick = () => { if (alive) line.textContent = `Reading depth… ${Math.max(1, Math.round((performance.now() - t0) / 1000))} s`; };
       tick();
@@ -124,9 +132,12 @@ export default function slope(sheet, ctx) {
   }
 
   let applyTimer = null;
+  let applyPending = false;
   function apply(now = false) {
     clearTimeout(applyTimer);
+    applyPending = !now;
     const go = async () => {
+      applyPending = false;
       const t = currentTerrain();
       await ctx.applyTerrain(t);
       if (!alive) return;
@@ -199,7 +210,7 @@ export default function slope(sheet, ctx) {
         <button type="button" class="dz-mini" data-i="${i}" data-x="1" aria-label="Remove height point ${i + 1}">×</button></div>`).join('');
     }
     ctx.overlay.set(drawPins);
-    sheet.setPrimary({ label: 'Next', onClick: () => ctx.next() });
+    sheet.setPrimary({ label: 'Next', onClick: next });
   }
 
   function drawPins(g, yard) {
@@ -223,6 +234,7 @@ export default function slope(sheet, ctx) {
   }
 
   // ------------------------------------------------------------ manual UI
+  radioKeys(manual.querySelector('.dz-seg'), '[data-p]', (x) => x.click());
   manual.querySelector('.dz-seg').addEventListener('click', (e) => {
     const btn = e.target.closest('[data-p]');
     if (!btn) return;
@@ -315,6 +327,7 @@ export default function slope(sheet, ctx) {
       alive = false;
       clearInterval(timer);
       clearTimeout(applyTimer);
+      ctx.depthModule().then((m) => m.removeProgressListener(onProg)).catch(() => {});
       offPointer();
       ctx.overlay.set(null);
     },

@@ -91,6 +91,10 @@ async function demoRun(vp) {
   await page.locator('.dz-scrub').evaluate((el) => { el.value = '330'; el.dispatchEvent(new Event('input', { bubbles: true })); });
   await sleep(400);
   await shot(page, `${p}-06-before-scrubbed`);
+  await page.locator('.dz-scrub').evaluate((el) => { el.value = '1000'; el.dispatchEvent(new Event('input', { bubbles: true })); });
+  await sleep(500);
+  r.clockBeforeEnd = await page.locator('.dz-clock').textContent();
+  await shot(page, `${p}-06-before-end`);
   await primary(page); await waitStep(page, 7); await sleep(1400); await shot(page, `${p}-07-design`);
   await primary(page); // Design my garden
   await sleep(4000);
@@ -107,6 +111,10 @@ async function demoRun(vp) {
   await sleep(5000);
   r.fpsCompare = await page.evaluate(() => window.__raingarden.fps());
   await shot(page, `${p}-09-compare`);
+  await page.locator('.dz-scrub').evaluate((el) => { el.value = '1000'; el.dispatchEvent(new Event('input', { bubbles: true })); });
+  await sleep(500);
+  r.clockCompareEnd = await page.locator('.dz-clock').textContent();
+  await shot(page, `${p}-09-compare-end`);
   await primary(page); await waitStep(page, 10);
   r.plan = await waitResult(page, 'plan', 120000);
   await sleep(1500); await shot(page, `${p}-10-plan`);
@@ -127,6 +135,10 @@ async function demoRun(vp) {
   await waitStep(page, 2);
   await sleep(1200);
   await shot(page, `${p}-02-mark-demo`);
+  // Escape closes the designer and focus returns to the opener
+  await page.keyboard.press('Escape');
+  await sleep(400);
+  r.escape = await page.evaluate(() => ({ open: !!document.querySelector('.dz'), focus: document.activeElement && (document.activeElement.dataset.design || document.activeElement.tagName) }));
   await browser.close();
 }
 

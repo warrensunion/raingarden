@@ -20,7 +20,7 @@
       "source": "photo",
       "backend": "webgpu"
     },
-    "slopeMs": 36509,
+    "slopeMs": 9282,
     "hscroll": 0,
     "storms": [
       {
@@ -50,6 +50,7 @@
       "frames": 96
     },
     "fpsStorm": 60,
+    "clockBeforeEnd": "next day 1:00 am, dry",
     "design": {
       "step": "design",
       "ok": true,
@@ -104,11 +105,12 @@
       "plants": 26
     },
     "fpsCompare": 60,
+    "clockCompareEnd": "day 3, 6:00 pm, dry",
     "plan": {
       "step": "plan",
       "pngW": 2480,
       "pngH": 3508,
-      "pngBytes": 9620225
+      "pngBytes": 10201544
     },
     "png": {
       "w": 2480,
@@ -116,10 +118,14 @@
       "format": "png"
     },
     "pdf": {
-      "bytes": 1394734,
+      "bytes": 1478714,
       "header": "%PDF-",
       "eof": "%%EOF"
     },
-    "hscrollEnd": 0
+    "hscrollEnd": 0,
+    "escape": {
+      "open": false,
+      "focus": "capture"
+    }
   }
 }

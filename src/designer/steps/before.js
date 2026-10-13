@@ -5,7 +5,7 @@
  */
 
 import { createPlayback } from '../playback.js';
-import { lerpFrames, ledgerAt, fmtL } from '../model.js';
+import { lerpFrames, ledgerAt, fmtL, playSpan } from '../model.js';
 
 export default function before(sheet, ctx) {
   const { state } = ctx;
@@ -16,7 +16,7 @@ export default function before(sheet, ctx) {
     <p class="dz-lede">${storm.label}: ${storm.totalMm.toFixed(1)} mm on ${Math.round(state.roofAreaM2)} m² of roof and your yard (${state.soil}).</p>
     <p class="dz-progress-line" role="status"></p>
     <dl class="dz-counters" hidden>
-      <div><dt>Rain on roof and yard</dt><dd class="c-fallen">0 L</dd></div>
+      <div><dt>Rain on roof and ground</dt><dd class="c-fallen">0 L</dd></div>
       <div><dt>Leaving the yard</dt><dd class="c-out">0 L</dd></div>
       <div><dt>Soaked in</dt><dd class="c-in">0 L</dd></div>
     </dl>
@@ -50,7 +50,8 @@ export default function before(sheet, ctx) {
     const { frames, result } = state.before;
     ctx.setResult({ step: 'before', ...result.ledger, drainH: result.drainH, frames: frames.length });
     const depth = new Float32Array(ctx.terrain().nx * ctx.terrain().ny);
-    const spanS = Math.max(storm.mm.length * storm.stepS, frames.length ? frames[frames.length - 1].t : 0);
+    // past the last frame of a drained run, so playback ends on a dry yard
+    const spanS = playSpan(storm.mm.length * storm.stepS, [{ frames, drained: result.drained }]);
     pb = createPlayback(b.querySelector('.dz-play-host'), {
       spanS, mm: storm.mm, stepS: storm.stepS, reducedMotion: ctx.reducedMotion,
       onTime(t, rate) {

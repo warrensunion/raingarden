@@ -12,7 +12,7 @@
  * puts "photo up" (away from the camera) at the top of the page.
  */
 
-import { niceInterval, gardenDims, fmtNum, fmtL } from './model.js';
+import { niceInterval, gardenDims, fmtNum, fmtL, stormPhrase } from './model.js';
 import { contours } from '../depth/contours.js';
 import { BERM_WIDTH_M } from '../garden/constraints.js';
 import { PALETTE } from '../render/palette.js';
@@ -25,6 +25,9 @@ const C = PALETTE; // the tokens, mirrored 1:1 (src/render/palette.js)
 const SERIF = '"Young Serif", Georgia, serif';
 const SANS = '"Atkinson Hyperlegible Next", system-ui, sans-serif';
 const M = 150;
+/** Plant table height between its header (y 2068) and the "Build steps" title. */
+const TABLE_H = 650;
+const STEPS_Y = 2790;
 
 /** Six build steps; the soil line depends on clay (WSU: never add sand to clay). */
 export function buildSteps(d) {
@@ -131,21 +134,23 @@ function text(ctx, s, x, y, { font, color = C.slate900, align = 'left', base = '
   if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
 }
 
-function para(ctx, s, x, y, maxW, lineH, font, color = C.slate900) {
+/** Word-wrap s to maxW px in the given font. */
+function wrapPx(ctx, s, maxW, font) {
   ctx.font = font;
-  const words = s.split(/\s+/);
+  const out = [];
   let line = '';
-  let yy = y;
-  for (const w of words) {
+  for (const w of s.split(/\s+/)) {
     const t = line ? `${line} ${w}` : w;
-    if (ctx.measureText(t).width > maxW && line) {
-      text(ctx, line, x, yy, { font, color });
-      line = w;
-      yy += lineH;
-    } else line = t;
+    if (ctx.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t;
   }
-  if (line) text(ctx, line, x, yy, { font, color });
-  return yy + lineH;
+  if (line) out.push(line);
+  return out;
+}
+
+function para(ctx, s, x, y, maxW, lineH, font, color = C.slate900) {
+  const lines = wrapPx(ctx, s, maxW, font);
+  lines.forEach((l, i) => text(ctx, l, x, y + i * lineH, { font, color }));
+  return y + lines.length * lineH;
 }
 
 function arrow(ctx, x0, y0, x1, y1, color, w = 6, head = 26) {
@@ -464,7 +469,7 @@ export async function drawPlan(d, canvas = document.createElement('canvas')) {
   let y = 1780;
   text(ctx, `${fmtNum(d.areaM2, 1)} m²  ·  ${dims.lengthM.toFixed(1)} × ${dims.widthM.toFixed(1)} m  ·  ${Math.round(dims.depthM * 100)} cm deep  ·  berm ${Math.round(dims.bermM * 100)} cm  ·  ${dims.houseM === null ? '' : `${dims.houseM.toFixed(1)} m from the house`}`, M, y, { font: `700 48px ${SANS}` });
   y += 66;
-  para(ctx, `In the ${d.storm.label.toLowerCase()} (${d.storm.totalMm.toFixed(1)} mm) it catches about ${fmtL(d.capturedL)}; ${fmtL(d.outAfterL)} still leaves the yard (${fmtL(d.outBeforeL)} before). The pond drains in about ${Math.max(1, Math.round(d.drainH))} h. About $${fmtNum(d.costTotal)} to build yourself.`, M, y, PLAN_W - 2 * M, 50, `400 38px ${SANS}`, C.slate700);
+  para(ctx, `In the ${stormPhrase(d.storm.label, d.storm.totalMm)} it catches about ${fmtL(d.capturedL)}; ${fmtL(d.outAfterL)} still leaves the yard (${fmtL(d.outBeforeL)} before). The pond drains in about ${Math.max(1, Math.round(d.drainH))} h. About $${fmtNum(d.costTotal)} to build yourself.`, M, y, PLAN_W - 2 * M, 50, `400 38px ${SANS}`, C.slate700);
 
   // ---- plant list ----
   y = 1990;
@@ -474,8 +479,11 @@ export async function drawPlan(d, canvas = document.createElement('canvas')) {
   const heads = [['Plant', M + 96], ['Zone', 870], ['Qty', 1060], ['Spacing', 1150]];
   heads.forEach(([h, x]) => text(ctx, h, x, y, { font: `700 28px ${SANS}`, color: C.slate700 }));
   y += 18;
-  const rows = d.rows.slice(0, 10);
-  const rowH = 64;
+  // every species fits above "Build steps" (at most 15: 3 zones x 5): rows shrink, never overflow
+  const rows = d.rows;
+  const rowH = Math.min(64, Math.floor(TABLE_H / Math.max(1, rows.length)));
+  const f1 = Math.round(rowH * 0.48);
+  const f2 = Math.round(rowH * 0.39);
   for (const r of rows) {
     ctx.fillStyle = C.slate700;
     ctx.globalAlpha = 0.25;
@@ -488,17 +496,17 @@ export async function drawPlan(d, canvas = document.createElement('canvas')) {
     } else {
       ctx.fillStyle = r.zone === 'wet' ? C.teal : r.zone === 'middle' ? C.fern : C.moss;
       ctx.beginPath();
-      ctx.arc(M + 34, y + rowH / 2, 20, 0, Math.PI * 2);
+      ctx.arc(M + 34, y + rowH / 2, Math.min(20, rowH * 0.32), 0, Math.PI * 2);
       ctx.fill();
     }
-    text(ctx, r.common, M + 96, y + 30, { font: `700 31px ${SANS}` });
-    text(ctx, r.latin, M + 96, y + 57, { font: `italic 400 25px ${SANS}`, color: C.slate700 });
-    text(ctx, r.zone[0].toUpperCase() + r.zone.slice(1), 870, y + 42, { font: `400 30px ${SANS}` });
-    text(ctx, String(r.qty), 1060, y + 42, { font: `700 30px ${SANS}` });
-    text(ctx, r.spacingM < 1 ? `${Math.round(r.spacingM * 100)} cm` : `${r.spacingM.toFixed(1)} m`, 1150, y + 42, { font: `400 30px ${SANS}` });
+    text(ctx, r.common, M + 96, y + rowH * 0.47, { font: `700 ${f1}px ${SANS}` });
+    text(ctx, r.latin, M + 96, y + rowH * 0.89, { font: `italic 400 ${f2}px ${SANS}`, color: C.slate700 });
+    const mid = y + rowH * 0.66;
+    text(ctx, r.zone[0].toUpperCase() + r.zone.slice(1), 870, mid, { font: `400 ${f1}px ${SANS}` });
+    text(ctx, String(r.qty), 1060, mid, { font: `700 ${f1}px ${SANS}` });
+    text(ctx, r.spacingM < 1 ? `${Math.round(r.spacingM * 100)} cm` : `${r.spacingM.toFixed(1)} m`, 1150, mid, { font: `400 ${f1}px ${SANS}` });
     y += rowH;
   }
-  if (d.rows.length > rows.length) text(ctx, `+ ${d.rows.length - rows.length} more species (see the app)`, M + 96, y + 36, { font: `400 28px ${SANS}`, color: C.slate700 });
 
   // ---- soil mix (cross-section) ----
   let ry = 1990;
@@ -529,14 +537,14 @@ export async function drawPlan(d, canvas = document.createElement('canvas')) {
   for (const l of soilMix(d.soil)) ry = para(ctx, l, colR, ry, PLAN_W - M - colR, 42, `400 32px ${SANS}`);
 
   // ---- build steps ----
-  y = 2770;
+  y = STEPS_Y;
   text(ctx, 'Build steps', M, y, { font: `400 68px ${SERIF}` });
   y += 40;
   const steps = buildSteps(dims);
   const cw = (PLAN_W - 2 * M) / 3;
   steps.forEach(([h, body], i) => {
     const cx = M + (i % 3) * cw;
-    const cy = y + Math.floor(i / 3) * 210;
+    const cy = y + Math.floor(i / 3) * 200;
     ctx.fillStyle = C.moss;
     ctx.beginPath();
     ctx.arc(cx + 30, cy + 40, 30, 0, Math.PI * 2);
@@ -548,7 +556,7 @@ export async function drawPlan(d, canvas = document.createElement('canvas')) {
 
   // ---- safety box ----
   y = 3222;
-  const bh = 150;
+  const bh = 130;
   ctx.strokeStyle = C.marigold;
   ctx.lineWidth = 8;
   ctx.beginPath();
@@ -556,7 +564,12 @@ export async function drawPlan(d, canvas = document.createElement('canvas')) {
   ctx.stroke();
   para(ctx, SAFETY, M + 40, y + 58, PLAN_W - 2 * M - 80, 42, `700 32px ${SANS}`);
 
-  // ---- sources ----
-  para(ctx, d.sources.join('  ·  '), M, 3404, PLAN_W - 2 * M, 30, `400 22px ${SANS}`, C.slate700);
+  // ---- sources: every line, inside the border (bottom at PLAN_H - 60), below the safety box ----
+  let srcFont = 22;
+  let srcLines = wrapPx(ctx, d.sources.join('  ·  '), PLAN_W - 2 * M, `400 ${srcFont}px ${SANS}`);
+  if (srcLines.length > 2) { srcFont = 19; srcLines = wrapPx(ctx, d.sources.join('  ·  '), PLAN_W - 2 * M, `400 ${srcFont}px ${SANS}`); }
+  const srcLead = srcFont + 7;
+  const srcY = Math.max(3222 + 130 + srcFont + 6, PLAN_H - 60 - 14 - (srcLines.length - 1) * srcLead);
+  srcLines.forEach((l, i) => text(ctx, l, M, srcY + i * srcLead, { font: `400 ${srcFont}px ${SANS}`, color: C.slate700 }));
   return canvas;
 }
