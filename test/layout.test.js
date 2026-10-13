@@ -96,6 +96,15 @@ test('never more than 5 species in a zone, any size', () => {
   }
 });
 
+test('small gardens report few species / small drifts in warnings; roomy ones do not', () => {
+  const small = layoutPlants(SMALL, PLANTS, { seed: 1, region: 'pnw' });
+  assert.ok(Array.isArray(small.warnings));
+  assert.ok(small.warnings.some((w) => w.code === 'small-garden-few-species'));
+  for (const w of small.warnings) assert.ok(['wet', 'middle', 'edge'].includes(w.zone) && w.message);
+  const roomy = layoutPlants(WSU_SIZE, PLANTS, { seed: 1, region: 'on' });
+  assert.deepEqual(roomy.warnings, []);
+});
+
 test('deterministic for a seed', () => {
   const a = layoutPlants(G, PLANTS, { seed: 9, region: 'on' });
   const b = layoutPlants(G, PLANTS, { seed: 9, region: 'on' });

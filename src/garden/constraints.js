@@ -8,8 +8,9 @@
  *  - Septic: WSU 2013 (pp. 12-14) keeps >= 10 ft (3.048 m) when the garden is
  *    downhill of the septic system and >= 50 ft (15.24 m) when it is uphill
  *    (Wisconsin just says "not over a septic system"). "Uphill" here means the
- *    cell's ground is higher than the mean ground over the septic polygon; on
- *    level ground the 10 ft buffer applies.
+ *    cell's ground is more than 0.05 m above the LOWEST ground over the septic
+ *    polygon (conservative: a cell beside any part of a sloped field above its
+ *    low end gets 50 ft); within 0.05 m counts as level and gets 10 ft.
  *  - Yard: cells whose centre is outside the yard polygon are forbidden, and so are
  *    cells within 0.5 m of its boundary (fence or property line; our call, so the
  *    berm and digging stay on the owner's side).
@@ -24,6 +25,8 @@ export const FENCE_BUFFER_M = 0.5;
 export const SEPTIC_DOWNHILL_M = 10 * 0.3048;
 export const SEPTIC_UPHILL_M = 50 * 0.3048;
 export const BERM_WIDTH_M = 0.6;
+/** Within this height of the septic system's lowest point counts as level (downhill buffer). */
+export const SEPTIC_LEVEL_TOL_M = 0.05;
 
 function segDist(px, py, ax, ay, bx, by) {
   const dx = bx - ax;
@@ -60,19 +63,15 @@ function nearestCell(t, px, py) {
   return y * t.nx + x;
 }
 
-/** Mean ground height over a polygon (cells whose centre is inside; else the centroid's cell). */
-function meanZ(t, poly) {
-  let s = 0;
-  let n = 0;
+/** Lowest ground height over a polygon (cells whose centre is inside; else the centroid's cell). */
+function minZ(t, poly) {
+  let m = Infinity;
   for (let y = 0; y < t.ny; y++) {
     for (let x = 0; x < t.nx; x++) {
-      if (inPolygon((x + 0.5) * t.cell, (y + 0.5) * t.cell, poly)) {
-        s += t.z[y * t.nx + x];
-        n++;
-      }
+      if (inPolygon((x + 0.5) * t.cell, (y + 0.5) * t.cell, poly)) m = Math.min(m, t.z[y * t.nx + x]);
     }
   }
-  if (n) return s / n;
+  if (m < Infinity) return m;
   const cx = poly.reduce((a, p) => a + p[0], 0) / poly.length;
   const cy = poly.reduce((a, p) => a + p[1], 0) / poly.length;
   return t.z[nearestCell(t, cx, cy)];
@@ -91,7 +90,7 @@ export function forbiddenMask(terrain, {
 }) {
   const { nx, ny, cell, z } = terrain;
   const m = new Uint8Array(nx * ny);
-  const septicZ = septic && septic.length >= 3 ? meanZ(terrain, septic) : null;
+  const septicZ = septic && septic.length >= 3 ? minZ(terrain, septic) + SEPTIC_LEVEL_TOL_M : null;
   for (let y = 0; y < ny; y++) {
     for (let x = 0; x < nx; x++) {
       const i = y * nx + x;
@@ -111,6 +110,7 @@ export function forbiddenMask(terrain, {
 
 /** Ellipse radius fraction of a point in garden g: < 1 inside. Optional inflation (m) on both semi-axes. */
 export function ellipseRho(g, px, py, inflateM = 0) {
+  if (!(g.lenM > 0) || !(g.widM > 0)) throw new RangeError(`garden axes must be > 0 (lenM ${g.lenM}, widM ${g.widM})`);
   const c = Math.cos(g.rot || 0);
   const s = Math.sin(g.rot || 0);
   const dx = px - g.cx;
@@ -143,9 +143,10 @@ export function gardenCells(terrain, g) {
  * Floor: level at min(z over the rim) - depthM, where the rim is the garden cells
  * with a 4-neighbour outside the garden (or on the grid edge), so the pond fills
  * exactly depthM before it can spill at the lowest lip.
- * Berm: the ring up to 0.6 m outside the ellipse (approximated by inflating both
- * semi-axes by 0.6 m; exact at the axis ends) is raised to floor + depthM + bermM
- * where the ground is lower.
+ * Berm: the cells within R = ceil(max(0.6 m, cell*sqrt2)/cell) cells of the garden
+ * (disc dilation of the mask) are raised to floor + depthM + bermM where lower.
+ * R >= sqrt2 cells guarantees every 8-neighbour is berm, so under D8 routing the
+ * pond holds its full depthM before spilling.
  * @returns {{terrain:object, mask:Uint8Array, bermMask:Uint8Array, floorZ:number}}
  */
 export function applyGarden(terrain, g) {
@@ -167,20 +168,28 @@ export function applyGarden(terrain, g) {
   if (rimMin === Infinity) return { terrain: out, mask, bermMask, floorZ: NaN };
   const floorZ = rimMin - g.depthM;
   const bermTop = floorZ + g.depthM + g.bermM;
-  const r = Math.max(g.lenM, g.widM) / 2 + BERM_WIDTH_M + cell;
-  const x0 = Math.max(0, Math.floor((g.cx - r) / cell));
-  const x1 = Math.min(nx - 1, Math.ceil((g.cx + r) / cell));
-  const y0 = Math.max(0, Math.floor((g.cy - r) / cell));
-  const y1 = Math.min(ny - 1, Math.ceil((g.cy + r) / cell));
-  for (let y = y0; y <= y1; y++) {
-    for (let x = x0; x <= x1; x++) {
+  // Berm = disc dilation of the mask, radius ceil(max(0.6 m, cell*sqrt2)/cell) cells,
+  // so it always contains every 8-neighbour of the garden (D8 cannot slip past
+  // diagonally) and is at least 0.6 m wide in every direction.
+  const R = Math.ceil(Math.max(BERM_WIDTH_M, cell * Math.SQRT2) / cell - 1e-9);
+  const R2 = R * R;
+  for (let y = 0; y < ny; y++) {
+    for (let x = 0; x < nx; x++) {
       const i = y * nx + x;
-      if (mask[i]) { z[i] = floorZ; continue; }
-      if (ellipseRho(g, (x + 0.5) * cell, (y + 0.5) * cell, BERM_WIDTH_M) <= 1) {
-        bermMask[i] = 1;
-        if (z[i] < bermTop) z[i] = bermTop;
+      if (!mask[i]) continue;
+      z[i] = floorZ;
+      for (let dy = -R; dy <= R; dy++) {
+        const yy = y + dy;
+        if (yy < 0 || yy >= ny) continue;
+        for (let dx = -R; dx <= R; dx++) {
+          const xx = x + dx;
+          if (xx < 0 || xx >= nx || dx * dx + dy * dy > R2) continue;
+          const j = yy * nx + xx;
+          if (!mask[j]) bermMask[j] = 1;
+        }
       }
     }
   }
+  for (let i = 0; i < z.length; i++) if (bermMask[i] && z[i] < bermTop) z[i] = bermTop;
   return { terrain: out, mask, bermMask, floorZ };
 }

@@ -86,6 +86,7 @@ function chooseSpecies(g, pool, zone, rng) {
  * @param {Array} plants usually PLANTS
  * @param {{seed?:number, region:'pnw'|'on', sun?:'full'|'part'|'shade'}} opts
  * @returns {Array<{id:string, x:number, y:number, r:number, zone:string, drift:number}>}
+ *   The array also carries `.warnings`: [{ code, zone, message }] (see layoutWarnings).
  */
 export function layoutPlants(g, plants = PLANTS, { seed = 1, region, sun } = {}) {
   if (!region) throw new TypeError('layoutPlants needs a region (pnw or on)');
@@ -208,7 +209,38 @@ export function layoutPlants(g, plants = PLANTS, { seed = 1, region, sun } = {})
     // Big rim shrubs stop at their share: they shade out the side slope.
     fill(zone, species.slice().reverse(), (p) => (isBig(p, zone) ? 0 : Infinity));
   });
+  placed.warnings = layoutWarnings(pool, placed);
   return placed;
+}
+
+/**
+ * Say so when a zone came out thin, instead of failing silently.
+ * - no-species-for-light: the region has none for this zone in this light.
+ * - small-garden-few-species: fewer than 3 species placed (and the pool has more).
+ * - small-garden-small-drifts: under half the zone's plants are in drifts of 3+.
+ */
+function layoutWarnings(pool, placed) {
+  const out = [];
+  for (const zone of ZONES) {
+    const available = new Set(pool.filter((p) => p.zone === zone).map((p) => p.id)).size;
+    const here = placed.filter((p) => p.zone === zone);
+    if (!available) {
+      out.push({ code: 'no-species-for-light', zone, message: `No native ${zone}-zone plants for this light; leave it mulched.` });
+      continue;
+    }
+    const species = new Set(here.map((p) => p.id)).size;
+    if (species < Math.min(3, available)) {
+      out.push({ code: 'small-garden-few-species', zone, message: `Only ${species} species fit the ${zone} zone; a larger garden takes 3-5.` });
+    }
+    const drifts = new Map();
+    for (const p of here) drifts.set(p.drift, (drifts.get(p.drift) || 0) + 1);
+    let inBig = 0;
+    for (const [, k] of drifts) if (k >= 3) inBig += k;
+    if (here.length && inBig < here.length / 2) {
+      out.push({ code: 'small-garden-small-drifts', zone, message: `The ${zone} zone is too small for drifts of 3-7 of one species.` });
+    }
+  }
+  return out;
 }
 
 /** Shopping list: one row per species, sorted by zone (wet, middle, edge) then qty desc. */

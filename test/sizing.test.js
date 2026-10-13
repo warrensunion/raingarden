@@ -49,6 +49,16 @@ test('Wisconsin far table (>= 30 ft from downspout) applies at all depths', () =
   assert.equal(sizeGarden({ ...base, soil: 'clay', depthM: 0.15 }).factor, 0.10);
 });
 
+test('Wisconsin 30 ft cut-off compared in metres', () => {
+  const base = { region: 'on', drainageAreaM2: 100, soil: 'loam', depthM: 0.15 };
+  assert.equal(sizeGarden({ ...base, downspoutDistM: 9.144 }).inputs.distance, '>=30 ft');
+  assert.equal(sizeGarden({ ...base, downspoutDistM: 9.14 }).inputs.distance, '<30 ft');
+});
+
+test('soil lookup ignores inherited keys', () => {
+  assert.throws(() => sizeGarden({ region: 'on', drainageAreaM2: 1, soil: 'toString', depthM: 0.15 }), RangeError);
+});
+
 test('Wisconsin near table depth bands', () => {
   const base = { region: 'on', drainageAreaM2: 100, soil: 'clay' };
   assert.equal(sizeGarden({ ...base, depthM: 4 * IN }).factor, 0.43);
@@ -100,7 +110,7 @@ test('costOf returns a CAD breakdown from area, depth and the amended layer', ()
   const g = { cx: 0, cy: 0, lenM: 4, widM: 2, rot: 0, depthM: 0.15, bermM: 0.1 };
   const area = Math.PI * 2 * 1;
   const c = costOf(g);
-  assert.ok(Math.abs(c.excavation - area * 0.15 * 60) < 1e-9);
+  assert.ok(Math.abs(c.excavation - area * (0.15 + 0.3048) * 60) < 1e-9); // bowl + amended layer
   assert.ok(Math.abs(c.soil - area * 0.3048 * 90) < 1e-9);
   assert.ok(Math.abs(c.mulch - area * 12) < 1e-9);
   assert.ok(Math.abs(c.plants - area * 45) < 1e-9);

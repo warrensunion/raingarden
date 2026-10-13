@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { forbiddenMask, gardenCells, applyGarden } from '../src/garden/constraints.js';
+import { forbiddenMask, gardenCells, applyGarden, ellipseRho } from '../src/garden/constraints.js';
 
 function flat(nx, ny, cell, f = () => 0) {
   const z = new Float64Array(nx * ny);
@@ -110,8 +110,8 @@ test('applyGarden floor is level and below the rim; berm raised; input untouched
     assert.ok(!(mask[i] && bermMask[i]));
   }
   assert.ok(nb > 0);
-  // berm ring at most ~0.6 m (+ half a cell) outside the ellipse
-  assert.equal(bermMask[at(t, 10 + 3 * Math.cos(0.3) + 1.2 * Math.cos(0.3), 10 + 3 * Math.sin(0.3) + 1.2 * Math.sin(0.3))], 0);
+  // berm ring is a few cells wide, not unbounded
+  assert.equal(bermMask[at(t, 10 + 3 * Math.cos(0.3) + 1.8 * Math.cos(0.3), 10 + 3 * Math.sin(0.3) + 1.8 * Math.sin(0.3))], 0);
 });
 
 test('applyGarden with a garden off the grid returns an unchanged copy and empty mask', () => {
@@ -119,4 +119,44 @@ test('applyGarden with a garden off the grid returns an unchanged copy and empty
   const { terrain, mask } = applyGarden(t, { cx: 50, cy: 50, lenM: 2, widM: 1, rot: 0, depthM: 0.15, bermM: 0.1 });
   assert.deepEqual(terrain.z, t.z);
   assert.ok(mask.every((v) => v === 0));
+});
+
+test('berm blocks every 8-neighbour of the garden (D8 cannot leak diagonally) on tilted planes', () => {
+  let cases = 0;
+  for (const cell of [0.25, 0.5, 1]) {
+    for (const [sx, sy] of [[0, 0], [0.05, 0], [0.03, 0.04], [-0.06, 0.02], [0.1, -0.1]]) {
+      for (const rot of [0, 0.3, 0.8, 1.3, 2.2]) {
+        const n = Math.round(24 / cell);
+        const t = flat(n, n, cell, (x, y) => sx * x + sy * y);
+        const g = { cx: 12, cy: 12, lenM: 6, widM: 3, rot, depthM: 0.15, bermM: 0.1 };
+        const { terrain, mask, floorZ } = applyGarden(t, g);
+        for (let y = 1; y < n - 1; y++) for (let x = 1; x < n - 1; x++) {
+          const i = y * n + x;
+          if (!mask[i]) continue;
+          for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+            const j = i + dy * n + dx;
+            if (!mask[j]) assert.ok(terrain.z[j] >= floorZ + g.depthM - 1e-12, `leak at cell ${cell} slope ${sx},${sy} rot ${rot}`);
+          }
+        }
+        cases++;
+      }
+    }
+  }
+  assert.equal(cases, 75);
+});
+
+test('septic: a cell beside the lower part of a sloped field counts as uphill (min septic z + 0.05 m)', () => {
+  const t = flat(40, 40, 0.5, (x, y) => -0.2 * y);
+  const septic = [[10, 14], [12, 14], [12, 16], [10, 16]];
+  const m = forbiddenMask(t, { yard: YARD, wall: WALL, septic });
+  // y = 15.25: z = -3.05, below the field's mean (-3.0) but > min (-3.15) + 0.05; 4.25 m to the side
+  assert.equal(m[at(t, 16.25, 15.25)], 1);
+  // y = 15.75: z = -3.15 = min septic z -> level, 10 ft buffer only
+  assert.equal(m[at(t, 16.25, 15.75)], 0);
+});
+
+test('ellipse with a zero or negative axis is a RangeError', () => {
+  const t = flat(10, 10, 0.5);
+  assert.throws(() => gardenCells(t, { cx: 2, cy: 2, lenM: 0, widM: 1, rot: 0 }), RangeError);
+  assert.throws(() => ellipseRho({ cx: 0, cy: 0, lenM: 2, widM: -1, rot: 0 }, 0, 0), RangeError);
 });

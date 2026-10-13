@@ -204,3 +204,60 @@ Zones are radius fractions of the ellipse:
 4. **Excavation volume understates the dig.** As ruled, excavation = area × depth. Physically, the amended 0.3 m layer is also dug out (WSU gives a 24–42 in total excavation). The cost therefore under-counts digging by about area × 0.3 × $60.
 5. **Ponding ranges outside the charts.** Depths outside 6–12 in are mapped to the nearest WSU row. Wisconsin depths above 8 in use the 8 in factor and add a warning.
 6. **Rawls clay rate is below the WSU chart.** At 0.3 mm/h, clay is under the chart's 0.1 in/h minimum. Clay in PNW is clamped to the lowest band and a warning is returned. The UI should surface that warning, because WSU's advice is to "consider a different location".
+
+## Fix round 1
+
+### Changes
+
+1. **Berm no longer leaks diagonally (`constraints.js` `applyGarden`).**
+   - **Old berm:** "inflate both semi-axes by 0.6 m". This left gaps between diagonal neighbours.
+   - **New berm:** a disc dilation of the garden mask, with radius R = ceil(max(0.6 m, cell·√2)/cell) cells. That is R = 2 at 0.5 m and 1 m cells, and R = 3 at 0.25 m cells.
+   - Every 8-neighbour of the garden is now berm, raised to at least floor + depthM + bermM. Under D8 the pond therefore holds the full depthM before it spills.
+   - The berm is wider than before: about 1 m on 0.5 m cells.
+   - The layout's "edge" zone still uses the 0.6 m plant ring.
+2. **Septic uphill test is now conservative (`forbiddenMask`).**
+   - A cell is uphill when its z is greater than the **minimum** ground z over the septic polygon + 0.05 m. Within 0.05 m counts as level and gets the 10 ft buffer.
+   - This replaces the comparison with the mean z.
+   - The constant is `SEPTIC_LEVEL_TOL_M`, and the change is logged in DECISIONS.md.
+3. **Excavation now includes the amended layer (`cost.js`).**
+   - Excavation = area × (depthM + 0.3048) × excavPerM3.
+   - The test and the DECISIONS.md cost line are updated. This resolves concern 4 from the first round.
+4. **Minor fixes:**
+   - `sizeGarden` uses `Object.hasOwn` for the soil lookup. Before, `soil: 'toString'` caused a TypeError; it now throws a RangeError.
+   - The 30 ft cut-off is compared in metres: `downspoutDistM >= 9.144 - 1e-9`.
+   - `ellipseRho`, and so also `gardenCells`, `applyGarden` and layout, throws a RangeError when lenM ≤ 0 or widM ≤ 0.
+   - `layoutPlants` now attaches `.warnings` to the returned array. Each warning is `{ code, zone, message }`, with one of these codes:
+
+     | Code | Raised when |
+     |---|---|
+     | `small-garden-few-species` | fewer than min(3, available) species were placed in a zone |
+     | `small-garden-small-drifts` | under half of a zone's plants are in drifts of 3 or more |
+     | `no-species-for-light` | the light filter leaves a zone with no species |
+
+     The array's elements and their order are unchanged.
+
+### New tests
+
+All six were RED first, each failing for the expected reason:
+
+| Test | RED failure |
+|---|---|
+| Berm blocks every 8-neighbour, 75 cases: cells 0.25/0.5/1 m × 5 tilts × 5 rotations | `leak at cell 0.5 slope 0.05,0 rot 0.3` |
+| A cell beside the lower part of a sloped field is uphill | expected 1, got 0 |
+| Zero or negative axis throws RangeError | missing expected exception |
+| Small garden returns warnings; a roomy one returns none | `.warnings` undefined |
+| Soil lookup ignores inherited keys | `Received "TypeError"` |
+| Cost includes the amended layer in excavation | old value |
+
+The 30 ft cut-off test (9.144 m → '>=30 ft', 9.14 m → '<30 ft') passed before the change: 9.144/0.3048 happens to equal exactly 30 in floating point. The change makes this independent of float luck.
+
+### Command and output
+
+```
+node --test test/sizing.test.js test/constraints.test.js test/layout.test.js
+ℹ tests 37
+ℹ pass 37
+ℹ fail 0
+```
+
+`npm test` gives the same result: 37 pass, 0 fail.

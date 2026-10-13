@@ -49,7 +49,7 @@ function sizeWisconsin({ drainageAreaM2, soil, depthM, downspoutDistM = 0 }) {
   const soilClass = WI_SOIL[soil];
   const depthIn = depthM / IN_M;
   const warnings = [];
-  const far = downspoutDistM / FT_M >= 30;
+  const far = downspoutDistM >= 30 * FT_M - 1e-9; // 30 ft = 9.144 m
   let factor;
   let depthBand;
   if (far) {
@@ -158,7 +158,7 @@ function sizeWsu({ drainageAreaM2, soil, depthM, drainRateMmH, rainRegion = 4, p
  * @returns {{areaM2:number, factor:number, method:string, cite:string, inputs:object, warnings:string[]}}
  */
 export function sizeGarden(o) {
-  if (!(o.soil in RAWLS_KS_MMH)) throw new RangeError(`unknown soil ${o.soil}`);
+  if (!Object.hasOwn(RAWLS_KS_MMH, o.soil)) throw new RangeError(`unknown soil ${o.soil}`);
   if (!(o.drainageAreaM2 >= 0)) throw new RangeError('drainageAreaM2 must be >= 0');
   if (!(o.depthM > 0)) throw new RangeError('depthM must be > 0');
   if (o.region === 'pnw') return sizeWsu(o);
