@@ -364,3 +364,213 @@ A botanically accurate illustrated cut-out of one mature Red-twig dogwood (Cornu
 A botanically accurate illustrated cut-out of one mature Douglas spirea (hardhack) (Spiraea douglasii) plant, whole plant from the base, seen from the side at eye level, in bloom (rosy-pink flower spikes); WSU zones 1–2. Great for butterflies, but can spread and crowd out other plants in constantly wet soil.
 
 + CUTOUT line
+
+### plant-black-twinberry (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Black twinberry (Lonicera involucrata) plant, whole plant from the base, seen from the side at eye level, in bloom (yellow flowers; red bracts); WSU zones 1–3. Attracts hummingbirds. Needs room, and may need pruning to stay tidy.
+
++ CUTOUT line
+
+### plant-pacific-crabapple (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Pacific crabapple (Malus fusca) plant, a young tree, whole plant from the base, seen from the side at eye level, in bloom (white to pink blossoms); WSU zones 1–3. A native small tree for larger rain gardens. Its fruit attracts wildlife.
+
++ CUTOUT line
+
+### plant-deer-fern (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Deer fern (Blechnum spicant) plant, whole plant from the base, seen from the side at eye level, foliage glossy dark-green fronds; WSU zones 1–3, evergreen. Tolerates shallow flooding, but keep it out of sun.
+
++ CUTOUT line
+
+### plant-western-columbine (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Western columbine (Aquilegia formosa) plant, whole plant from the base, seen from the side at eye level, in bloom (red and yellow); WSU zones 2–3. Attracts hummingbirds, re-seeds itself, and tolerates seasonal flooding.
+
++ CUTOUT line
+
+### plant-common-camas (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Common camas (Camassia quamash) plant, whole plant from the base, seen from the side at eye level, in bloom (deep blue); WSU zones 2–3. A bulb that is showiest planted in groups. It is wet in spring and dormant by summer.
+
++ CUTOUT line
+
+### plant-douglas-aster (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Douglas aster (Symphyotrichum subspicatum) plant, whole plant from the base, seen from the side at eye level, in bloom (blue-purple, yellow centre); WSU zones 1–3. A late-season bloomer that spreads. It prefers full sun but tolerates some shade.
+
++ CUTOUT line
+
+### plant-common-snowberry (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Common snowberry (Symphoricarpos albus) plant, whole plant from the base, seen from the side at eye level, in bloom (pink flowers; white berries); WSU zones 2–3. Thicket-forming and good for pollinators. Its white berries last into winter.
+
++ CUTOUT line
+
+### plant-pacific-ninebark (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Pacific ninebark (Physocarpus capitatus) plant, whole plant from the base, seen from the side at eye level, in bloom (white flowers; peeling bark); WSU zones 1–3. Best in part shade. We placed it on the side slope because it is large.
+
++ CUTOUT line
+
+### plant-western-sword-fern (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Western sword fern (Polystichum munitum) plant, whole plant from the base, seen from the side at eye level, foliage evergreen dark-green fronds; WSU zones 2–3, evergreen. A stately native fern that prefers some shade.
+
++ CUTOUT line
+
+### plant-kinnikinnick (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Kinnikinnick (bearberry) (Arctostaphylos uva-ursi) plant, whole plant from the base, seen from the side at eye level, in bloom (white-pink bells; red berries); WSU zones 2–3, evergreen. A low groundcover for the berm that is easy care once established.
+
++ CUTOUT line
+
+### plant-tall-oregon-grape (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Tall Oregon grape (Mahonia aquifolium) plant, whole plant from the base, seen from the side at eye level, in bloom (yellow flowers; blue-black berries); WSU zones 2–3, evergreen. Glossy holly-like leaves, and it attracts hummingbirds.
+
++ CUTOUT line
+
+### plant-evergreen-huckleberry (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Evergreen huckleberry (Vaccinium ovatum) plant, whole plant from the base, seen from the side at eye level, in bloom (pinkish-white flowers); WSU zone 3 only, evergreen. Suits partly or very shady rims.
+
++ CUTOUT line
+
+### plant-oceanspray (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Oceanspray (Holodiscus discolor) plant, whole plant from the base, seen from the side at eye level, in bloom (creamy-white plumes); WSU zone 3 only. A good soil binder, and great for native butterflies and birds.
+
++ CUTOUT line
+
+### plant-red-flowering-currant (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Red-flowering currant (Ribes sanguineum) plant, whole plant from the base, seen from the side at eye level, in bloom (rosy-red); WSU zones 2–3. Its early flowers feed hummingbirds. Thornless.
+
++ CUTOUT line
+
+### plant-western-serviceberry (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Western serviceberry (saskatoon) (Amelanchier alnifolia) plant, whole plant from the base, seen from the side at eye level, in bloom (white flowers; purple berries); WSU zones 2–3. A large shrub or small tree whose berries attract native birds.
+
++ CUTOUT line
+
+### plant-blue-flag-iris (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Blue flag iris (Iris versicolor) plant, whole plant from the base, seen from the side at eye level, in bloom (blue-violet); CVC Low zone. Spreads slowly. Buy it by Latin name, because it is often confused with invasive yellow flag iris.
+
++ CUTOUT line
+
+### plant-swamp-milkweed (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Swamp milkweed (Asclepias incarnata) plant, whole plant from the base, seen from the side at eye level, in bloom (pink); CVC Low zone. A monarch butterfly host plant.
+
++ CUTOUT line
+
+### plant-spotted-joe-pye-weed (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Spotted Joe-Pye weed (Eutrochium maculatum) plant, whole plant from the base, seen from the side at eye level, in bloom (pink-mauve); CVC Low zone. A tall nectar plant for the back of the garden (App. B lists it as Eupatorium maculatum).
+
++ CUTOUT line
+
+### plant-soft-rush (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Soft rush (Juncus effusus) plant, whole plant from the base, seen from the side at eye level, foliage green stems; brown seed clusters; CVC Middle/Low; placed in wet (App. B zone L). CVC lists ssp. solutus (lamp rush). Clumping, and salt tolerant per TRCA STEP.
+
++ CUTOUT line
+
+### plant-bristly-sedge (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Bristly (bottlebrush) sedge (Carex comosa) plant, whole plant from the base, seen from the side at eye level, foliage green; bottlebrush seed heads; CVC Middle/Low; placed in wet (STEP moisture "wet"). Clump-forming. No published spacing, so spacing = lower spread.
+
++ CUTOUT line
+
+### plant-monkeyflower (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Square-stemmed monkeyflower (Mimulus ringens) plant, whole plant from the base, seen from the side at eye level, in bloom (lavender); CVC Low zone. Spreads by underground roots. No published spacing, so spacing = lower spread.
+
++ CUTOUT line
+
+### plant-cardinal-flower (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Cardinal flower (Lobelia cardinalis) plant, whole plant from the base, seen from the side at eye level, in bloom (scarlet red); CVC Middle/Low. A hummingbird magnet that is short-lived but self-seeds. CVC marks it rare in the watershed. No published spacing, so spacing = lower spread.
+
++ CUTOUT line
+
+### plant-great-blue-lobelia (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Great blue lobelia (Lobelia siphilitica) plant, whole plant from the base, seen from the side at eye level, in bloom (blue); CVC Middle/Low. Self-sows easily.
+
++ CUTOUT line
+
+### plant-white-turtlehead (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature White turtlehead (Chelone glabra) plant, whole plant from the base, seen from the side at eye level, in bloom (white to cream); CVC Middle/Low. Its flowers are shaped like a turtle head. App. B says it "cannot tolerate drought".
+
++ CUTOUT line
+
+### plant-fox-sedge (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Fox sedge (Carex vulpinoidea) plant, whole plant from the base, seen from the side at eye level, foliage green; brown-yellow seed heads; CVC Middle/Low. A clump-forming sedge that tolerates compaction and pollution.
+
++ CUTOUT line
+
+### plant-sensitive-fern (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Sensitive fern (Onoclea sensibilis) plant, whole plant from the base, seen from the side at eye level, foliage light-green fronds; CVC Middle/Low. Takes full sun if the soil stays moist. Sensitive to frost.
+
++ CUTOUT line
+
+### plant-red-osier-dogwood (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Red-osier dogwood (Cornus sericea) plant, whole plant from the base, seen from the side at eye level, in bloom (white flowers; red winter twigs); CVC Middle/Low. Tolerates short flooding but is sensitive to road salt.
+
++ CUTOUT line
+
+### plant-new-england-aster (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature New England aster (Symphyotrichum novae-angliae) plant, whole plant from the base, seen from the side at eye level, in bloom (purple); CVC Middle zone. A late-season pollinator plant that helps stabilize slopes.
+
++ CUTOUT line
+
+### plant-black-eyed-susan (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Black-eyed Susan (Rudbeckia hirta) plant, whole plant from the base, seen from the side at eye level, in bloom (yellow, dark centre); CVC High/Middle. Short-lived but self-seeds readily.
+
++ CUTOUT line
+
+### plant-wild-bergamot (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Wild bergamot (Monarda fistulosa) plant, whole plant from the base, seen from the side at eye level, in bloom (lavender); CVC High/Middle. Its leaves are aromatic, and deadheading extends the bloom.
+
++ CUTOUT line
+
+### plant-butterfly-milkweed (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Butterfly milkweed (Asclepias tuberosa) plant, whole plant from the base, seen from the side at eye level, in bloom (orange); CVC High/Middle. Does not tolerate wet soil, so keep it on the berm. A monarch host plant that CVC marks rare in the watershed.
+
++ CUTOUT line
+
+### plant-little-bluestem (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Little bluestem (Schizachyrium scoparium) plant, whole plant from the base, seen from the side at eye level, foliage blue-green; copper-red in fall; CVC High zone. Best on poor, dry soil, and its stems stand through winter. CVC marks it rare in the watershed.
+
++ CUTOUT line
+
+### plant-pennsylvania-sedge (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Pennsylvania sedge (Carex pensylvanica) plant, whole plant from the base, seen from the side at eye level, foliage fine bright green; CVC High zone. A low, mounding groundcover that does well under trees.
+
++ CUTOUT line
+
+### plant-foxglove-beardtongue (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Foxglove beardtongue (Penstemon digitalis) plant, whole plant from the base, seen from the side at eye level, in bloom (white); CVC High/Middle. Short-lived but spreads by seed and rhizomes. CVC marks it rare in the watershed.
+
++ CUTOUT line
+
+### plant-smooth-serviceberry (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Smooth serviceberry (Amelanchier laevis) plant, a young tree, whole plant from the base, seen from the side at eye level, in bloom (white flowers); CVC High/Middle. Grows as a small tree or multi-stemmed shrub. App. B gives its size as 5–8 m by 4–6 m.
+
++ CUTOUT line
