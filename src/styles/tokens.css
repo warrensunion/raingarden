@@ -1,0 +1,32 @@
+/*
+ * The only colours in src/ (constraints.md), plus the motion tokens.
+ * Why tokens for motion too: CSS reveals and the JS-driven wipe must use the
+ * same curves (src/core/ease.js mirrors these numbers; change both).
+ */
+:root {
+  --slate-900: #26313C;
+  --slate-700: #3E4A59;
+  --rain: #7D8FA3;
+  --asphalt: #2B2F36;
+  --moss: #5F7A4A;
+  --fern: #9DB873;
+  --clay: #B9824F;
+  --teal: #49A3A0;
+  --paper: #ECE6DA;
+  --marigold: #E8B04A;
+
+  --ink-on-marigold: var(--slate-900);
+
+  /* NOTES §4/§6: easeOutCubic for UI (0.25 / 0.5 / 0.8 s), the house fast-out for reveals, the camera flight for wipes. */
+  --ease-ui: cubic-bezier(.215, .61, .355, 1);
+  --ease-reveal: cubic-bezier(.05, .75, .1, 1);
+  --ease-wipe: cubic-bezier(.65, 0, .35, 1);
+  --ease-frame: cubic-bezier(.83, 0, .17, 1);
+  --ease-in: cubic-bezier(.55, .055, .675, .19);
+  --t-fast: .25s;
+  --t-mid: .5s;
+  --t-slow: .8s;
+
+  --font-display: "Young Serif", Georgia, serif;
+  --font-ui: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+}
