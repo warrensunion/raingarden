@@ -52,9 +52,49 @@ test('bad params post an error instead of throwing', () => {
   assert.equal(msgs[0].id, 2);
 });
 
-test('optimize is a stub until Task 6', () => {
+function valley() {
+  const nx = 24, ny = 24, cell = 0.5, z = new Float64Array(nx * ny);
+  for (let y = 0; y < ny; y++) for (let x = 0; x < nx; x++) z[y * nx + x] = -0.04 * y * cell + 0.02 * Math.abs(x - 12) * cell;
+  const imperv = new Uint8Array(nx * ny);
+  for (let x = 0; x < nx; x++) imperv[x] = 1;
+  const forbidden = new Uint8Array(nx * ny);
+  for (let y = 0; y < ny; y++) for (let x = 0; x < nx; x++) if (y < 7 || x < 1 || y > 22 || x > 22) forbidden[y * nx + x] = 1;
+  return {
+    terrain: { nx, ny, cell, z }, forbidden, soil: 'loam', imperv, outlet: edgeMask(nx, ny),
+    roof: { areaM2: 60, cell: nx + 12, mask: imperv },
+    storm: { totalMm: 30, shape: 'IA', durationH: 24 }, stepS: 300,
+    limits: { maxAreaM2: 6, budget: 1500 }, prior: { areaM2: 3 }, iters: 8, seed: 1,
+  };
+}
+
+test('optimize posts throttled tries (nothing transferred) then done', () => {
+  // frozen clock: only the first try gets through the 20/s throttle
+  const msgs = [];
+  handle({ type: 'optimize', id: 9, params: valley() }, (m, transfer) => msgs.push({ m, transfer }), () => 1000);
+  const tries = msgs.filter((x) => x.m.type === 'try');
+  assert.equal(tries.length, 1);
+  assert.equal(tries[0].m.id, 9);
+  assert.ok(!tries[0].transfer || tries[0].transfer.length === 0);
+  assert.ok(tries[0].m.garden && Number.isFinite(tries[0].m.outAfterL));
+  const last = msgs[msgs.length - 1].m;
+  assert.equal(last.type, 'done');
+  assert.equal(last.id, 9);
+  assert.equal(last.result.ok, true);
+  assert.ok(last.result.capturedL > 0);
+  assert.equal(last.result.tries, 9);
+});
+
+test('optimize posts every try when the clock moves >= 50 ms between them', () => {
+  let t = 0;
+  const msgs = [];
+  handle({ type: 'optimize', id: 4, params: valley() }, (m) => msgs.push(m), () => (t += 60));
+  const done = msgs.find((m) => m.type === 'done');
+  assert.equal(msgs.filter((m) => m.type === 'try').length, done.result.tries);
+});
+
+test('optimize with bad params posts an error', () => {
   const msgs = [];
   handle({ type: 'optimize', id: 3, params: {} }, (m) => msgs.push(m));
   assert.equal(msgs[0].type, 'error');
-  assert.match(msgs[0].error, /not implemented/);
+  assert.equal(msgs[0].id, 3);
 });
