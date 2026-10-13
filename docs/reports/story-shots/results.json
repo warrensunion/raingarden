@@ -2,14 +2,18 @@
   "viewports": {
     "390": {
       "errors": [],
-      "preloaderTailMs": 3479,
-      "preloaderCachedMs": 1633,
+      "preloaderTailMs": 3877,
+      "preloaderCachedMs": 3613,
+      "rainIdle": {
+        "state": "on",
+        "opacity": "1"
+      },
       "overflowX": 0,
       "fps": {
-        "fps": 143.7,
+        "fps": 134.9,
         "p95ms": 7.1,
-        "over33ms": 0,
-        "frames": 1294
+        "over33ms": 4,
+        "frames": 1214
       },
       "reduced": {
         "wipeVisible": "hidden",
@@ -18,14 +22,18 @@
     },
     "1440": {
       "errors": [],
-      "preloaderTailMs": 3853,
-      "preloaderCachedMs": 1507,
+      "preloaderTailMs": 3621,
+      "preloaderCachedMs": 6462,
+      "rainIdle": {
+        "state": "on",
+        "opacity": "1"
+      },
       "overflowX": -15,
       "fps": {
-        "fps": 143.2,
-        "p95ms": 7,
-        "over33ms": 0,
-        "frames": 1289
+        "fps": 110.4,
+        "p95ms": 14,
+        "over33ms": 14,
+        "frames": 991
       },
       "reduced": {
         "wipeVisible": "hidden",
@@ -34,14 +42,18 @@
     },
     "1920": {
       "errors": [],
-      "preloaderTailMs": 3130,
-      "preloaderCachedMs": 1641,
+      "preloaderTailMs": 3978,
+      "preloaderCachedMs": 4372,
+      "rainIdle": {
+        "state": "on",
+        "opacity": "1"
+      },
       "overflowX": -15,
       "fps": {
-        "fps": 139.9,
-        "p95ms": 7.1,
-        "over33ms": 0,
-        "frames": 1259
+        "fps": 111.4,
+        "p95ms": 13.9,
+        "over33ms": 9,
+        "frames": 1004
       },
       "reduced": {
         "wipeVisible": "hidden",

@@ -6,7 +6,8 @@
  *
  * Depth `z` is distance from the camera in units of the pivot distance
  * (NOTES "Techniques" #3): back plate 3.0, mist 2.5, subject 1.0 (the pivot,
- * it never slides), mid cut-outs 0.6-0.8, foreground band 0.2. The far and
+ * it never slides), mid cut-outs 0.6-0.8, foreground band FORE_Z (0.44, derived
+ * in parallax.js from the reference's measured -5 px per 100 px). The far and
  * near plates are one painting split along a traced skyline by
  * scripts/split-plates.mjs, so they share the plate's geometry exactly.
  *
@@ -22,6 +23,7 @@
  * layer, so the drop stays on the gutter whatever the viewport.
  */
 import storms from '../data/storms-richmond.json';
+import { FORE_Z } from './parallax.js';
 
 /** One roof, 150 m², in the 90th-percentile design storm: litres = m² × mm. */
 const ROOF_M2 = 150;
@@ -36,7 +38,7 @@ const plates = (scene, alt) => [
   { kind: 'mist', z: 2.5 },
   { kind: 'plate', src: split(scene, 'near'), z: 1.0, alt },
 ];
-const band = (scene) => ({ kind: 'band', src: art(`band-${scene}`), z: 0.2, alt: '' });
+const band = (scene) => ({ kind: 'band', src: art(`band-${scene}`), z: FORE_Z, alt: '' });
 
 export const scenes = [
   {

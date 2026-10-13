@@ -117,6 +117,13 @@ async function split(name) {
   const out = Buffer.alloc(w * h * 3);
   for (let i = 0; i < w * h * 3; i++) out[i] = Math.round(Math.min(1, filled[i]) * 255);
   await sharp(out, { raw: { width: w, height: h, channels: 3 } }).webp({ quality: 80, effort: 6 }).toFile(`${OUT}/plate-${name}-far.webp`);
+  // Wipe veil: the far plate, softened (1100 px, 2.2 px blur) and darkened: a rain-soaked painted curtain.
+  await sharp(out, { raw: { width: w, height: h, channels: 3 } })
+    .resize(1100)
+    .blur(2.2)
+    .modulate({ brightness: 0.6, saturation: 0.85 })
+    .webp({ quality: 68 })
+    .toFile(`${OUT}/plate-${name}-veil.webp`);
   console.log('split', name, w + 'x' + h);
 }
 

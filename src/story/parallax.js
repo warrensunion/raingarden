@@ -11,10 +11,11 @@
  * Calibration (NOTES "Techniques" #2): camera offset ±0.8 x ±0.45 units at
  * pivot distance 50 gives the back plate (z = 3) +2.6 px per 100 px of mouse
  * at 1440 wide; so K_X = 0.026 / (1 - 1/3) = 0.039 px per px. Vertical uses
- * the same camera scaled by 0.45/0.8 and the viewport aspect. Resulting
- * px per 100 px of mouse at 1440: back +2.6, mist +2.3, subject 0, mid (0.7)
- * -1.7, band (0.2) -15.6, which is the reference's "foreground travels about
- * 2x the background, opposite" once its fore cards (0.1-0.3x) are counted.
+ * the same camera scaled by 0.45/0.8 and the viewport aspect. The foreground
+ * plane is placed where the same camera gives the reference's MEASURED fore
+ * shift, -5 px per 100 px: 1 - 1/z = -0.05/K_X, so z = FORE_Z = 0.438.
+ * Resulting px per 100 px of mouse at 1440: back +2.6, mist +2.3, subject 0,
+ * mid (0.7) -1.7, foreground band -5.0.
  *
  * Scroll moves the same camera: it cranes down through each scene by
  * CRANE x viewport height and dollies in by DOLLY pivot units, so the plate
@@ -24,6 +25,9 @@ import { env } from '../core/env.js';
 import { follow } from '../core/ease.js';
 
 export const K_X = 0.039;
+/** Foreground plane depth derived from the measured fore shift (-5 px per 100 px at 1440). */
+export const FORE_SHIFT = -0.05;
+export const FORE_Z = 1 / (1 - FORE_SHIFT / K_X);
 const K_Y_RATIO = 0.45 / 0.8;
 const TAU = 0.3;
 export const CRANE = 1.9;

@@ -23,7 +23,7 @@ import { scroll, settleScroll } from '../core/scroll.js';
 import { onFrame } from '../core/raf.js';
 import { easeWipe, clamp, lerp } from '../core/ease.js';
 import { warmImages, whenIdle } from '../core/lazy.js';
-import { createCamera, layerMotion } from './parallax.js';
+import { createCamera, layerMotion, FORE_Z } from './parallax.js';
 import { createDrop } from './drop.js';
 
 const PLATE_W = 1672;
@@ -63,13 +63,10 @@ function buildLayer(layer, sceneIndex) {
   }
   const img = el('img', `sl sl-${layer.kind}`, { alt: layer.alt ?? '', decoding: 'async' });
   if (layer.kind === 'plate') { img.width = PLATE_W; img.height = PLATE_H; }
-  if (eager) {
-    img.src = layer.src;
-    img.setAttribute('fetchpriority', 'high');
-  } else {
-    img.loading = 'lazy';
-    img.dataset.src = layer.src;
-  }
+  // Scene 1's bytes are fetched once by the preloader and handed over as blobs (adopt()).
+  if (eager) img.setAttribute('fetchpriority', 'high');
+  else img.loading = 'lazy';
+  img.dataset.src = layer.src;
   return img;
 }
 
@@ -102,9 +99,11 @@ export function startStory(root, { onDesign } = {}) {
   const views = scenes.map((scene, i) => {
     const wrap = el('div', 'story-scene', { 'data-scene': scene.id });
     const layers = el('div', 'story-layers');
+    const above = [];
     const items = scene.layers.map((layer) => {
       const node = buildLayer(layer, i);
-      layers.append(node);
+      // The soil cut-away carries text, so it sits above the scrim (z 3), not in the art stack.
+      if (layer.kind === 'section') above.push(node); else layers.append(node);
       return { layer, node, cx: 0, cy: 0 };
     });
     const copy = el('section', 'story-copy', { 'aria-labelledby': `scene-${scene.id}` });
@@ -123,17 +122,22 @@ export function startStory(root, { onDesign } = {}) {
         <a class="story-demo" href="#designer" data-design="demo">Try a demo yard</a>`;
       copy.append(actions);
     }
-    wrap.append(layers, copy);
+    wrap.append(layers, ...above, copy);
     return { scene, wrap, layers, items, copy, h, warmed: i === 0 };
   });
 
   const rainCanvas = el('canvas', 'story-rain', { 'aria-hidden': 'true' });
   const scrim = el('div', 'story-scrim', { 'aria-hidden': 'true' });
+  // The wipe: the next scene's band twice (offset, mirrored) at the leading edge, a painted
+  // veil (its far plate, blurred and darkened offline) as the body, the band mirrored as the tail.
   const wipe = el('div', 'story-wipe', { 'aria-hidden': 'true' });
-  const wipeBand = el('img', 'story-wipe-band', { alt: '', decoding: 'async' });
+  const wipeImg = (cls) => el('img', 'story-wipe-' + cls, { alt: '', decoding: 'async' });
+  const wipeBands = [wipeImg('band story-wipe-band2'), wipeImg('band')];
+  const wipeVeil = wipeImg('veil');
   const wipeBody = el('div', 'story-wipe-body');
-  const wipeTail = el('img', 'story-wipe-band story-wipe-tail', { alt: '', decoding: 'async' });
-  wipe.append(wipeBand, wipeBody, wipeTail);
+  wipeBody.append(wipeVeil);
+  const wipeTail = wipeImg('band story-wipe-tail');
+  wipe.append(...wipeBands, wipeBody, wipeTail);
   const frame = el('div', 'story-frame', { 'aria-hidden': 'true' });
   stage.append(...views.map((v) => v.wrap), rainCanvas, scrim);
   const drop = createDrop(stage, scenes);
@@ -228,20 +232,36 @@ export function startStory(root, { onDesign } = {}) {
     copyIn = i;
   }
 
+  /** Loads the wipe for scene i as soon as the scene before it is current, so its first frame has art. */
   function setWipeScene(i) {
     if (i === wipeFor) return;
     wipeFor = i;
     const src = `/art/band-${scenes[i].id}.webp`;
-    wipeBand.src = src;
+    for (const b of wipeBands) b.src = src;
     wipeTail.src = src;
+    wipeVeil.src = `/art/story/plate-${scenes[i].id}-veil.webp`;
   }
 
+  let lastKey = '';
+  let offscreen = false;
+  let wiping = false;
   function frameUpdate(dt) {
     cam.update(dt);
     const f = (scroll.y - L.top) / L.sceneH;
     const i = clamp(Math.floor(f), 0, n - 1);
     const p = f - i;
     const still = env.reducedMotion;
+
+    // Story scrolled fully past: nothing to draw.
+    const off = f > n;
+    if (off !== offscreen) { offscreen = off; rain?.setIntensity(0); }
+    if (off) return;
+    // Settled (no scroll, camera and cursor at rest): nothing changed since the last write.
+    const key = `${f.toFixed(4)}|${cam.x.toFixed(2)}|${cam.y.toFixed(2)}|${cam.px}|${cam.py}|${L.vw}|${L.vh}|${still}|${entered}`;
+    // The drop's lean eases on after the pointer stops, so keep drawing until it has settled too.
+    if (key === lastKey && drop.settled) return;
+    lastKey = key;
+    setWipeScene(Math.min(i + 1, n - 1));
 
     let w = -1;
     if (!still && i < n - 1 && p > WIPE_FROM) w = easeWipe((p - WIPE_FROM) / (1 - WIPE_FROM));
@@ -268,10 +288,10 @@ export function startStory(root, { onDesign } = {}) {
     }
 
     // The wipe: next scene's foreground, 1.6x, sweeping up over the frame.
+    if ((w >= 0) !== wiping) { wiping = w >= 0; stage.classList.toggle('is-wiping', wiping); }
     if (w >= 0) {
-      setWipeScene(i + 1);
       const y = L.vh - w * (L.vh + L.wipeH);
-      const x = layerMotion(0.2, cam, 0.5, L.vw, L.vh, motion).tx; // band depth
+      const x = layerMotion(FORE_Z, cam, 0.5, L.vw, L.vh, motion).tx; // foreground depth
       wipe.style.visibility = 'visible';
       wipe.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0)`;
     } else wipe.style.visibility = 'hidden';
@@ -281,7 +301,8 @@ export function startStory(root, { onDesign } = {}) {
     if (rain) {
       const a = scenes[i].rain, b = scenes[Math.min(i + 1, n - 1)].rain;
       const past = clamp((f - (n - 1)) / 0.4);
-      rain.setIntensity(w >= 0 ? lerp(a, b, w) : scenes[vis].rain * (1 - past));
+      // During the wipe the rain sits above the curtain and peaks at full intensity at the swap.
+      rain.setIntensity(w >= 0 ? Math.max(lerp(a, b, w), Math.sin(Math.PI * w)) : scenes[vis].rain * (1 - past));
       rain.setVelocity(scroll.velocity);
     }
   }
@@ -327,22 +348,34 @@ export function startStory(root, { onDesign } = {}) {
   let resizeTimer = 0;
   const onResize = () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => { layout(); settleScroll(); }, 120);
+    resizeTimer = setTimeout(() => { layout(); settleScroll(); lastKey = ''; }, 120);
   };
   window.addEventListener('resize', onResize);
-  const offEnv = onEnvChange(() => { layout(); visible = -1; copyIn = -1; });
+  const offEnv = onEnvChange(() => { layout(); visible = -1; copyIn = -1; lastKey = ''; });
+
+  function adopt(blobs) {
+    for (const img of stage.querySelectorAll('.story-scene:first-child img[data-src], img.story-drop[data-src]')) {
+      const blob = blobs.get(img.dataset.src);
+      img.src = blob ? URL.createObjectURL(blob) : img.dataset.src;
+      img.removeAttribute('data-src');
+    }
+  }
 
   layout();
-  document.fonts?.ready.then(layout);
+  document.fonts?.ready.then(() => { layout(); lastKey = ''; });
   const offFrame = onFrame(frameUpdate);
 
   return {
     /** First-scene choreography once the page is uncovered. */
+    /** Hands scene 1 (and the drop) the preloader's already-fetched bytes: one download each. */
+    adopt,
     enter() {
+      adopt(new Map());
       entered = true;
       copyIn = -1;
       stage.classList.add('is-entered');
-      import('./rain-overlay.js').then(({ startRain }) => { rain = startRain(rainCanvas); });
+      // A new overlay needs this frame's intensity even if nothing else has moved: force a write.
+      import('./rain-overlay.js').then(({ startRain }) => { rain = startRain(rainCanvas); lastKey = ''; });
       warm(Math.max(visible, 0) + 1);
       whenIdle(() => warm(Math.max(visible, 0) + 2));
     },
@@ -352,6 +385,8 @@ export function startStory(root, { onDesign } = {}) {
       cam.destroy();
       drop.destroy();
       rain?.destroy();
+      rain = null;
+      lastKey = '';
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('scroll', onScrollIdle);
       window.removeEventListener('resize', onResize);

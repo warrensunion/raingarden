@@ -17,10 +17,11 @@
 
   --ink-on-marigold: var(--slate-900);
 
-  /* NOTES §4/§6: easeOutCubic for UI (0.25 / 0.5 / 0.8 s), the house fast-out for reveals, the camera flight for wipes. */
+  /* NOTES §4/§6: easeOutCubic for UI (0.25 / 0.5 / 0.8 s), the house fast-out for reveals, the camera flight for wipes
+     (GSAP Power3.easeInOut = quart, which fits the measured 10/50/90 % points). */
   --ease-ui: cubic-bezier(.215, .61, .355, 1);
   --ease-reveal: cubic-bezier(.05, .75, .1, 1);
-  --ease-wipe: cubic-bezier(.65, 0, .35, 1);
+  --ease-wipe: cubic-bezier(.76, 0, .24, 1);
   --ease-frame: cubic-bezier(.83, 0, .17, 1);
   --ease-in: cubic-bezier(.55, .055, .675, .19);
   --t-fast: .25s;
