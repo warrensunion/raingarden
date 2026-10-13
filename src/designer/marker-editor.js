@@ -91,8 +91,9 @@ export function createMarkerEditor(host, { photoUrl, aspect, marks, onChange }) 
       transform: `translate(${X(get())} ${Y(get())})`,
     });
     if (icon) {
-      el('circle', { r: 24 * s, class: 'dz-pin' }, g);
-      el('path', { d: ICONS[icon], transform: `scale(${2.2 * s})`, class: 'dz-pin-icon' }, g);
+      el('circle', { r: 22 * s, class: 'dz-hit' }, g);
+      el('circle', { r: 16 * s, class: 'dz-pin' }, g);
+      el('path', { d: ICONS[icon], transform: `scale(${1.5 * s})`, class: 'dz-pin-icon' }, g);
     } else {
       el('circle', { r: 22 * s, class: 'dz-hit' }, g);
       el('circle', { r: 9 * s, class: 'dz-dot' }, g);
@@ -145,22 +146,22 @@ export function createMarkerEditor(host, { photoUrl, aspect, marks, onChange }) 
     const s = k();
     for (const line of overlay) {
       if (line.length < 2) continue;
-      el('polyline', { points: line.map((p) => `${X(p)},${Y(p)}`).join(' '), class: 'dz-contour', 'stroke-width': 2.2 * s }, lineLayer);
+      el('polyline', { points: line.map((p) => `${X(p)},${Y(p)}`).join(' '), class: 'dz-contour', 'stroke-width': 2 }, lineLayer);
     }
     for (const kind of ['yard', 'septic']) {
       const pts = marks[kind] || [];
       if (pts.length < 2) continue;
       const tag = closed[kind] ? 'polygon' : 'polyline';
-      el(tag, { points: pts.map((p) => `${X(p)},${Y(p)}`).join(' '), class: `dz-poly dz-poly-${kind}`, 'stroke-width': 3 * s }, lineLayer);
+      el(tag, { points: pts.map((p) => `${X(p)},${Y(p)}`).join(' '), class: `dz-poly dz-poly-${kind}`, 'stroke-width': 2.5 }, lineLayer);
     }
     if (marks.scale && marks.scale.a && marks.scale.b) {
       const { a, b } = marks.scale;
-      el('line', { x1: X(a), y1: Y(a), x2: X(b), y2: Y(b), class: 'dz-scale', 'stroke-width': 4 * s, 'stroke-dasharray': `${10 * s} ${7 * s}` }, lineLayer);
+      el('line', { x1: X(a), y1: Y(a), x2: X(b), y2: Y(b), class: 'dz-scale', 'stroke-width': 3.5, 'stroke-dasharray': `${9 * s} ${6 * s}` }, lineLayer);
       const t = el('text', { x: (X(a) + X(b)) / 2, y: (Y(a) + Y(b)) / 2 - 22 * s, class: 'dz-scale-label', 'font-size': 18 * s }, lineLayer);
       t.textContent = `${(marks.scale.meters || 1).toFixed(1)} m`;
     }
     if (marks.wall && marks.wall.length >= 2) {
-      el('polyline', { points: marks.wall.map((p) => `${X(p)},${Y(p)}`).join(' '), class: 'dz-wall-line', 'stroke-width': 2 * s, 'stroke-dasharray': `${4 * s} ${6 * s}` }, lineLayer);
+      el('polyline', { points: marks.wall.map((p) => `${X(p)},${Y(p)}`).join(' '), class: 'dz-wall-line', 'stroke-width': 1.5, 'stroke-dasharray': `${4 * s} ${6 * s}` }, lineLayer);
     }
   }
 

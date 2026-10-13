@@ -254,3 +254,12 @@ test('optimizer failures in plain words, each with suggestions', () => {
   }
   assert.match(failureWords('everything is within 3 m of the house').say, /3 m/);
 });
+
+test('lerpFrames can fade the last frame out after a run that ended early (ponds empty)', () => {
+  const frames = [{ t: 900, depth: new Float32Array([2, 4]) }];
+  const out = new Float32Array(2);
+  lerpFrames(frames, 900 + 450, out, 900);
+  assert.deepEqual([...out], [1, 2]);
+  lerpFrames(frames, 5000, out, 900);
+  assert.deepEqual([...out], [0, 0]);
+});

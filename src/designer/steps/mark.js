@@ -50,7 +50,7 @@ export default function mark(sheet, ctx) {
   const skip = b.querySelector('.dz-skip');
   const undo = b.querySelector('.dz-undo');
   roofIn.value = String(state.roofAreaM2);
-  metersIn.value = String((m.scale && m.scale.meters) || 1);
+  metersIn.value = ((m.scale && m.scale.meters) || 1).toFixed(1);
 
   metersIn.addEventListener('input', () => {
     const v = parseFloat(metersIn.value);

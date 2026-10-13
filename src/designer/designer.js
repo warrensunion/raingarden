@@ -274,6 +274,13 @@ export function openDesigner(root, { mode = 'capture' } = {}) {
       yardHost.classList.add('is-dip');
       setTimeout(() => { fn(); yardHost.classList.remove('is-dip'); }, 250);
     },
+    /** Scroll the sheet (not the page) so a just-filled element is in view. */
+    reveal(node) {
+      const panes = node.closest('.dz-panes');
+      if (!panes) return;
+      const over = node.getBoundingClientRect().bottom - panes.getBoundingClientRect().bottom + 12;
+      if (over > 0) panes.scrollBy({ top: over, behavior: reducedMotion ? 'auto' : 'smooth' });
+    },
     startDemo,
   };
 

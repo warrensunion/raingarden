@@ -520,6 +520,8 @@ polygon.dz-poly-septic { fill: var(--clay); fill-opacity: .14; }
 @media (max-width: 1023px) {
   .dz.is-photo .dz-photo-host { padding: 58px 8px 26px; }
   .dz-pane { padding-top: 8px; }
+  .dz-thumb { max-height: 24vh; width: auto; max-width: 100%; }
+  .dz-split-tag { top: 64px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -14,6 +14,7 @@
 import { chromium } from 'playwright';
 import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import sharp from 'sharp';
 
 const base = process.argv[2] || 'http://localhost:5191';
@@ -46,7 +47,7 @@ async function shot(page, name) {
   await page.screenshot({ path: `${out}/${name}.png` });
 }
 
-async function openSite(ctx, r) {
+async function openSite(ctx, r, query = '') {
   const page = await ctx.newPage();
   page.on('console', (m) => {
     if (m.type() === 'error') r.errors.push(m.text());
@@ -54,7 +55,7 @@ async function openSite(ctx, r) {
   });
   page.on('pageerror', (e) => r.errors.push(String(e)));
   page.on('response', (res) => { if (res.status() >= 400 && !res.url().endsWith('favicon.ico')) r.errors.push(`${res.status()} ${res.url()}`); });
-  await page.goto(base + '/', { waitUntil: 'load' });
+  await page.goto(base + '/' + query, { waitUntil: 'load' });
   await page.waitForFunction(() => !document.documentElement.classList.contains('pl-on'), null, { timeout: 60000 }).catch(() => {});
   await sleep(1500);
   return page;
@@ -66,8 +67,9 @@ async function demoRun(vp) {
   const browser = await chromium.launch({ headless: false, args: GPU });
   const ctx = await browser.newContext({
     viewport: { width: vp.width, height: vp.height }, deviceScaleFactor: 1, isMobile: !!vp.mobile, hasTouch: !!vp.mobile, acceptDownloads: true,
+    reducedMotion: vp.reduced ? 'reduce' : 'no-preference',
   });
-  const page = await openSite(ctx, r);
+  const page = await openSite(ctx, r, vp.query || '');
   const p = `${vp.name}`;
   await page.evaluate(() => document.querySelector('a[data-design="demo"]').click());
   await waitStep(page, 3, 60000);
@@ -120,13 +122,18 @@ async function demoRun(vp) {
   const pdf = await readFile(pdfPath);
   r.pdf = { bytes: pdf.length, header: pdf.subarray(0, 5).toString('latin1'), eof: pdf.subarray(-6).toString('latin1').trim() };
   r.hscrollEnd = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+  // back to the marks (the demo skips them): the editor with the demo's marks
+  await page.evaluate(() => window.__raingarden.goTo(2));
+  await waitStep(page, 2);
+  await sleep(1200);
+  await shot(page, `${p}-02-mark-demo`);
   await browser.close();
 }
 
 async function cameraRun() {
   const r = { errors: [], logs: [] };
   results.camera = r;
-  const y4m = `${out}/../demo-yard.y4m`;
+  const y4m = resolve(out, '..', 'demo-yard.y4m');
   if (!existsSync(y4m)) { r.skipped = `no ${y4m}`; return; }
   const browser = await chromium.launch({
     headless: false,
@@ -179,9 +186,14 @@ async function cameraRun() {
   await browser.close();
 }
 
-const VPS = [{ name: '1440', width: 1440, height: 900 }, { name: '390', width: 390, height: 844, mobile: true }];
+const VPS = [
+  { name: '1440', width: 1440, height: 900 },
+  { name: '390', width: 390, height: 844, mobile: true },
+  // the Canvas2D fallback with reduced motion: the same flow must work end to end
+  { name: 'static', width: 1440, height: 900, query: '?static=1', reduced: true, optional: true },
+];
 for (const vp of VPS) {
-  if (only && only !== vp.name) continue;
+  if (only ? only !== vp.name : vp.optional) continue;
   try { await demoRun(vp); } catch (e) { results[vp.name].fatal = String(e && e.stack || e); console.error(e); }
 }
 if (!only || only === 'camera') {

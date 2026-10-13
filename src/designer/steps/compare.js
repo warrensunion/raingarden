@@ -114,8 +114,8 @@ export default function compare(sheet, ctx) {
     pb = createPlayback(b.querySelector('.dz-play-host'), {
       spanS, mm: storm.mm, stepS: storm.stepS, reducedMotion: ctx.reducedMotion,
       onTime(t, rate) {
-        lerpFrames(af, t, dA);
-        lerpFrames(bf, t, dB);
+        lerpFrames(af, t, dA, state.after.result.drained ? 900 : 0);
+        lerpFrames(bf, t, dB, state.before.result.drained ? 900 : 0);
         const y = ctx.yard();
         if (!y) return;
         y.setWater(dA, { rainMmH: rate });

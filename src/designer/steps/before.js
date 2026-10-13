@@ -54,7 +54,7 @@ export default function before(sheet, ctx) {
     pb = createPlayback(b.querySelector('.dz-play-host'), {
       spanS, mm: storm.mm, stepS: storm.stepS, reducedMotion: ctx.reducedMotion,
       onTime(t, rate) {
-        lerpFrames(frames, t, depth);
+        lerpFrames(frames, t, depth, state.before.result.drained ? 900 : 0);
         ctx.yard()?.setWater(depth, { rainMmH: rate });
         const l = ledgerAt(frames, t);
         cFallen.textContent = fmtL(l.rainL + l.roofL);

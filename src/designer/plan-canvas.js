@@ -46,7 +46,11 @@ export function soilMix(soil) {
     : ['Mix about 60% screened sand with 40% compost.', 'Or mix 65% of your own soil with 35% compost.'];
 }
 
-/** A painted cut-out has transparent corners; an opaque one is a placeholder card. */
+/**
+ * A painted cut-out is mostly transparent just inside its edges; a labelled
+ * placeholder card (art-src/MISSING.md) is opaque all round that ring, so it
+ * gets the plain plant symbol instead of a grey card on the plan.
+ */
 function isCutout(img) {
   if (!img || !img.naturalWidth) return false;
   try {
@@ -55,8 +59,16 @@ function isCutout(img) {
     const g = c.getContext('2d', { willReadFrequently: true });
     g.drawImage(img, 0, 0, 16, 16);
     const px = g.getImageData(0, 0, 16, 16).data;
-    const alpha = (x, y) => px[(y * 16 + x) * 4 + 3];
-    return [alpha(0, 0), alpha(15, 0), alpha(0, 15), alpha(15, 15)].every((v) => v < 40);
+    let ring = 0;
+    let opaque = 0;
+    for (let y = 2; y <= 13; y++) {
+      for (let x = 2; x <= 13; x++) {
+        if (x !== 2 && x !== 13 && y !== 2 && y !== 13) continue;
+        ring++;
+        if (px[(y * 16 + x) * 4 + 3] > 200) opaque++;
+      }
+    }
+    return opaque / ring < 0.7;
   } catch {
     return false;
   }
@@ -217,7 +229,7 @@ export async function drawPlan(d, canvas = document.createElement('canvas')) {
   ctx.strokeStyle = C.slate700;
   ctx.globalAlpha = 0.35;
   ctx.lineWidth = 3;
-  ctx.strokeRect(80, 80, PLAN_W - 160, PLAN_H - 160);
+  ctx.strokeRect(60, 60, PLAN_W - 120, PLAN_H - 120);
   ctx.globalAlpha = 1;
 
   // ---- header ----
@@ -535,7 +547,7 @@ export async function drawPlan(d, canvas = document.createElement('canvas')) {
   });
 
   // ---- safety box ----
-  y = 3240;
+  y = 3222;
   const bh = 150;
   ctx.strokeStyle = C.marigold;
   ctx.lineWidth = 8;
@@ -545,6 +557,6 @@ export async function drawPlan(d, canvas = document.createElement('canvas')) {
   para(ctx, SAFETY, M + 40, y + 58, PLAN_W - 2 * M - 80, 42, `700 32px ${SANS}`);
 
   // ---- sources ----
-  para(ctx, d.sources.join('  ·  '), M, 3432, PLAN_W - 2 * M, 30, `400 22px ${SANS}`, C.slate700);
+  para(ctx, d.sources.join('  ·  '), M, 3404, PLAN_W - 2 * M, 30, `400 22px ${SANS}`, C.slate700);
   return canvas;
 }

@@ -297,7 +297,11 @@ export default function slope(sheet, ctx) {
     await read();
     if (!alive) return;
     line.textContent = '';
-    await apply(true);
+    if (state.terrain) {
+      // back from a later step: same terrain, same yard (no rebuild)
+      drawThumb(state.terrain);
+      describe();
+    } else await apply(true);
     if (!alive) return;
     setTimeout(() => alive && ctx.pose('storm'), 900);
     ctx.setResult({ step: 'slope', confidence: state.hf.confidence, manual: state.slope.manual, source: state.slope.source, backend: state.depthBackend || null });

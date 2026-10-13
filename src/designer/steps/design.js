@@ -178,6 +178,7 @@ export default function design(sheet, ctx) {
     outcome.innerHTML = `<p class="dz-result">${say}</p>
       <p class="dz-note">About $${fmtNum(cost.total)} to build yourself (digging, soil, mulch, plants). Ponded water drains in ${Math.round(res.drainH)} h (the limit is 48 h).</p>
       <button type="button" class="dz-text-btn dz-again">Try again</button>`;
+    ctx.reveal(outcome);
     outcome.querySelector('.dz-again').addEventListener('click', () => { state.design = null; ctx.resetFrom('limits'); run(); });
     sheet.setPrimary({ label: 'Plant it', onClick: () => ctx.next() });
   }

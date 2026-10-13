@@ -349,11 +349,21 @@ export function frameIndexAt(frames, t) {
   return { i: lo, k: (t - frames[lo].t) / (frames[hi].t - frames[lo].t) };
 }
 
-/** Write the depth at time t into out (linear between frames). */
-export function lerpFrames(frames, t, out) {
+/**
+ * Write the depth at time t into out (linear between frames). fadeS > 0: past
+ * the last frame the water fades to nothing over fadeS seconds (the sim stops
+ * sending frames once every pond is empty, so the last sheet flow must drain).
+ */
+export function lerpFrames(frames, t, out, fadeS = 0) {
   const { i, k } = frameIndexAt(frames, t);
   if (i < 0) { out.fill(0); return out; }
   const a = frames[i].depth;
+  const last = frames[frames.length - 1];
+  if (fadeS > 0 && t > last.t) {
+    const f = Math.max(0, 1 - (t - last.t) / fadeS);
+    for (let j = 0; j < out.length; j++) out[j] = last.depth[j] * f;
+    return out;
+  }
   if (k === 0 || i + 1 >= frames.length) { out.set(a.subarray(0, out.length)); return out; }
   const b = frames[i + 1].depth;
   for (let j = 0; j < out.length; j++) out[j] = a[j] + (b[j] - a[j]) * k;
