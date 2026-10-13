@@ -146,3 +146,29 @@ Where this section and the text above disagree, this section is current.
 ### Shots read this round
 
 `1440-5-garden.png`: labels crisp above the scrim, larger cut-away. `1440-wipe.png` and `1440-wipe-mid.png`: double band leading edge, then the rain-soaked painted drain scene with rain in front. `390-5-garden.png`: headline "Or your yard / drinks it.", labels legible. `390-wipe.png` and `390-wipe-mid.png`: painted curtain, no slate panel.
+
+## Fix round 2 (rain idle after the settled-key skip)
+
+**Bug:** on an idle first load the rain never started. `enter()` changed the frame key once. `rain` was only assigned later, when `import('./rain-overlay.js')` resolved, and by then the key was stable. So `setIntensity` was never called until the reader scrolled or moved the mouse.
+
+**Changes:**
+- `story.js` resets `lastKey = ''` when the overlay is created, in the `.then` that assigns `rain`. `destroy()` also nulls `rain` and resets the key.
+- The drop now reports `settled` (its lean is within 0.1 px of the pointer target). The frame loop only skips when the key is unchanged and `drop.settled` is true, so the drop's 0.30 s lean finishes easing after the pointer stops.
+- `rain-overlay.js` sets `data-rain="on"` or `"off"` on the canvas, only when it switches between drawing and cleared (no per-frame DOM writes).
+- `scripts/verify-story.mjs` now loads with no scroll and no mouse, waits 2 s after the preloader, and records an error unless `data-rain="on"`.
+
+**The check would have caught it.** I ran it with the `lastKey` reset removed:
+
+```
+1440 {"errors":["rain overlay idle after an idle load: {\"state\":\"none\",\"opacity\":\"0\"}"], ...}
+```
+
+**With the fix**, `node scripts/verify-story.mjs http://localhost:5181 docs/reports/story-shots`:
+
+| Viewport | rain after idle load | errors | fps (auto-scroll) | p95 | frames > 33 ms |
+|---|---|---|---|---|---|
+| 1440×900 | on, opacity 1 | 0 | 110.4 | 14.0 ms | 14 |
+| 1920×1080 | on, opacity 1 | 0 | 111.4 | 13.9 ms | 9 |
+| 390×844 | on, opacity 1 | 0 | 134.9 | 7.1 ms | 4 |
+
+The machine was still saturated by other agents during these runs. overflowX is 0 at 390, and reduced motion still hides the wipe. `npx vite build` is clean (`✓ built`, no warnings).

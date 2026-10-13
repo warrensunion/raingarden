@@ -88,6 +88,7 @@ export function createDrop(stage, scenes) {
    */
   function update(scene, p, toScreen, cam, dt, show) {
     if (!show || env.reducedMotion) {
+      api.settled = true;
       drop.style.opacity = '0';
       splash.style.opacity = '0';
       return;
@@ -110,6 +111,7 @@ export function createDrop(stage, scenes) {
     const f = follow(dt, TAU);
     lean.x += (lx - lean.x) * f;
     lean.y += (ly - lean.y) * f;
+    api.settled = Math.abs(lx - lean.x) < 0.1 && Math.abs(ly - lean.y) < 0.1;
 
     const fadeIn = clamp((p + 0.06) / 0.08);
     const fadeOut = 1 - clamp((p - TRAVEL_END) / 0.05);
@@ -129,9 +131,12 @@ export function createDrop(stage, scenes) {
     } else splash.style.opacity = '0';
   }
 
-  return {
+  const api = {
+    /** True once the lean has caught up with the pointer; story.js may then skip frames. */
+    settled: true,
     update,
     resize,
     destroy() { drop.remove(); splash.remove(); },
   };
+  return api;
 }

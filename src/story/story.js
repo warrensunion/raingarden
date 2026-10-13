@@ -258,7 +258,8 @@ export function startStory(root, { onDesign } = {}) {
     if (off) return;
     // Settled (no scroll, camera and cursor at rest): nothing changed since the last write.
     const key = `${f.toFixed(4)}|${cam.x.toFixed(2)}|${cam.y.toFixed(2)}|${cam.px}|${cam.py}|${L.vw}|${L.vh}|${still}|${entered}`;
-    if (key === lastKey) return;
+    // The drop's lean eases on after the pointer stops, so keep drawing until it has settled too.
+    if (key === lastKey && drop.settled) return;
     lastKey = key;
     setWipeScene(Math.min(i + 1, n - 1));
 
@@ -373,7 +374,8 @@ export function startStory(root, { onDesign } = {}) {
       entered = true;
       copyIn = -1;
       stage.classList.add('is-entered');
-      import('./rain-overlay.js').then(({ startRain }) => { rain = startRain(rainCanvas); });
+      // A new overlay needs this frame's intensity even if nothing else has moved: force a write.
+      import('./rain-overlay.js').then(({ startRain }) => { rain = startRain(rainCanvas); lastKey = ''; });
       warm(Math.max(visible, 0) + 1);
       whenIdle(() => warm(Math.max(visible, 0) + 2));
     },
@@ -383,6 +385,8 @@ export function startStory(root, { onDesign } = {}) {
       cam.destroy();
       drop.destroy();
       rain?.destroy();
+      rain = null;
+      lastKey = '';
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('scroll', onScrollIdle);
       window.removeEventListener('resize', onResize);

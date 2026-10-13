@@ -72,7 +72,13 @@ for (const vp of VIEWPORTS) {
   await page.reload({ waitUntil: 'commit' });
   await page.waitForSelector('#pl', { state: 'detached', timeout: 30000 });
   r.preloaderCachedMs = Date.now() - t1;
-  await sleep(1800);
+  // Idle first load (no scroll, no mouse yet): the rain overlay must start on its own.
+  await sleep(2000);
+  r.rainIdle = await page.evaluate(() => {
+    const c = document.querySelector('.story-rain');
+    return { state: c?.dataset.rain ?? 'none', opacity: c ? getComputedStyle(c).opacity : '' };
+  });
+  if (r.rainIdle.state !== 'on' && !r.info?.includes('rain overlay')) r.errors.push('rain overlay idle after an idle load: ' + JSON.stringify(r.rainIdle));
 
   if (!vp.mobile) await page.mouse.move(vp.width * 0.62, vp.height * 0.45);
   for (let i = 0; i < SCENES.length; i++) {

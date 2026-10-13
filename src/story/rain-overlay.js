@@ -124,7 +124,7 @@ export function startRain(canvas) {
   window.addEventListener('resize', resize);
 
   let intensity = 0, shown = 0, velocity = 0, speed = 1, time = 0, lost = false;
-  let cleared = false;
+  let cleared = true;
   canvas.addEventListener('webglcontextlost', (e) => {
     e.preventDefault();
     lost = true;
@@ -141,10 +141,11 @@ export function startRain(canvas) {
     const n = Math.round(MAX * shown);
     // Nothing to draw: clear once, then leave the GPU alone.
     if (n <= 0) {
-      if (!cleared) { gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); canvas.style.opacity = '0'; cleared = true; }
+      if (!cleared) { gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); canvas.style.opacity = '0'; canvas.dataset.rain = 'off'; cleared = true; }
       return;
     }
-    if (cleared) { canvas.style.opacity = '1'; cleared = false; }
+    // data-rain flips only on/off transitions (no per-frame DOM writes); scripts/verify-story.mjs reads it.
+    if (cleared) { canvas.style.opacity = '1'; canvas.dataset.rain = 'on'; cleared = false; }
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniform1f(uTime, time);
