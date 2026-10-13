@@ -62,9 +62,9 @@
 .sl-section::before {
   content: "";
   position: absolute;
-  inset: -30% -110% -25% -45%;
+  inset: -25% -120% -20% -40%;
   z-index: -1;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--slate-900) 80%, transparent), transparent);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--slate-900) 88%, transparent) 35%, transparent);
 }
 .sl-section-img { width: 100%; height: 100%; filter: drop-shadow(0 20px 30px color-mix(in srgb, var(--asphalt) 70%, transparent)); }
 .sl-labels { position: absolute; inset: 0; }
@@ -118,12 +118,12 @@
   z-index: 2;
   pointer-events: none;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--slate-900) 55%, transparent) 0, transparent 140px),
+    linear-gradient(180deg, color-mix(in srgb, var(--slate-900) 65%, transparent) 0, transparent 150px),
     linear-gradient(90deg,
-      color-mix(in srgb, var(--slate-900) 72%, transparent) 0%,
-      color-mix(in srgb, var(--slate-900) 50%, transparent) 26%,
-      color-mix(in srgb, var(--slate-900) 16%, transparent) 46%,
-      transparent 60%);
+      color-mix(in srgb, var(--slate-900) 80%, transparent) 0%,
+      color-mix(in srgb, var(--slate-900) 64%, transparent) 26%,
+      color-mix(in srgb, var(--slate-900) 26%, transparent) 46%,
+      transparent 62%);
 }
 .story-drop, .story-splash {
   position: absolute;
@@ -154,6 +154,7 @@
 }
 .story-copy.is-in { pointer-events: auto; }
 .story-scene[data-scene="garden"] .story-copy { justify-content: flex-start; padding: 15vh 0 0; }
+.story-scene[data-scene="garden"] .story-h { max-width: min(9ch, 40vw); }
 .story-h {
   max-width: min(12ch, 44vw);
   font: 400 clamp(2.5rem, 7.2vw, 8rem)/1 var(--font-display);

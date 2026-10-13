@@ -215,8 +215,11 @@ export function startStory(root, { onDesign } = {}) {
     });
     visible = i;
     warm(i);
-    warm(i + 1);
-    whenIdle(() => warm(i + 2));
+    // Neighbours only once the preloader is done, so they don't race scene 1's decode.
+    if (entered) {
+      warm(i + 1);
+      whenIdle(() => warm(i + 2));
+    }
   }
 
   function setCopy(i) {
@@ -340,7 +343,8 @@ export function startStory(root, { onDesign } = {}) {
       copyIn = -1;
       stage.classList.add('is-entered');
       import('./rain-overlay.js').then(({ startRain }) => { rain = startRain(rainCanvas); });
-      whenIdle(() => warm(1));
+      warm(Math.max(visible, 0) + 1);
+      whenIdle(() => warm(Math.max(visible, 0) + 2));
     },
     destroy() {
       offFrame();

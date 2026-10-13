@@ -53,7 +53,7 @@ export const scenes = [
   },
   {
     id: 'drive',
-    headline: "It doesn't soak in.",
+    headline: 'It doesn’t soak in.',
     body: `${litres} litres run off one roof in a single design storm.`,
     layers: [
       ...plates('drive', 'Runoff sheets down a steep asphalt driveway into the street.'),
@@ -83,7 +83,7 @@ export const scenes = [
     body: 'Fast, dirty water scours the banks salmon need.',
     layers: [
       ...plates('creek', 'A storm pipe pours brown water into a creek, eroding its bank.'),
-      { kind: 'cut', src: art('creek-fish'), z: 0.8, alt: '', x: 0.36, y: 0.86, w: 15, drift: -0.06, phone: { x: 0.2, y: 0.62, w: 38 } },
+      { kind: 'cut', src: art('creek-fish'), z: 0.8, alt: '', x: 0.5, y: 0.74, w: 13, drift: -0.06, phone: { x: 0.3, y: 0.6, w: 34 } },
       { kind: 'cut', src: art('creek-reeds'), z: 0.6, alt: '', x: -0.06, y: 1.05, w: 34, phone: { x: -0.3, w: 80 } },
       band('creek'),
     ],
@@ -94,7 +94,7 @@ export const scenes = [
   {
     id: 'garden',
     headline: 'Or your yard drinks it.',
-    body: "A shallow bowl of native plants and loose soil soaks a roof's worth of rain into the ground.",
+    body: 'A shallow bowl of native plants and loose soil soaks a roof’s worth of rain into the ground.',
     layers: [
       ...plates('garden', 'A rain garden in cross-section: a downspout fills a planted bowl that drains through soil and gravel.'),
       { kind: 'section', src: art('soil-section'), z: 0.8, alt: 'Cut-away of the garden soil: mulch over amended soil over gravel.' },

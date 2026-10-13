@@ -7,8 +7,8 @@
  * HTTP cache), plus a final slice for decoding. At 100 %: hold 0.4 s, the
  * drop falls into the pool (0.6 s ease-in), and a ripple ring floods the
  * screen as a circular reveal of scene 1 (1.2 s --ease-wipe). Already cached
- * (loaded in under 0.3 s): no hold and half-length motion, under a second
- * in all. Reduced motion: a 0.4 s cross-fade. The markup and first-paint CSS
+ * (bytes back in under 0.3 s): no hold, the drop falls while scene 1
+ * decodes, and half-length motion: about 0.9 s from the bytes to the page. Reduced motion: a 0.4 s cross-fade. The markup and first-paint CSS
  * live inline in index.html, so it paints before this module arrives;
  * timings here are mirrored there (the pill's 0.5 s step transition).
  */
@@ -81,9 +81,12 @@ export async function runPreloader({ assets, decode, onReveal }) {
     bar.setAttribute('aria-valuenow', String(Math.round(v * 100)));
   };
   await fetchAll(assets, (a, b) => set(0.9 * (a / b)));
-  await Promise.all([decode?.(), document.fonts?.load('20px "Young Serif"'), document.fonts?.load('16px "Atkinson Hyperlegible Next"')].map((p) => Promise.resolve(p).catch(() => {})));
-  set(1);
+  performance.mark('pl:bytes');
+  // Cached = the bytes came back almost at once; then the drop falls while scene 1 decodes.
   const quick = performance.now() - t0 < QUICK_UNDER;
+  const ready = Promise.all([decode?.(), document.fonts?.load('20px "Young Serif"'), document.fonts?.load('16px "Atkinson Hyperlegible Next"')].map((p) => Promise.resolve(p).catch(() => {})))
+    .then(() => { set(1); performance.mark('pl:ready'); });
+  if (!quick || env.reducedMotion) await ready;
 
   if (env.reducedMotion) {
     html.classList.remove('pl-on');
@@ -94,7 +97,7 @@ export async function runPreloader({ assets, decode, onReveal }) {
   }
 
   // Let the pill's last 0.5 s step land, then hold.
-  await wait(quick ? 120 : 500 + HOLD);
+  if (!quick) await wait(500 + HOLD);
 
   const pr = pool.getBoundingClientRect();
   const dr = drop.getBoundingClientRect();
@@ -105,10 +108,11 @@ export async function runPreloader({ assets, decode, onReveal }) {
   const floodMs = quick ? FLOOD / 2 : FLOOD;
 
   bar.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: css('--ease-ui'), fill: 'forwards' });
-  await drop.animate(
+  const falling = drop.animate(
     [{ transform: 'translateY(0) scale(1, 1)', opacity: 1 }, { transform: `translateY(${fall}px) scale(0.7, 1.15)`, opacity: 1, offset: 0.9 }, { transform: `translateY(${fall}px) scale(0.2, 0.2)`, opacity: 0 }],
     { duration: fallMs, easing: css('--ease-in'), fill: 'forwards' },
   ).finished;
+  await Promise.all([falling, ready]);
 
   // Ripple, then the flood: scene 1 grows out of the pool.
   const siteTop = site.getBoundingClientRect().top;
