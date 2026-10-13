@@ -1,0 +1,2686 @@
+[
+ {
+  "target": "canvas#gl-canvas",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "alpha": 0
+  },
+  "from": null,
+  "t": 1838.7,
+  "method": "set"
+ },
+ {
+  "delay": 0.6,
+  "t": 1954.7,
+  "method": "delayedCall"
+ },
+ {
+  "target": "canvas#gl-canvas",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "alpha": 0
+  },
+  "from": null,
+  "t": 1955,
+  "method": "set"
+ },
+ {
+  "delay": 0.8,
+  "t": 2546.1,
+  "method": "delayedCall"
+ },
+ {
+  "delay": 0.5,
+  "t": 16851.5,
+  "method": "delayedCall"
+ },
+ {
+  "delay": 1.1,
+  "t": 16861.6,
+  "method": "delayedCall"
+ },
+ {
+  "target": "Object{onResize,uploadTex,canvas,dpr,width,height,gl,tex}",
+  "duration": 0.9,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.5781,
+    0.875,
+    0.9844
+   ],
+   "type": 1,
+   "power": 2,
+   "name": "Power2.easeOut"
+  },
+  "vars": {
+   "size": 0.35,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 17971.4,
+  "method": "to"
+ },
+ {
+  "target": "div.landing__logo.hide",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "width": 316.796875,
+   "height": 28.796875,
+   "top": 435.609375,
+   "left": 561.609375
+  },
+  "from": null,
+  "t": 17971.7,
+  "method": "set"
+ },
+ {
+  "target": "div.landing__logo",
+  "duration": 1.4,
+  "delay": 0.3,
+  "ease": {
+   "samples": [
+    0.8604,
+    0.9727,
+    0.9962
+   ],
+   "type": 0,
+   "power": 0,
+   "id": "custom",
+   "name": "CustomEase(custom)"
+  },
+  "vars": {
+   "autoAlpha": 1,
+   "scale": 1,
+   "ease": "[obj]",
+   "delay": 0.3
+  },
+  "from": {
+   "autoAlpha": 0,
+   "scale": 1.3
+  },
+  "t": 17972.3,
+  "method": "fromTo"
+ },
+ {
+  "target": "div.landing__logo",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "autoAlpha": 0,
+   "scale": 1.3,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 17972.4,
+  "method": "to"
+ },
+ {
+  "target": "div.landing__logo",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "autoAlpha": 0,
+   "scale": 1.3,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 18271.2,
+  "method": "to"
+ },
+ {
+  "target": "Object{onResize,uploadTex,canvas,dpr,width,height,gl,tex}",
+  "duration": 0.9,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.5781,
+    0.875,
+    0.9844
+   ],
+   "type": 1,
+   "power": 2,
+   "name": "Power2.easeOut"
+  },
+  "vars": {
+   "size": 0.4,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 24771.3,
+  "method": "to"
+ },
+ {
+  "target": "div.landing__logo",
+  "duration": 0.9,
+  "delay": 0.25,
+  "ease": {
+   "samples": [
+    0.5781,
+    0.875,
+    0.9844
+   ],
+   "type": 1,
+   "power": 2,
+   "name": "Power2.easeOut"
+  },
+  "vars": {
+   "scale": 1.1,
+   "ease": "[obj]",
+   "delay": 0.25
+  },
+  "from": null,
+  "t": 24771.5,
+  "method": "to"
+ },
+ {
+  "target": "canvas#gl-canvas",
+  "duration": 0.5,
+  "delay": 0.55,
+  "ease": {
+   "samples": [
+    0.0625,
+    0.5,
+    0.9375
+   ],
+   "type": 3,
+   "power": 2,
+   "name": "Power2.easeInOut"
+  },
+  "vars": {
+   "alpha": 1,
+   "ease": "[obj]",
+   "delay": 0.55
+  },
+  "from": {
+   "alpha": 0
+  },
+  "t": 28356.9,
+  "method": "fromTo"
+ },
+ {
+  "target": "canvas#gl-canvas",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "alpha": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 28357.1,
+  "method": "to"
+ },
+ {
+  "target": "div.landing__left-block",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "x": "-720px"
+  },
+  "from": null,
+  "t": 28357.2,
+  "method": "set"
+ },
+ {
+  "target": "div.landing__bottom-block.landing__bottom-block--left",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "x": "-720px"
+  },
+  "from": null,
+  "t": 28358.4,
+  "method": "set"
+ },
+ {
+  "target": "div.landing__center-bar.landing__center-bar--left",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "x": "-720px"
+  },
+  "from": null,
+  "t": 28358.9,
+  "method": "set"
+ },
+ {
+  "target": "div.landing__center-corner.landing__center-corner--left",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "x": "-720px"
+  },
+  "from": null,
+  "t": 28359,
+  "method": "set"
+ },
+ {
+  "target": "div.landing__right-block",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "x": "720px"
+  },
+  "from": null,
+  "t": 28359.3,
+  "method": "set"
+ },
+ {
+  "target": "div.landing__bottom-block.landing__bottom-block--right",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "x": "720px"
+  },
+  "from": null,
+  "t": 28359.5,
+  "method": "set"
+ },
+ {
+  "target": "div.landing__center-bar.landing__center-bar--right",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "x": "720px"
+  },
+  "from": null,
+  "t": 28359.7,
+  "method": "set"
+ },
+ {
+  "target": "div.landing__center-corner.landing__center-corner--right",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "x": "720px"
+  },
+  "from": null,
+  "t": 28359.9,
+  "method": "set"
+ },
+ {
+  "target": "div.landing__center-block",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "opacity": 0,
+   "scale": 0.6
+  },
+  "from": null,
+  "t": 28360,
+  "method": "set"
+ },
+ {
+  "target": "div.landing__title-placed",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "opacity": 0
+  },
+  "from": null,
+  "t": 28360.3,
+  "method": "set"
+ },
+ {
+  "target": "Object{onResize,uploadTex,canvas,dpr,width,height,gl,tex}",
+  "duration": 1.2,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.0313,
+    0.5,
+    0.9688
+   ],
+   "type": 3,
+   "power": 3,
+   "name": "Power3.easeInOut"
+  },
+  "vars": {
+   "size": 1,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 28360.4,
+  "method": "to"
+ },
+ {
+  "target": "div.landing__logo",
+  "duration": 0.8,
+  "delay": 0.3,
+  "ease": {
+   "samples": [
+    0.0156,
+    0.5,
+    0.9844
+   ],
+   "type": 3,
+   "power": 4,
+   "name": "Power4.easeInOut"
+  },
+  "vars": {
+   "scale": 2.5460419235511713,
+   "y": "241.9921875px",
+   "delay": 0.3,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 28360.5,
+  "method": "to"
+ },
+ {
+  "target": "div.landing__center-block",
+  "duration": 0.85,
+  "delay": 0.7,
+  "ease": {
+   "samples": [
+    0.8604,
+    0.9727,
+    0.9962
+   ],
+   "type": 0,
+   "power": 0,
+   "id": "custom",
+   "name": "CustomEase(custom)"
+  },
+  "vars": {
+   "opacity": 1,
+   "scale": 1,
+   "delay": 0.7,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 28360.7,
+  "method": "to"
+ },
+ {
+  "target": "div.landing__center-corner.landing__center-corner--left",
+  "duration": 1,
+  "delay": 0.6,
+  "ease": {
+   "samples": [
+    0.8604,
+    0.9727,
+    0.9962
+   ],
+   "type": 0,
+   "power": 0,
+   "id": "custom",
+   "name": "CustomEase(custom)"
+  },
+  "vars": {
+   "x": 0,
+   "delay": 0.6,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 28360.8,
+  "method": "to"
+ },
+ {
+  "target": "div.landing__center-corner.landing__center-corner--right",
+  "duration": 1,
+  "delay": 0.6,
+  "ease": {
+   "samples": [
+    0.8604,
+    0.9727,
+    0.9962
+   ],
+   "type": 0,
+   "power": 0,
+   "id": "custom",
+   "name": "CustomEase(custom)"
+  },
+  "vars": {
+   "x": 0,
+   "delay": 0.6,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 28360.8,
+  "method": "to"
+ },
+ {
+  "target": "div.landing__center-bar.landing__center-bar--left",
+  "duration": 1,
+  "delay": 0.75,
+  "ease": {
+   "samples": [
+    0.8604,
+    0.9727,
+    0.9962
+   ],
+   "type": 0,
+   "power": 0,
+   "id": "custom",
+   "name": "CustomEase(custom)"
+  },
+  "vars": {
+   "x": 0,
+   "delay": 0.75,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 28360.9,
+  "method": "to"
+ },
+ {
+  "target": "div.landing__center-bar.landing__center-bar--right",
+  "duration": 1,
+  "delay": 0.75,
+  "ease": {
+   "samples": [
+    0.8604,
+    0.9727,
+    0.9962
+   ],
+   "type": 0,
+   "power": 0,
+   "id": "custom",
+   "name": "CustomEase(custom)"
+  },
+  "vars": {
+   "x": 0,
+   "delay": 0.75,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 28360.9,
+  "method": "to"
+ },
+ {
+  "target": "div.landing__left-block",
+  "duration": 1,
+  "delay": 0.9,
+  "ease": {
+   "samples": [
+    0.8604,
+    0.9727,
+    0.9962
+   ],
+   "type": 0,
+   "power": 0,
+   "id": "custom",
+   "name": "CustomEase(custom)"
+  },
+  "vars": {
+   "x": 0,
+   "delay": 0.9,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 28360.9,
+  "method": "to"
+ },
+ {
+  "target": "div.landing__right-block",
+  "duration": 1,
+  "delay": 0.9,
+  "ease": {
+   "samples": [
+    0.8604,
+    0.9727,
+    0.9962
+   ],
+   "type": 0,
+   "power": 0,
+   "id": "custom",
+   "name": "CustomEase(custom)"
+  },
+  "vars": {
+   "x": 0,
+   "delay": 0.9,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 28360.9,
+  "method": "to"
+ },
+ {
+  "target": "div.landing__bottom-block.landing__bottom-block--left",
+  "duration": 1,
+  "delay": 1.05,
+  "ease": {
+   "samples": [
+    0.8604,
+    0.9727,
+    0.9962
+   ],
+   "type": 0,
+   "power": 0,
+   "id": "custom",
+   "name": "CustomEase(custom)"
+  },
+  "vars": {
+   "x": 0,
+   "delay": 1.05,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 28360.9,
+  "method": "to"
+ },
+ {
+  "target": "div.landing__bottom-block.landing__bottom-block--right",
+  "duration": 1,
+  "delay": 1.05,
+  "ease": {
+   "samples": [
+    0.8604,
+    0.9727,
+    0.9962
+   ],
+   "type": 0,
+   "power": 0,
+   "id": "custom",
+   "name": "CustomEase(custom)"
+  },
+  "vars": {
+   "x": 0,
+   "delay": 1.05,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 28360.9,
+  "method": "to"
+ },
+ {
+  "delay": 10,
+  "t": 28360.9,
+  "method": "delayedCall"
+ },
+ {
+  "target": "div.audio-btn.hide",
+  "duration": 0.6,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.5781,
+    0.875,
+    0.9844
+   ],
+   "type": 1,
+   "power": 2,
+   "name": "Power2.easeOut"
+  },
+  "vars": {
+   "autoAlpha": 1,
+   "scale": 1,
+   "ease": "[obj]",
+   "clearProps": "transform"
+  },
+  "from": {
+   "autoAlpha": 0,
+   "scale": 0
+  },
+  "t": 28361.6,
+  "method": "fromTo"
+ },
+ {
+  "target": "div.audio-btn.hide",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "autoAlpha": 0,
+   "scale": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 28361.8,
+  "method": "to"
+ },
+ {
+  "target": "div.audio-btn.hide",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "autoAlpha": 0,
+   "scale": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 28380.3,
+  "method": "to"
+ },
+ {
+  "target": "canvas#gl-canvas",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "alpha": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 28907.4,
+  "method": "to"
+ },
+ {
+  "target": "div.landing",
+  "duration": 1,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.0625,
+    0.5,
+    0.9375
+   ],
+   "type": 3,
+   "power": 2,
+   "name": "Power2.easeInOut"
+  },
+  "vars": {
+   "y": "100%",
+   "ease": "[obj]"
+  },
+  "from": {
+   "y": 0
+  },
+  "t": 48919.8,
+  "method": "fromTo"
+ },
+ {
+  "target": "div.landing",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 48920,
+  "method": "to"
+ },
+ {
+  "target": "canvas#gl-canvas",
+  "duration": 1,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.0625,
+    0.5,
+    0.9375
+   ],
+   "type": 3,
+   "power": 2,
+   "name": "Power2.easeInOut"
+  },
+  "vars": {
+   "y": "100%",
+   "ease": "[obj]"
+  },
+  "from": {
+   "y": 0
+  },
+  "t": 48920.4,
+  "method": "fromTo"
+ },
+ {
+  "target": "canvas#gl-canvas",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 48920.6,
+  "method": "to"
+ },
+ {
+  "delay": 0.7,
+  "t": 48921,
+  "method": "delayedCall"
+ },
+ {
+  "target": "div.landing",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 48922.9,
+  "method": "to"
+ },
+ {
+  "target": "canvas#gl-canvas",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 48923.3,
+  "method": "to"
+ },
+ {
+  "target": "canvas#gl-canvas",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": "-100%"
+  },
+  "from": null,
+  "t": 49623,
+  "method": "set"
+ },
+ {
+  "target": "canvas#gl-canvas",
+  "duration": 1,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.0625,
+    0.5,
+    0.9375
+   ],
+   "type": 3,
+   "power": 2,
+   "name": "Power2.easeInOut"
+  },
+  "vars": {
+   "y": "0%",
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 49623.7,
+  "method": "to"
+ },
+ {
+  "target": "d{id,root,mats,texs,gltf,lights,npr,voiceAudio}",
+  "duration": 1.5,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.0156,
+    0.5,
+    0.9844
+   ],
+   "type": 3,
+   "power": 4,
+   "name": "Power4.easeInOut"
+  },
+  "vars": {
+   "marieLouiseOffset": 0,
+   "ease": "[obj]",
+   "delay": 0
+  },
+  "from": {
+   "marieLouiseOffset": 3
+  },
+  "t": 49922.2,
+  "method": "fromTo"
+ },
+ {
+  "target": "d{id,root,mats,texs,gltf,lights,npr,voiceAudio}",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "marieLouiseOffset": 3,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 49922.4,
+  "method": "to"
+ },
+ {
+  "target": "d{id,root,mats,texs,gltf,lights,npr,voiceAudio}",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "marieLouiseOffset": 3,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 49922.6,
+  "method": "to"
+ },
+ {
+  "target": "d{id,root,mats,texs,gltf,lights,npr,voiceAudio}",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "marieLouiseOffset": 3,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 49930,
+  "method": "to"
+ },
+ {
+  "target": "d{list,children,parent,_hasCode,_hasSetup,_invalid,_proxies,iColor}",
+  "duration": 8,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "progress": 1
+  },
+  "from": null,
+  "t": 50622.5,
+  "method": "to"
+ },
+ {
+  "target": "Object{vol}",
+  "duration": 0.6,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "vol": 1
+  },
+  "from": null,
+  "t": 50622.9,
+  "method": "to"
+ },
+ {
+  "target": "d{list,children,parent,_hasCode,_hasSetup,_invalid,_proxies,iColor}",
+  "duration": 8,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "progress": 0
+  },
+  "from": null,
+  "t": 57624.5,
+  "method": "to"
+ },
+ {
+  "delay": 0.6,
+  "t": 159162.5,
+  "method": "delayedCall"
+ },
+ {
+  "target": "Object{module,scene,touch,ray,referentiel,spline,lastStrokePos,smoothStrokePos}",
+  "duration": 8.25,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.25,
+    0.5,
+    0.75
+   ],
+   "type": 2,
+   "power": 0,
+   "name": "Power0.easeIn"
+  },
+  "vars": {
+   "openingProgress": 30,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 159162.7,
+  "method": "to"
+ },
+ {
+  "delay": 0.6,
+  "t": 168493.4,
+  "method": "delayedCall"
+ },
+ {
+  "target": "Object{module,scene,touch,ray,referentiel,spline,lastStrokePos,smoothStrokePos}",
+  "duration": 8.25,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.25,
+    0.5,
+    0.75
+   ],
+   "type": 2,
+   "power": 0,
+   "name": "Power0.easeIn"
+  },
+  "vars": {
+   "openingProgress": 30,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 168493.5,
+  "method": "to"
+ },
+ {
+  "delay": 0.6,
+  "t": 174920.3,
+  "method": "delayedCall"
+ },
+ {
+  "target": "Object{module,scene,touch,ray,referentiel,spline,lastStrokePos,smoothStrokePos}",
+  "duration": 8.25,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.25,
+    0.5,
+    0.75
+   ],
+   "type": 2,
+   "power": 0,
+   "name": "Power0.easeIn"
+  },
+  "vars": {
+   "openingProgress": 30,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 174920.3,
+  "method": "to"
+ },
+ {
+  "target": "Object{vol}",
+  "duration": 1.3,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "vol": 0
+  },
+  "from": null,
+  "t": 200042.1,
+  "method": "to"
+ },
+ {
+  "delay": 0.7,
+  "t": 200042.3,
+  "method": "delayedCall"
+ },
+ {
+  "target": "Object{offsetProgress,isTransitionning,manager,chapters}",
+  "duration": 1.75,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.0313,
+    0.5,
+    0.9688
+   ],
+   "type": 3,
+   "power": 3,
+   "name": "Power3.easeInOut"
+  },
+  "vars": {
+   "offsetProgress": 1,
+   "ease": "[obj]"
+  },
+  "from": {
+   "offsetProgress": 0
+  },
+  "t": 200042.5,
+  "method": "fromTo"
+ },
+ {
+  "target": "Object{offsetProgress,isTransitionning,manager,chapters,_gsTweenID}",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "offsetProgress": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 200042.7,
+  "method": "to"
+ },
+ {
+  "target": "Object{offsetProgress,isTransitionning,manager,chapters,_gsTweenID}",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "offsetProgress": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 200665.1,
+  "method": "to"
+ },
+ {
+  "target": "d{list,children,parent,_hasCode,_hasSetup,_invalid,_proxies,iColor}",
+  "duration": 8,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "progress": 1
+  },
+  "from": null,
+  "t": 202393.8,
+  "method": "to"
+ },
+ {
+  "target": "Object{vol}",
+  "duration": 0.6,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "vol": 1
+  },
+  "from": null,
+  "t": 202394.1,
+  "method": "to"
+ },
+ {
+  "target": "d{list,children,parent,_hasCode,_hasSetup,_invalid,_proxies,iColor}",
+  "duration": 8,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "progress": 0
+  },
+  "from": null,
+  "t": 209394.6,
+  "method": "to"
+ },
+ {
+  "target": "[0,0,0]",
+  "duration": 0.9,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "0": 1.05,
+   "delay": 0
+  },
+  "from": null,
+  "t": 215394.4,
+  "method": "to"
+ },
+ {
+  "target": "[0,0,0]",
+  "duration": 0.9,
+  "delay": 0.8,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "1": 1.05,
+   "delay": 0.8
+  },
+  "from": null,
+  "t": 215394.4,
+  "method": "to"
+ },
+ {
+  "target": "[0,0,0]",
+  "duration": 0.9,
+  "delay": 1.6,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "2": 1.05,
+   "delay": 1.6
+  },
+  "from": null,
+  "t": 215397.2,
+  "method": "to"
+ },
+ {
+  "target": "Object{vol}",
+  "duration": 1.3,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "vol": 0
+  },
+  "from": null,
+  "t": 349305.1,
+  "method": "to"
+ },
+ {
+  "delay": 0.7,
+  "t": 349305.3,
+  "method": "delayedCall"
+ },
+ {
+  "target": "Object{offsetProgress,isTransitionning,manager,chapters,_gsTweenID}",
+  "duration": 1.75,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.0313,
+    0.5,
+    0.9688
+   ],
+   "type": 3,
+   "power": 3,
+   "name": "Power3.easeInOut"
+  },
+  "vars": {
+   "offsetProgress": 1,
+   "ease": "[obj]"
+  },
+  "from": {
+   "offsetProgress": 0
+  },
+  "t": 349305.4,
+  "method": "fromTo"
+ },
+ {
+  "target": "Object{offsetProgress,isTransitionning,manager,chapters,_gsTweenID}",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "offsetProgress": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 349305.4,
+  "method": "to"
+ },
+ {
+  "target": "Object{offsetProgress,isTransitionning,manager,chapters,_gsTweenID}",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "offsetProgress": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 350096.7,
+  "method": "to"
+ },
+ {
+  "target": "d{list,children,parent,_hasCode,_hasSetup,_invalid,_proxies,iColor}",
+  "duration": 8,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "progress": 1
+  },
+  "from": null,
+  "t": 351839.3,
+  "method": "to"
+ },
+ {
+  "target": "Object{vol}",
+  "duration": 0.6,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "vol": 1
+  },
+  "from": null,
+  "t": 351839.8,
+  "method": "to"
+ },
+ {
+  "target": "d{list,children,parent,_hasCode,_hasSetup,_invalid,_proxies,iColor}",
+  "duration": 8,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "progress": 0
+  },
+  "from": null,
+  "t": 358841.8,
+  "method": "to"
+ },
+ {
+  "target": "Object{vol}",
+  "duration": 1.3,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "vol": 0
+  },
+  "from": null,
+  "t": 538726.6,
+  "method": "to"
+ },
+ {
+  "delay": 0.7,
+  "t": 538726.8,
+  "method": "delayedCall"
+ },
+ {
+  "target": "Object{offsetProgress,isTransitionning,manager,chapters,_gsTweenID}",
+  "duration": 1.75,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.0313,
+    0.5,
+    0.9688
+   ],
+   "type": 3,
+   "power": 3,
+   "name": "Power3.easeInOut"
+  },
+  "vars": {
+   "offsetProgress": 1,
+   "ease": "[obj]"
+  },
+  "from": {
+   "offsetProgress": 0
+  },
+  "t": 538726.9,
+  "method": "fromTo"
+ },
+ {
+  "target": "Object{offsetProgress,isTransitionning,manager,chapters,_gsTweenID}",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "offsetProgress": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 538726.9,
+  "method": "to"
+ },
+ {
+  "target": "Object{offsetProgress,isTransitionning,manager,chapters,_gsTweenID}",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "offsetProgress": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 538792.1,
+  "method": "to"
+ },
+ {
+  "target": "d{list,children,parent,_hasCode,_hasSetup,_invalid,_proxies,iColor}",
+  "duration": 8,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "progress": 1
+  },
+  "from": null,
+  "t": 540476.8,
+  "method": "to"
+ },
+ {
+  "target": "d{list,children,parent,_hasCode,_hasSetup,_invalid,_proxies,iColor}",
+  "duration": 8,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "progress": 0
+  },
+  "from": null,
+  "t": 547492.8,
+  "method": "to"
+ },
+ {
+  "delay": 0.6,
+  "t": 654754.9,
+  "method": "delayedCall"
+ },
+ {
+  "target": "Object{module,scene,touch,ray,referentiel,spline,lastStrokePos,smoothStrokePos}",
+  "duration": 8.25,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.25,
+    0.5,
+    0.75
+   ],
+   "type": 2,
+   "power": 0,
+   "name": "Power0.easeIn"
+  },
+  "vars": {
+   "openingProgress": 30,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 654755.1,
+  "method": "to"
+ },
+ {
+  "delay": 0.6,
+  "t": 661093.5,
+  "method": "delayedCall"
+ },
+ {
+  "target": "Object{module,scene,touch,ray,referentiel,spline,lastStrokePos,smoothStrokePos}",
+  "duration": 8.25,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.25,
+    0.5,
+    0.75
+   ],
+   "type": 2,
+   "power": 0,
+   "name": "Power0.easeIn"
+  },
+  "vars": {
+   "openingProgress": 30,
+   "ease": "[obj]"
+  },
+  "from": null,
+  "t": 661093.6,
+  "method": "to"
+ },
+ {
+  "target": "Object{vol}",
+  "duration": 1.3,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "vol": 0
+  },
+  "from": null,
+  "t": 683974.4,
+  "method": "to"
+ },
+ {
+  "delay": 0.7,
+  "t": 683974.8,
+  "method": "delayedCall"
+ },
+ {
+  "target": "d{id,root,mats,texs,gltf,lights,npr,voiceAudio}",
+  "duration": 1.5,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.0156,
+    0.5,
+    0.9844
+   ],
+   "type": 3,
+   "power": 4,
+   "name": "Power4.easeInOut"
+  },
+  "vars": {
+   "marieLouiseOffset": 3,
+   "ease": "[obj]"
+  },
+  "from": {
+   "marieLouiseOffset": 0
+  },
+  "t": 683974.9,
+  "method": "fromTo"
+ },
+ {
+  "target": "d{id,root,mats,texs,gltf,lights,npr,voiceAudio}",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "marieLouiseOffset": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 683975,
+  "method": "to"
+ },
+ {
+  "target": "d{id,root,mats,texs,gltf,lights,npr,voiceAudio}",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "marieLouiseOffset": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 683989,
+  "method": "to"
+ },
+ {
+  "target": "Object{offsetProgress,isTransitionning,manager,chapters,_gsTweenID}",
+  "duration": 1.75,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.0313,
+    0.5,
+    0.9688
+   ],
+   "type": 3,
+   "power": 3,
+   "name": "Power3.easeInOut"
+  },
+  "vars": {
+   "offsetProgress": 1,
+   "ease": "[obj]"
+  },
+  "from": {
+   "offsetProgress": 0
+  },
+  "t": 684982.3,
+  "method": "fromTo"
+ },
+ {
+  "target": "Object{offsetProgress,isTransitionning,manager,chapters,_gsTweenID}",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "offsetProgress": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 684982.3,
+  "method": "to"
+ },
+ {
+  "target": "Object{offsetProgress,isTransitionning,manager,chapters,_gsTweenID}",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "offsetProgress": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 684984.5,
+  "method": "to"
+ },
+ {
+  "target": "div.ending",
+  "duration": 2,
+  "delay": 0,
+  "ease": {
+   "samples": [
+    0.0156,
+    0.5,
+    0.9844
+   ],
+   "type": 3,
+   "power": 4,
+   "name": "Power4.easeInOut"
+  },
+  "vars": {
+   "y": "0vh",
+   "ease": "[obj]"
+  },
+  "from": {
+   "y": "-100vh"
+  },
+  "t": 685499,
+  "method": "fromTo"
+ },
+ {
+  "target": "div.ending",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": "-100vh",
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 685499.2,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__happy__y",
+  "duration": 0.8,
+  "delay": 1,
+  "ease": {
+   "samples": [
+    0.5781,
+    0.875,
+    0.9844
+   ],
+   "type": 1,
+   "power": 2,
+   "name": "Power2.easeOut"
+  },
+  "vars": {
+   "y": 0,
+   "delay": 1,
+   "ease": "[obj]"
+  },
+  "from": {
+   "y": -315
+  },
+  "t": 685524.5,
+  "method": "fromTo"
+ },
+ {
+  "target": "div.ending__letter.ending__happy__y",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 685524.5,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__happy__p2",
+  "duration": 0.8,
+  "delay": 1,
+  "ease": {
+   "samples": [
+    0.5781,
+    0.875,
+    0.9844
+   ],
+   "type": 1,
+   "power": 2,
+   "name": "Power2.easeOut"
+  },
+  "vars": {
+   "y": 0,
+   "delay": 1,
+   "ease": "[obj]"
+  },
+  "from": {
+   "y": -315
+  },
+  "t": 685526.5,
+  "method": "fromTo"
+ },
+ {
+  "target": "div.ending__letter.ending__happy__p2",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 685526.6,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__happy__p",
+  "duration": 0.8,
+  "delay": 1.1,
+  "ease": {
+   "samples": [
+    0.5781,
+    0.875,
+    0.9844
+   ],
+   "type": 1,
+   "power": 2,
+   "name": "Power2.easeOut"
+  },
+  "vars": {
+   "y": 0,
+   "delay": 1.1,
+   "ease": "[obj]"
+  },
+  "from": {
+   "y": -315
+  },
+  "t": 685527.3,
+  "method": "fromTo"
+ },
+ {
+  "target": "div.ending__letter.ending__happy__p",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 685527.4,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__happy__a",
+  "duration": 0.8,
+  "delay": 1.2,
+  "ease": {
+   "samples": [
+    0.5781,
+    0.875,
+    0.9844
+   ],
+   "type": 1,
+   "power": 2,
+   "name": "Power2.easeOut"
+  },
+  "vars": {
+   "y": 0,
+   "delay": 1.2,
+   "ease": "[obj]"
+  },
+  "from": {
+   "y": -315
+  },
+  "t": 685527.9,
+  "method": "fromTo"
+ },
+ {
+  "target": "div.ending__letter.ending__happy__a",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 685528,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__happy__h",
+  "duration": 0.8,
+  "delay": 1.3,
+  "ease": {
+   "samples": [
+    0.5781,
+    0.875,
+    0.9844
+   ],
+   "type": 1,
+   "power": 2,
+   "name": "Power2.easeOut"
+  },
+  "vars": {
+   "y": 0,
+   "delay": 1.3,
+   "ease": "[obj]"
+  },
+  "from": {
+   "y": -315
+  },
+  "t": 685528.5,
+  "method": "fromTo"
+ },
+ {
+  "target": "div.ending__letter.ending__happy__h",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 685528.6,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__2019__2",
+  "duration": 0.8,
+  "delay": 1,
+  "ease": {
+   "samples": [
+    0.5781,
+    0.875,
+    0.9844
+   ],
+   "type": 1,
+   "power": 2,
+   "name": "Power2.easeOut"
+  },
+  "vars": {
+   "y": 0,
+   "delay": 1,
+   "ease": "[obj]"
+  },
+  "from": {
+   "y": -315
+  },
+  "t": 685530.4,
+  "method": "fromTo"
+ },
+ {
+  "target": "div.ending__letter.ending__2019__2",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 685530.4,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__2019__0",
+  "duration": 0.8,
+  "delay": 1,
+  "ease": {
+   "samples": [
+    0.5781,
+    0.875,
+    0.9844
+   ],
+   "type": 1,
+   "power": 2,
+   "name": "Power2.easeOut"
+  },
+  "vars": {
+   "y": 0,
+   "delay": 1,
+   "ease": "[obj]"
+  },
+  "from": {
+   "y": -315
+  },
+  "t": 685531.7,
+  "method": "fromTo"
+ },
+ {
+  "target": "div.ending__letter.ending__2019__0",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 685531.8,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__2019__1",
+  "duration": 0.8,
+  "delay": 1.1,
+  "ease": {
+   "samples": [
+    0.5781,
+    0.875,
+    0.9844
+   ],
+   "type": 1,
+   "power": 2,
+   "name": "Power2.easeOut"
+  },
+  "vars": {
+   "y": 0,
+   "delay": 1.1,
+   "ease": "[obj]"
+  },
+  "from": {
+   "y": -315
+  },
+  "t": 685532.3,
+  "method": "fromTo"
+ },
+ {
+  "target": "div.ending__letter.ending__2019__1",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 685532.3,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__2019__9",
+  "duration": 0.8,
+  "delay": 1.2,
+  "ease": {
+   "samples": [
+    0.5781,
+    0.875,
+    0.9844
+   ],
+   "type": 1,
+   "power": 2,
+   "name": "Power2.easeOut"
+  },
+  "vars": {
+   "y": 0,
+   "delay": 1.2,
+   "ease": "[obj]"
+  },
+  "from": {
+   "y": -315
+  },
+  "t": 685532.9,
+  "method": "fromTo"
+ },
+ {
+  "target": "div.ending__letter.ending__2019__9",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 685532.9,
+  "method": "to"
+ },
+ {
+  "target": "a.ending__makemepulse",
+  "duration": 1,
+  "delay": 2.6,
+  "ease": {
+   "samples": [
+    0.8604,
+    0.9727,
+    0.9962
+   ],
+   "type": 0,
+   "power": 0,
+   "id": "custom",
+   "name": "CustomEase(custom)"
+  },
+  "vars": {
+   "y": "0%",
+   "opacity": 1,
+   "delay": 2.6,
+   "ease": "[obj]"
+  },
+  "from": {
+   "y": "-100%",
+   "opacity": 0
+  },
+  "t": 685533.4,
+  "method": "fromTo"
+ },
+ {
+  "target": "a.ending__makemepulse",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": "-100%",
+   "opacity": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 685533.5,
+  "method": "to"
+ },
+ {
+  "target": "a.ending__social__link.ending__social__link--tw",
+  "duration": 0.7,
+  "delay": 2.6,
+  "ease": {
+   "samples": [
+    0.8604,
+    0.9727,
+    0.9962
+   ],
+   "type": 0,
+   "power": 0,
+   "id": "custom",
+   "name": "CustomEase(custom)"
+  },
+  "vars": {
+   "y": "0%",
+   "opacity": 1,
+   "delay": 2.6,
+   "ease": "[obj]"
+  },
+  "from": {
+   "y": "100%",
+   "opacity": 0
+  },
+  "t": 685534.1,
+  "method": "fromTo"
+ },
+ {
+  "target": "a.ending__social__link.ending__social__link--tw",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": "100%",
+   "opacity": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 685534.1,
+  "method": "to"
+ },
+ {
+  "target": "a.ending__social__link.ending__social__link--ig",
+  "duration": 0.7,
+  "delay": 2.7,
+  "ease": {
+   "samples": [
+    0.8604,
+    0.9727,
+    0.9962
+   ],
+   "type": 0,
+   "power": 0,
+   "id": "custom",
+   "name": "CustomEase(custom)"
+  },
+  "vars": {
+   "y": "0%",
+   "opacity": 1,
+   "delay": 2.7,
+   "ease": "[obj]"
+  },
+  "from": {
+   "y": "100%",
+   "opacity": 0
+  },
+  "t": 685534.5,
+  "method": "fromTo"
+ },
+ {
+  "target": "a.ending__social__link.ending__social__link--ig",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": "100%",
+   "opacity": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 685534.5,
+  "method": "to"
+ },
+ {
+  "target": "a.ending__social__link.ending__social__link--fb",
+  "duration": 0.7,
+  "delay": 2.8000000000000003,
+  "ease": {
+   "samples": [
+    0.8604,
+    0.9727,
+    0.9962
+   ],
+   "type": 0,
+   "power": 0,
+   "id": "custom",
+   "name": "CustomEase(custom)"
+  },
+  "vars": {
+   "y": "0%",
+   "opacity": 1,
+   "delay": 2.8000000000000003,
+   "ease": "[obj]"
+  },
+  "from": {
+   "y": "100%",
+   "opacity": 0
+  },
+  "t": 685535,
+  "method": "fromTo"
+ },
+ {
+  "target": "a.ending__social__link.ending__social__link--fb",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": "100%",
+   "opacity": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 685535,
+  "method": "to"
+ },
+ {
+  "delay": 1.9,
+  "t": 685535.5,
+  "method": "delayedCall"
+ },
+ {
+  "target": "div.ending",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": "-100vh",
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 685553.3,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__happy__y",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 686504.9,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__happy__p2",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 686505.1,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__2019__2",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 686505.5,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__2019__0",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 686505.9,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__happy__p",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 686604.4,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__2019__1",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 686604.7,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__happy__a",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 686717.3,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__2019__9",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 686718.1,
+  "method": "to"
+ },
+ {
+  "target": "div.ending__letter.ending__happy__h",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": -315,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 686805.2,
+  "method": "to"
+ },
+ {
+  "target": "a.ending__makemepulse",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": "-100%",
+   "opacity": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 688103.9,
+  "method": "to"
+ },
+ {
+  "target": "a.ending__social__link.ending__social__link--tw",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": "100%",
+   "opacity": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 688104.3,
+  "method": "to"
+ },
+ {
+  "target": "a.ending__social__link.ending__social__link--ig",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": "100%",
+   "opacity": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 688201.3,
+  "method": "to"
+ },
+ {
+  "target": "a.ending__social__link.ending__social__link--fb",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": "100%",
+   "opacity": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 688297.3,
+  "method": "to"
+ },
+ {
+  "target": "a.ending__social__link.ending__social__link--fb",
+  "duration": 0,
+  "delay": 0,
+  "ease": {
+   "name": "default(Power1.easeOut)"
+  },
+  "vars": {
+   "y": "100%",
+   "opacity": 0,
+   "data": "isStart",
+   "overwrite": false,
+   "immediateRender": true,
+   "lazy": true,
+   "delay": "[obj]",
+   "startAt": "[obj]"
+  },
+  "from": null,
+  "t": 688348.1,
+  "method": "to"
+ }
+]

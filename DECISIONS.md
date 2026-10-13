@@ -19,4 +19,8 @@ One line each: the decision, and why. Newest at the bottom.
 - Optimizer is simulated annealing (not CMA-ES): mixed constraints are easy as rejected moves, and ~150 coarse sims fit in a few seconds.
 - PDF export is a hand-written single-page PDF writer (JPEG + text): no dependency for one page.
 - Region auto-picked from longitude (west of -100 -> PNW, else Southern Ontario), switchable.
-- Fonts: Fraunces (display) + Inter Tight (UI), self-hosted variable woff2, both SIL OFL.
+- Fonts: Young Serif (display) + Atkinson Hyperlegible Next (UI), self-hosted woff2, both SIL OFL (first pick Fraunces + Inter Tight was revised, see below).
+- Art direction revised after frontend-design's review: cream page + Fraunces is a generated-page default, so the base is deep storm slate #26313C with paper type, one marigold action accent; the one bold device is a single raindrop you follow from roof to garden.
+- Design images (image-to-code's method) come before building: one large ChatGPT comp per section, then layer art to match.
+- Art is generated with the same ChatGPT Plus subscription through the codex CLI (gpt-image-bridge), not the chatgpt.com tab: in the user's Chrome every CDP call to chatgpt.com timed out (screenshots, typing and page JS hung for 45 s at a time while the window wasn't painting), so the browser route couldn't finish ~80 images. Same model family, same account; prompts logged in art-src/PROMPTS.md.
+- Image prompts run 4 at a time from art-src/manifest.mjs through art-src/tools/gen.mjs, which skips images that already exist, so a rate limit or a crash resumes cleanly.

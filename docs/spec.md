@@ -70,11 +70,17 @@ moss `#5F7A4A`, fern `#8FAE6B`, clay ochre `#B9824F`, rain teal `#3F8C8A`,
 paper cream `#EFE7D6`, a single warm accent marigold `#E2A33B`. Matte, no
 gloss, no text, no logos.
 
-UI: paper-cream on storm-slate, one accent (marigold) for actions, teal for
-water data. Type: a characterful serif display (Fraunces, variable, opsz +
-SOFT axes) for headlines, and a clean grotesk (Inter Tight, variable) for UI
-and numbers (tabular figures). Grain overlay at 4–6% opacity, a soft
-vignette per scene — the "colour grading" layer.
+UI (revised after the frontend-design review, which flagged cream-page +
+Fraunces as a generated-page default): the page base is deep storm slate
+`#26313C` with paper `#ECE6DA` type; paper is a surface only for the
+plan and cards. One action accent, marigold `#E8B04A`; water data in
+rain teal `#49A3A0`. Type: **Young Serif** (one weight, old-style,
+warm) for display only, **Atkinson Hyperlegible Next** (variable) for UI,
+body and numbers — legibility first for a public tool. Grain overlay at
+4–6% opacity and a soft vignette per scene — the colour-grading layer.
+The one bold device: **a single raindrop you follow** from the roof to the
+garden; it is also the cursor follower (lagged), and it becomes the
+designer's water.
 
 ## 4. Architecture
 
