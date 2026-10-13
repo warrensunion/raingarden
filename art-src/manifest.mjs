@@ -53,6 +53,25 @@ export const ITEMS = [
   { name: 'stream-fish', group: 'scenes', size: S, cutout: true, prompt: 'A healthy adult coho salmon swimming strongly, side view, bright silver and soft red tones.' },
   { name: 'stream-ferns', group: 'scenes', size: W, cutout: true, prompt: 'Close foreground: sword fern fronds and moss-covered stones along a horizontal band.' },
 
+
+  // ---- v2 scene plates (full-bleed, subject right, calm left third for the headline) and edge-to-edge bands ----
+  ...[
+    ['roof', 'the pitched shingle roof of a small West Coast wooden house in the right half, rain sheeting off it, a metal gutter and a downspout at its corner, misty conifers and far rooftops and a grey inlet behind, overcast dusk sky with a faint warm glow; the left third is calmer misty sky and distant hills'],
+    ['drive', 'a steep wet asphalt driveway running from a garage at upper right diagonally down to the street at lower left, a thin rushing stream of rainwater racing down it, lawns on both sides, a parked bicycle, houses and conifers in mist behind'],
+    ['drain', 'very low at street level beside a concrete curb: a cast-iron storm drain grate swallowing a fast stream of water with an oily rainbow sheen, wet leaves, a crushed cup, the wet road receding into misty lamplight'],
+    ['creek', 'an urban creek in cut-away view, half above and half below the waterline: eroded bare banks with exposed roots, a concrete culvert pouring murky water in, houses behind, brown-green silty water below with a lone tired small fish'],
+    ['garden', 'a front-yard rain garden shown in cut-away cross-section: a shallow planted basin of sedges, rushes and flowering native perennials fed by a downspout, below the surface mulch, amended soil and gravel layers with roots reaching down and water soaking in; clouds breaking with soft light'],
+    ['stream', 'a healthy clear forest stream over clean pebbles with sword ferns, red alders and cedars, a salmon swimming upstream, soft light beams breaking through the clouds'],
+  ].map(([k, p]) => ({ name: `plate-${k}`, group: 'plates', size: '2560x1440', prompt: `A full-bleed background painting for a wide website scene, 16:9, nothing cut off awkwardly, no text: ${p}. Leave the left third visually quiet (soft sky, mist or shadow) so a headline can sit there.` })),
+  ...[
+    ['roof', 'dripping wet dark foliage of a vine maple and cedar sprigs with raindrops'],
+    ['drive', 'a concrete curb and gutter with a fast stream of rainwater and a few fallen leaves'],
+    ['drain', 'a loose scatter of large wet fallen maple and alder leaves and pebbles'],
+    ['creek', 'reeds, a broken branch and dark wet stones at the water edge'],
+    ['garden', 'native rain-garden plants: sedge tufts, a sword fern, flowering stems in marigold and violet'],
+    ['stream', 'sword fern fronds and moss-covered stones'],
+  ].map(([k, p]) => ({ name: `band-${k}`, group: 'bands', size: '2560x1440', cutout: true, prompt: `A foreground parallax layer for a wide website scene: a horizontal band of ${p}, running across the FULL WIDTH of the image and continuing off both the left and right edges (cut straight by the frame edges), sitting along the bottom edge, taking up the lower quarter of the frame; everything above it fully transparent.` })),
+
   // ---- soil, textures, UI, preloader ----
   { name: 'soil-section', group: 'soil', size: T, cutout: true, prompt: 'A clean educational cross-section slice of a rain garden soil profile, a tall rectangular block: from top, a thin layer of shredded bark mulch, a thick layer of amended soil (sandy loam mixed with dark compost), a layer of washed round gravel, then native subsoil; a few plant roots growing down through it and water drops percolating down. Edges cut straight like a cake slice.' },
   { name: 'tex-raindrop', group: 'tex', size: S, cutout: true, prompt: 'A single falling raindrop, slightly elongated, glassy, catching a small marigold highlight; nothing else.' },

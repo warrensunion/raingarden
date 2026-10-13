@@ -7,3 +7,4 @@ public/ort/
 design-reference/**/*.webm
 design-reference/**/*.mp4
 art-src/.vendor/
+.superpowers/
