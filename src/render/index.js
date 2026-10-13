@@ -38,6 +38,19 @@ function canvasFor2d(canvas) {
   return twin;
 }
 
+/**
+ * Create the yard view: WebGL2 scene, or the Canvas2D fallback on any failure.
+ *
+ * Carve contract: opts.terrain is ALWAYS the UNCARVED base yard; setGarden(g)
+ * is the only place the garden is dug; sim depth arrays (computed on the
+ * carved terrain from applyGarden) go to setWater as-is. The split's "before"
+ * side is the base terrain without the garden.
+ *
+ * The fallback may swap in a fresh canvas (a canvas that handed out a WebGL
+ * context cannot give a 2d one): attach pointer listeners to api.canvas.
+ *
+ * @returns {Promise<object>} api — see yard-scene.js; api.kind is 'webgl' | 'static'.
+ */
 export async function createYard(canvas, opts) {
   let reason;
   try {

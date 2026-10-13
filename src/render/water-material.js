@@ -41,7 +41,7 @@ const float WET = 0.0005;
 float surfOr(ivec2 g, float fallback) {
   float d = depthAt(g);
   if (d < WET) return fallback;
-  return terrainAt(g) + gardenOffset(vec2(gclamp(g)) * uGrid.z) + d;
+  return terrainAt(g) + gardenOffset((vec2(gclamp(g)) + 0.5) * uGrid.z) + d;
 }
 
 void main() {

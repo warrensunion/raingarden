@@ -21,8 +21,8 @@ function makeTerrain() {
   const z = new Float64Array(N * N);
   for (let iy = 0; iy < N; iy++) {
     for (let ix = 0; ix < N; ix++) {
-      const x = ix * CELL;
-      const y = iy * CELL;
+      const x = (ix + 0.5) * CELL;
+      const y = (iy + 0.5) * CELL;
       let h = 0.045 * y + 0.012 * x;                       // rises away from the house
       h += 0.09 * Math.sin(0.42 * x + 0.15 * y);            // shallow swales
       h += 0.03 * Math.sin(1.3 * x - 0.7 * y) * Math.cos(0.9 * y);
@@ -59,22 +59,22 @@ for (let iy = 0; iy < N; iy++) {
 const order = Array.from({ length: N * N }, (_, i) => i).sort((a, b) => z[b] - z[a]);
 const acc = new Float32Array(N * N).fill(1);
 const SPOUT = [2.6, 13.2];
-const spoutCell = Math.round(SPOUT[1] / CELL) * N + Math.round(SPOUT[0] / CELL);
+const spoutCell = Math.floor(SPOUT[1] / CELL) * N + Math.floor(SPOUT[0] / CELL);
 acc[spoutCell] += 900;
 for (const i of order) if (down[i] >= 0) acc[down[i]] += acc[i];
 
 // the bowl: its lowest cell, its spill level and its overflow path
 let bottom = 0;
 for (let i = 0; i < N * N; i++) {
-  const x = (i % N) * CELL - 10.5;
-  const y = Math.floor(i / N) * CELL - 6.5;
+  const x = ((i % N) + 0.5) * CELL - 10.5;
+  const y = (Math.floor(i / N) + 0.5) * CELL - 6.5;
   if (x * x + y * y < 4 && z[i] < z[bottom]) bottom = i;
 }
 let spill = Infinity;
 let spillCell = bottom;
 for (let i = 0; i < N * N; i++) {
-  const x = (i % N) * CELL - 10.5;
-  const y = Math.floor(i / N) * CELL - 6.5;
+  const x = ((i % N) + 0.5) * CELL - 10.5;
+  const y = (Math.floor(i / N) + 0.5) * CELL - 6.5;
   const r = Math.hypot(x, y);
   if (r > 2.3 && r < 2.5 && z[i] < spill) { spill = z[i]; spillCell = i; }
 }
@@ -98,7 +98,7 @@ function makePlants(g) {
       const lx = Math.cos(a) * f * g.lenM / 2;
       const ly = Math.sin(a) * f * g.widM / 2;
       const [id, form] = PLANT_IDS[k++ % PLANT_IDS.length];
-      out.push({ x: g.cx + lx * c - ly * s, y: g.cy + lx * s + ly * c, r: form === 'shrub' ? 0.5 : 0.32, id, form });
+      out.push({ x: g.cx + lx * c - ly * s, y: g.cy + lx * s + ly * c, r: form === 'shrub' ? 0.5 : 0.32, id }); // no form, like layoutPlants
     }
   }
   return out;
@@ -128,8 +128,8 @@ function storm(t, out, { withGarden }) {
   // the bowl fills to its spill level, then overflows downhill
   const level = z[bottom] + (spill - z[bottom] + 0.01) * Math.min(1, p * 1.5);
   for (let i = 0; i < N * N; i++) {
-    const x = (i % N) * CELL - 10.5;
-    const y = Math.floor(i / N) * CELL - 6.5;
+    const x = ((i % N) + 0.5) * CELL - 10.5;
+    const y = (Math.floor(i / N) + 0.5) * CELL - 6.5;
     if (x * x + y * y < 2.6 * 2.6 && level > z[i]) out[i] = Math.max(out[i], level - z[i]);
   }
   if (p * 1.5 > 1) {
@@ -153,8 +153,8 @@ function storm(t, out, { withGarden }) {
   // the garden captures the roof water: it ponds and the streams below it stop
   if (withGarden) {
     for (let i = 0; i < N * N; i++) {
-      const x = (i % N) * CELL;
-      const y = Math.floor(i / N) * CELL;
+      const x = ((i % N) + 0.5) * CELL;
+      const y = (Math.floor(i / N) + 0.5) * CELL;
       const r = inGarden(x, y, GARDEN);
       if (r < 0.9) out[i] = Math.max(out[i], 0.11 * Math.min(1, p * 2) * Math.min(1, (0.9 - r) * 6));
       else if (y < GARDEN.cy && Math.abs(x - GARDEN.cx) < 2.2) out[i] *= 0.25;
@@ -183,7 +183,7 @@ function contours(interval) {
             const t = a / (a - b);
             const p0 = c[e];
             const p1 = c[(e + 1) % 4];
-            pts.push((p0[0] + (p1[0] - p0[0]) * t) * CELL, (p0[1] + (p1[1] - p0[1]) * t) * CELL);
+            pts.push((p0[0] + (p1[0] - p0[0]) * t + 0.5) * CELL, (p0[1] + (p1[1] - p0[1]) * t + 0.5) * CELL);
           }
         }
         if (pts.length >= 4) segs.push(...pts.slice(0, 4));
@@ -212,8 +212,8 @@ function fakePhoto() {
     g.fill();
   }
   g.globalAlpha = 1;
-  const px = (x) => (x / ((N - 1) * CELL)) * S;
-  const py = (y) => (1 - y / ((N - 1) * CELL)) * S;
+  const px = (x) => (x / (N * CELL)) * S;
+  const py = (y) => (1 - y / (N * CELL)) * S;
   // patio by the house
   g.fillStyle = '#ECE6DA';
   for (let r = 0; r < 4; r++) {
@@ -249,7 +249,7 @@ function fakePhoto() {
 const canvas = document.getElementById('yard');
 const hud = document.getElementById('hud');
 const usePhoto = qs.get('photo') !== '0';
-const WM = (N - 1) * CELL;
+const WM = N * CELL;
 const api = await createYard(canvas, {
   terrain,
   photo: usePhoto ? fakePhoto() : null,
@@ -257,11 +257,11 @@ const api = await createYard(canvas, {
   reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
 });
 
-const W = (N - 1) * CELL;
+const W = N * CELL;
 api.setMarks([
   { kind: 'downspout', pts: [SPOUT] },
   { kind: 'wall', pts: [[0.4, 14.6], [7.5, 14.6]] },
-  { kind: 'outlet', pts: [[overflow[overflow.length - 1] % N * CELL, Math.floor(overflow[overflow.length - 1] / N) * CELL]] },
+  { kind: 'outlet', pts: [[(overflow[overflow.length - 1] % N + 0.5) * CELL, (Math.floor(overflow[overflow.length - 1] / N) + 0.5) * CELL]] },
   { kind: 'septic', pts: [[11, 11.5], [14, 11.5], [14, 13.8], [11, 13.8]] },
   { kind: 'scale', pts: [[1, 0.8], [4, 0.8]] },
 ]);
@@ -311,7 +311,7 @@ document.getElementById('rain').onclick = (e) => {
   raining = !raining;
   e.target.setAttribute('aria-pressed', String(raining));
 };
-(api.canvas || canvas).addEventListener('pointerdown', (e) => {
+api.canvas.addEventListener('pointerdown', (e) => {
   if (e.target.closest && e.target.closest('#ui')) return;
   const p = api.pick(e.clientX, e.clientY);
   console.log('pick', p && p.map((v) => v.toFixed(2)).join(', '));
@@ -330,6 +330,7 @@ window.demo = {
   },
   setContours(on) { showContours = on; api.setContours(on ? contours(0.1) : null); },
   restart() { t0 = performance.now(); },
+  setSeason(season) { api.setGarden(GARDEN, plants, { season }); },
 };
 requestAnimationFrame(tick);
 window.demo.ready = true;

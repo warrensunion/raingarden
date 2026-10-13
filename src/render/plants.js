@@ -9,6 +9,20 @@
  */
 
 import { PALETTE } from './palette.js';
+import { PLANTS } from '../data/plants.js';
+
+// layoutPlants returns { id, x, y, r, zone, drift } without a form: look it up by id
+const FORM_BY_ID = new Map(PLANTS.map((p) => [p.id, p.form]));
+
+/** Growth form of a placed plant: its own, else the catalogue's, else 'perennial'. */
+export function formOf(p) {
+  return p.form || FORM_BY_ID.get(p.id) || 'perennial';
+}
+
+/** Sprite scale for a season 0..1: seedlings at 0.3, full size at 1. */
+export function seasonScale(season) {
+  return 0.3 + 0.7 * Math.min(1, Math.max(0, season));
+}
 
 const TINTS = {
   grass: [PALETTE.fern, PALETTE.moss, null],
@@ -61,6 +75,7 @@ export function createPlantLayer(THREE, { onChange }) {
   const art = new Map();     // id -> Promise<Texture|null>
   const loader = new THREE.TextureLoader();
   let disposed = false;
+  let curK = 1;
 
   function blob(form) {
     if (!blobs.has(form)) {
@@ -92,13 +107,14 @@ export function createPlantLayer(THREE, { onChange }) {
   /** plants: [{ x, y, r, id, form }]; h(x,y) world height; toWorld(x,y,h). */
   function set(plants, season, h, toWorld) {
     clear();
-    const k = 0.3 + 0.7 * Math.min(1, Math.max(0, season));
+    const k = seasonScale(season);
     for (const p of plants || []) {
-      const mat = new THREE.SpriteMaterial({ map: blob(p.form), transparent: true, alphaTest: 0.04, depthWrite: false });
+      const mat = new THREE.SpriteMaterial({ map: blob(formOf(p)), transparent: true, alphaTest: 0.04, depthWrite: false });
       const s = new THREE.Sprite(mat);
       s.center.set(0.5, 0.06);
-      const size = 2 * p.r * k;
-      s.scale.set(size, size, 1);
+      s.userData.base = 2 * p.r;
+      s.userData.aspect = 1;
+      s.scale.set(s.userData.base * k, s.userData.base * k, 1);
       s.position.set(...toWorld(p.x, p.y, h(p.x, p.y)));
       s.renderOrder = 4;
       group.add(s);
@@ -107,12 +123,20 @@ export function createPlantLayer(THREE, { onChange }) {
         s.material.map = t;
         s.material.needsUpdate = true;
         const img = t.image;
-        const aspect = img && img.width ? img.height / img.width : 1;
-        s.scale.set(size, size * aspect, 1);
+        s.userData.aspect = img && img.width ? img.height / img.width : 1;
+        s.scale.set(s.userData.base * curK, s.userData.base * curK * s.userData.aspect, 1);
         onChange();
       });
     }
+    curK = k;
     return k;
+  }
+
+  /** Rescale the existing sprites for a new season (no rebuild). Returns the scale. */
+  function setSeason(season) {
+    curK = seasonScale(season);
+    for (const s of group.children) s.scale.set(s.userData.base * curK, s.userData.base * curK * s.userData.aspect, 1);
+    return curK;
   }
 
   function dispose() {
@@ -122,5 +146,5 @@ export function createPlantLayer(THREE, { onChange }) {
     for (const p of art.values()) p.then((t) => t && t.dispose());
   }
 
-  return { group, set, dispose };
+  return { group, set, setSeason, dispose };
 }

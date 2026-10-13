@@ -27,7 +27,7 @@ varying float vWet;
 varying float vRim;
 
 float hAt(ivec2 g) {
-  vec2 p = vec2(g) * uGrid.z;
+  vec2 p = (vec2(g) + 0.5) * uGrid.z;  // cell centre
   return terrainAt(g) + gardenOffset(p);
 }
 

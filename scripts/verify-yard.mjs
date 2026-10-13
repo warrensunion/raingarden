@@ -29,10 +29,11 @@ const browser = await chromium.launch({
   args: ['--use-angle=d3d11', '--enable-gpu', '--ignore-gpu-blocklist'],
 });
 const POSES = ['capture', 'mark', 'storm', 'optimize', 'plants', 'compare', 'plan'];
-const result = { gpu: null, errors: [], missingArt: 0, shots: [], fps: {}, staticLog: null };
+const result = { gpu: null, errors: [], warnings: [], missingArt: 0, shots: [], fps: {}, staticLog: null };
 
 function watch(page) {
   page.on('console', (m) => {
+    if (m.type() === 'warning') { result.warnings.push(m.text()); return; }
     if (m.type() !== 'error') return;
     const url = m.location()?.url || '';
     if (/404/.test(m.text()) && /\/art\//.test(url)) { result.missingArt++; return; }
@@ -93,6 +94,30 @@ for (const [vw, vh, tag, dsf] of [[1440, 900, 'desktop', 1], [390, 844, 'phone',
     };
     requestAnimationFrame(f);
   }));
+  // true fps in the plants pose too (no screenshots during the window)
+  await page.evaluate(() => window.demo.api.cameraTo('plants', 0));
+  await page.waitForTimeout(800);
+  result.fps[tag + 'Plants'] = await page.evaluate(() => new Promise((res) => {
+    let n = 0;
+    const t0 = performance.now();
+    const f = (now) => { n++; if (now - t0 < 3000) requestAnimationFrame(f); else res(+(n / ((now - t0) / 1000)).toFixed(1)); };
+    requestAnimationFrame(f);
+  }));
+  // season fast path (same garden + plants) and pick cost (pointermove budget)
+  result.seasonMs = result.seasonMs || {};
+  result.seasonMs[tag] = await page.evaluate(() => {
+    const t0 = performance.now();
+    for (let i = 0; i < 50; i++) window.demo.setSeason((i % 10) / 10);
+    window.demo.setSeason(1);
+    return +((performance.now() - t0) / 50).toFixed(3);
+  });
+  result.pickMs = result.pickMs || {};
+  result.pickMs[tag] = await page.evaluate(() => {
+    const t0 = performance.now();
+    for (let i = 0; i < 200; i++) window.demo.api.pick(innerWidth * (0.2 + 0.003 * i), innerHeight * 0.5);
+    return +((performance.now() - t0) / 200).toFixed(3);
+  });
+  await page.evaluate(() => window.demo.api.cameraTo('storm', 0));
   // a camera move mid-flight, to see the arc
   await page.evaluate(() => window.demo.api.cameraTo('plants', 1400));
   await page.waitForTimeout(600);

@@ -11,6 +11,8 @@
  * (cx, cy) metres, full axis lengths lenM × widM, rotated rot radians from +x.
  */
 
+import { bilinear } from './grid-coords.js';
+
 /** Uniform values for a garden (or "no garden"). */
 export function gardenUniforms(g) {
   if (!g) return { a: [0, 0, 1, 1], b: [1, 0, 0, 0], on: 0 };
@@ -66,20 +68,11 @@ export function gardenOffset(u, x, y) {
 }
 
 /**
- * Bilinear terrain height at ground metres (x, y), plus the garden offset.
- * Vertex (ix, iy) of the grid sits at (ix*cell, iy*cell).
+ * Ground height at (x, y) metres: bilinear terrain (cell centres at
+ * (i+0.5)·cell, see grid-coords.js) minus z0, plus the garden carve.
  */
 export function groundHeight(terrain, z0, u, x, y) {
-  const { nx, ny, cell, z } = terrain;
-  const fx = Math.min(nx - 1, Math.max(0, x / cell));
-  const fy = Math.min(ny - 1, Math.max(0, y / cell));
-  const x0 = Math.min(nx - 2, Math.floor(fx));
-  const y0 = Math.min(ny - 2, Math.floor(fy));
-  const tx = fx - x0;
-  const ty = fy - y0;
-  const i = y0 * nx + x0;
-  const h = (z[i] * (1 - tx) + z[i + 1] * tx) * (1 - ty) + (z[i + nx] * (1 - tx) + z[i + nx + 1] * tx) * ty;
-  return h - z0 + gardenOffset(u, x, y);
+  return bilinear(terrain, terrain.z, z0, x, y) + gardenOffset(u, x, y);
 }
 
 /** Metres outside the rim (negative = inside); JS twin of the GLSL gardenRim. */

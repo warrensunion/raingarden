@@ -10,15 +10,26 @@
 
 import { PALETTE, rgb } from './palette.js';
 import { displayDepth } from './depth-display.js';
+import { gridFrame } from './grid-coords.js';
+import { formOf } from './plants.js';
 
 const FIT = { capture: 0.92, mark: 0.92, storm: 0.92, optimize: 0.92, plants: 0.92, compare: 0.92, plan: 0.95 };
 
+/**
+ * Same contract as createYardScene (yard-scene.js): `terrain` is the UNCARVED
+ * base yard, cell (i, j) is centred at ((i+0.5)·cell, (j+0.5)·cell), setWater
+ * takes sim depth as-is (copied), setSplit shows before (otherDepth, no garden)
+ * on the LEFT and now on the RIGHT. A photo without toImage is mapped with the
+ * default planar UV (image top = far edge). DPR is capped at 1.5 on phones.
+ * Attach pointer listeners to api.canvas.
+ */
 export function createStaticYard(canvas, { terrain, photo = null, toImage = null } = {}) {
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('no 2d context');
   const { nx, ny, cell, z } = terrain;
-  const W = (nx - 1) * cell;
-  const D = (ny - 1) * cell;
+  const grid = gridFrame(terrain);
+  const { W, D } = grid;
+  const uvOf = toImage || (([x, y]) => grid.planarUV(x, y));
   const n = nx * ny;
 
   // ---- base image: hillshade × (photo | lawn), rows flipped so far (large y) is up ----
@@ -30,7 +41,7 @@ export function createStaticYard(canvas, { terrain, photo = null, toImage = null
   let pix = null;
   let pw = 0;
   let ph = 0;
-  if (photo && toImage) {
+  if (photo) {
     const s = Math.min(1, 1024 / Math.max(photo.width, photo.height));
     pw = Math.max(1, Math.round(photo.width * s));
     ph = Math.max(1, Math.round(photo.height * s));
@@ -53,7 +64,7 @@ export function createStaticYard(canvas, { terrain, photo = null, toImage = null
       const nl = Math.hypot(zx, zy, 1);
       const shade = 0.72 + 0.45 * Math.max(0, (-zx * L[0] - zy * L[2] + L[1]) / (nl * ll));
       let c;
-      const uv = pix ? toImage([ix * cell, iy * cell]) : null;
+      const uv = pix ? uvOf(grid.center(ix, iy)) : null;
       if (uv && uv[0] >= 0 && uv[0] <= 1 && uv[1] >= 0 && uv[1] <= 1) {
         const p = (Math.min(ph - 1, Math.floor(uv[1] * ph)) * pw + Math.min(pw - 1, Math.floor(uv[0] * pw))) * 4;
         c = [pix[p] / 255, pix[p + 1] / 255, pix[p + 2] / 255];
@@ -117,7 +128,9 @@ export function createStaticYard(canvas, { terrain, photo = null, toImage = null
   let dpr = 1;
 
   function frame() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const phone = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches
+      && Math.min(screen.width, screen.height) < 820;
+    dpr = Math.min(window.devicePixelRatio || 1, phone ? 1.5 : 2);
     const cw = Math.max(1, canvas.clientWidth || canvas.width);
     const chh = Math.max(1, canvas.clientHeight || canvas.height);
     if (canvas.width !== Math.round(cw * dpr) || canvas.height !== Math.round(chh * dpr)) {
@@ -166,7 +179,8 @@ export function createStaticYard(canvas, { terrain, photo = null, toImage = null
     for (const p of plants) {
       ctx.beginPath();
       ctx.arc(sx(p.x), sy(p.y), Math.max(2, p.r * k * s), 0, Math.PI * 2);
-      ctx.fillStyle = p.form === 'shrub' || p.form === 'tree' ? PALETTE.moss : PALETTE.fern;
+      const form = formOf(p);
+      ctx.fillStyle = form === 'shrub' || form === 'tree' ? PALETTE.moss : PALETTE.fern;
       ctx.globalAlpha = 0.9;
       ctx.fill();
       ctx.globalAlpha = 1;
