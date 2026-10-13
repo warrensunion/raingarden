@@ -10,7 +10,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test \"test/**/*.test.js\""
+    "test": "node --test \"test/**/*.test.js\"",
+    "fetch-models": "node scripts/fetch-models.mjs"
   },
   "devDependencies": {
     "playwright": "1.63",

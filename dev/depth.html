@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Depth check</title>
+<!--
+  Dev-only harness (not part of the site): loads dev/demo-yard.png, runs
+  loadDepth + estimate through the worker, draws the depth map, runs
+  toHeightfield on it (level-assumed, lower 60% as the yard) and exposes the
+  numbers on window.__depthCheck for dev/run-depth-check.mjs.
+-->
+<style>
+  body { background: #26313C; color: #ECE6DA; font: 14px/1.4 system-ui, sans-serif; margin: 16px; }
+  canvas, img { max-width: 100%; display: block; margin: 8px 0; }
+  pre { white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<pre id="log">loading...</pre>
+<img id="photo" src="./demo-yard.png" alt="demo yard">
+<canvas id="depth"></canvas>
+<script type="module">
+  import { loadDepth } from '../src/depth/depth.js';
+  import { toHeightfield } from '../src/depth/heightfield.js';
+  import { contours } from '../src/depth/contours.js';
+
+  const log = (s) => { document.getElementById('log').textContent += '\n' + s; };
+  const out = { progress: [] };
+  window.__depthCheck = out;
+  try {
+    const img = document.getElementById('photo');
+    await img.decode();
+    // a frame counter proves the main thread stays responsive during inference
+    let frames = 0;
+    const tick = () => { frames++; requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+    const t0 = performance.now();
+    const depth = await loadDepth({ backend: new URLSearchParams(location.search).get('backend') || undefined, onProgress: (p) => { if (p.phase === 'init' || p.fraction === 1) out.progress.push(p.phase); } });
+    out.loadMs = Math.round(performance.now() - t0);
+    out.backend = depth.backend;
+    out.size = depth.size;
+    log(`backend ${depth.backend}, input ${depth.size}, load ${out.loadMs} ms`);
+    const bmp = await createImageBitmap(img);
+    const f0 = frames;
+    const t1 = performance.now();
+    const d = await depth.estimate(bmp);
+    out.estimateMs = Math.round(performance.now() - t1);
+    out.workerMs = Math.round(d.ms);
+    out.framesDuringEstimate = frames - f0;
+    out.w = d.w; out.h = d.h; out.aspect = d.aspect;
+    let mn = Infinity, mx = -Infinity;
+    for (const v of d.data) { mn = Math.min(mn, v); mx = Math.max(mx, v); }
+    out.min = mn; out.max = mx;
+    // near (bottom) should read larger than far (top)
+    const row = (y) => { let s = 0; for (let x = 0; x < d.w; x++) s += d.data[y * d.w + x]; return s / d.w; };
+    out.bottomMean = row(d.h - 5); out.topMean = row(5);
+    log(`estimate ${out.estimateMs} ms (worker ${out.workerMs} ms), ${d.w}x${d.h}, range ${mn.toFixed(3)}..${mx.toFixed(3)}, frames during estimate ${out.framesDuringEstimate}`);
+
+    const c = document.getElementById('depth');
+    c.width = d.w; c.height = d.h;
+    const ctx = c.getContext('2d');
+    const im = ctx.createImageData(d.w, d.h);
+    for (let i = 0; i < d.data.length; i++) {
+      const g = Math.round(255 * (d.data[i] - mn) / (mx - mn || 1));
+      im.data[i * 4] = g; im.data[i * 4 + 1] = g; im.data[i * 4 + 2] = g; im.data[i * 4 + 3] = 255;
+    }
+    ctx.putImageData(im, 0, 0);
+    out.png = c.toDataURL('image/png');
+    // raw depth for offline analysis (base64 Float32, little-endian)
+    { const u8 = new Uint8Array(d.data.buffer.slice(0)); let bin = ''; for (let i = 0; i < u8.length; i += 0x8000) bin += String.fromCharCode(...u8.subarray(i, i + 0x8000)); out.raw = btoa(bin); }
+
+    // heightfield on the real depth (no gravity in a dev page): lawn polygon,
+    // a 1 m line on the lawn (assumed), and three taps on the house wall at left
+    const yard = [[0.24, 0.56], [0.6, 0.5], [0.97, 0.62], [0.98, 0.95], [0.4, 0.95], [0.22, 0.72]];
+    const scale = { a: [0.5, 0.8], b: [0.6, 0.8], meters: 1 };
+    out.heightfield = {};
+    for (const [name, wallPts] of [['level', null], ['wall', [[0.04, 0.3], [0.08, 0.62], [0.02, 0.55]]]]) {
+      const hf = toHeightfield({ depth: d, yard, scale, wallPts, n: 96 });
+      let finite = true;
+      for (const v of hf.terrain.z) if (!Number.isFinite(v)) finite = false;
+      const cs = contours(hf.terrain, 0.1);
+      out.heightfield[name] = { ...hf.confidence, nx: hf.terrain.nx, ny: hf.terrain.ny, cell: hf.terrain.cell, finite, cameraHeightM: hf.meta.cameraHeightM, yardAreaM2: hf.meta.yardAreaM2, contourLevels: cs.length };
+      log(`${name}: ${hf.terrain.nx}x${hf.terrain.ny} @ ${hf.terrain.cell.toFixed(3)} m, ${hf.confidence.source} slope ${hf.confidence.slopePct.toFixed(2)}% [${hf.confidence.lowPct.toFixed(1)}, ${hf.confidence.highPct.toFixed(1)}], ${cs.length} contour levels, notes: ${hf.confidence.notes.join('; ')}`);
+    }
+    out.done = true;
+  } catch (err) {
+    out.error = { code: err.code, message: err.message };
+    out.done = true;
+    log(`error ${err.code}: ${err.message}`);
+  }
+</script>
+</body>
+</html>
