@@ -30,3 +30,12 @@ scripts/make-richmond-storms.mjs, src/plan/pdf.js, test/weather.test.js, test/pd
   everything else -> '?'. Not opened in an external viewer (no PDF tooling installed); correctness is checked by the
   byte-exact xref test.
 - Gotcha: shell heredocs in this environment dropped backslashes; src files were written with the Write tool.
+
+## Fix round 1
+Changes:
+1. Window now computed in the user's local days from the response's `utc_offset_seconds` (forecast, else archive, else 0); it ends at local yesterday, so the current local day (possibly forecast hours) is never chosen. Test: 02:00 UTC 14 Oct with offset -7 h, forecast 50 mm/h-day on local 13 Oct must not win.
+2. weather.test.js pins: typical = median wet day (5.5), design = nearest-rank P90 (9) on a known series, shapeFn gets 'IA' (pnw) / 'II' (on) with (total,shape,24,300), exact source.url strings (2 dp coords), peakMmH.
+3. shapeFn wrapped: a throw falls back to the uniform shape (both live and offline paths) with a `[raingarden]` console.warn; the caught fetch/parse error is also console.warn'ed with a `[raingarden]` prefix.
+4. pdf.js header documents that lines are not wrapped (pre-wrap, about 16 lines budget).
+RED: with src changes stashed, the 3 new tests failed (9 tests, 6 pass, 3 fail). Note the pinned test had an additional float-equality slip in the test itself, fixed with a tolerance.
+Command: `node --test test/weather.test.js test/pdf.test.js` -> tests 12, pass 12, fail 0.

@@ -7,6 +7,10 @@
  * PDF 1.4 with a DCT image XObject and Helvetica is all that is needed; the
  * JPEG bytes are embedded untouched (no re-encode, no canvas round trip).
  * Pure module: bytes in, bytes out.
+ *
+ * Lines are NOT wrapped: each entry in `lines` is one text line and the caller must
+ * pre-wrap to the page width (about 90 characters at 9 pt) and budget roughly 16 lines
+ * below the image; lines that do not fit vertically are dropped.
  */
 
 const enc = new TextEncoder();

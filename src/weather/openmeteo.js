@@ -121,6 +121,11 @@ export async function fetchNumbers({ lat, lon, fetchFn, today }) {
       if (Number.isFinite(v)) merged.set(t, v);
     });
   }
+  // Window in the USER's local days (timezone=auto): end at local yesterday so the current
+  // local day, which may hold forecast hours, can never be picked.
+  const off = Number.isFinite(fc.utc_offset_seconds) ? fc.utc_offset_seconds : (Number.isFinite(arch.utc_offset_seconds) ? arch.utc_offset_seconds : 0);
+  const localToday = new Date(today.getTime() + off * 1000);
+  u.window = { from: iso(addDays(localToday, -30)), to: iso(addDays(localToday, -1)) };
   const times = [...merged.keys()]
     .filter((t) => t.slice(0, 10) >= u.window.from && t.slice(0, 10) <= u.window.to)
     .sort();
@@ -188,11 +193,21 @@ function offline({ region, shapeFn }) {
  * @returns {Promise<Array>} three storms; never rejects.
  */
 export async function getStorms({ lat, lon, region = 'pnw', fetchFn, today = new Date(), shapeFn = uniformShape } = {}) {
+  const userShape = shapeFn;
+  shapeFn = (total, shape, durH, stepS) => {
+    try {
+      return userShape(total, shape, durH, stepS);
+    } catch (err) {
+      console.warn('[raingarden] shapeFn threw, using uniform shape:', err && err.message);
+      return uniformShape(total, shape, durH, stepS);
+    }
+  };
   try {
     const f = fetchFn || (typeof fetch === 'function' ? fetch : null);
     if (!f || !Number.isFinite(lat) || !Number.isFinite(lon)) throw new Error('no fetch or coordinates');
     return await live({ lat, lon, region, fetchFn: f, today, shapeFn });
   } catch (err) {
+    console.warn('[raingarden] weather unavailable, using offline sample:', err && err.message);
     return offline({ region, shapeFn });
   }
 }

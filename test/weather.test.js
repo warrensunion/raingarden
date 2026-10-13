@@ -90,3 +90,79 @@ test('getStorms falls back on bad payload and non-ok response', async () => {
     assert.match(s[0].source.text, /offline sample/);
   }
 });
+
+// --- pinned rulings -------------------------------------------------------
+
+function hourlyOf(days) {
+  const time = []; const precipitation = [];
+  for (const [d, f] of days) for (let h = 0; h < 24; h++) {
+    time.push(`${d}T${String(h).padStart(2, '0')}:00`);
+    precipitation.push(f(h));
+  }
+  return { time, precipitation };
+}
+
+function pinnedFetch({ archive, forecast, offset = 0 }) {
+  return async (url) => {
+    const u = new URL(url);
+    if (u.searchParams.get('hourly')) {
+      const hourly = u.hostname.startsWith('archive') ? archive : forecast;
+      return { ok: true, json: async () => ({ utc_offset_seconds: offset, hourly }) };
+    }
+    // 10 dry days (0.5), wet days 1..10, padded with zeros to >= 300 values.
+    const precipitation_sum = [...Array(10).fill(0.5), 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ...Array(300).fill(0)];
+    return { ok: true, json: async () => ({ daily: { time: precipitation_sum.map((_, i) => `d${i}`), precipitation_sum } }) };
+  };
+}
+
+test('pins typical = median wet day, design = nearest-rank P90, shapes, urls, peakMmH', async () => {
+  const calls = [];
+  const shapeFn = (total, shape, durH, stepS) => { calls.push([total, shape, durH, stepS]); return uniform(total, shape, durH, stepS); };
+  const archive = hourlyOf([['2026-10-04', () => 0], ['2026-10-05', (h) => (h === 3 ? 6 : 0)]]);
+  const run = (region) => getStorms({
+    lat: 49.1712, lon: -123.1398, region, today: new Date('2026-10-13T12:00:00Z'), shapeFn,
+    fetchFn: pinnedFetch({ archive, forecast: { time: [], precipitation: [] } }),
+  });
+  const s = await run('pnw');
+  assert.equal(s[0].totalMm, 6);
+  assert.equal(s[0].when, '2026-10-05');
+  assert.equal(s[0].peakMmH, 6); // 6 mm in the hour -> 0.5 mm per 300 s step -> 6 mm/h
+  assert.equal(s[1].totalMm, 5.5); // median of wet days 1..10
+  assert.equal(s[2].totalMm, 9); // nearest-rank P90 of 10 wet days
+  assert.ok(Math.abs(s[1].peakMmH - (5.5 / 288) * 12) < 1e-12);
+  assert.deepEqual(calls.map((c) => c[1]), ['IA', 'IA']);
+  assert.deepEqual(calls[0], [5.5, 'IA', 24, 300]);
+  assert.equal(s[0].source.url, 'https://archive-api.open-meteo.com/v1/archive?latitude=49.17&longitude=-123.14&start_date=2026-09-13&end_date=2026-10-12&hourly=precipitation&timezone=auto');
+  assert.equal(s[1].source.url, 'https://archive-api.open-meteo.com/v1/archive?latitude=49.17&longitude=-123.14&start_date=2016-01-01&end_date=2025-12-31&daily=precipitation_sum&timezone=auto');
+  assert.equal(s[2].source.url, s[1].source.url);
+  calls.length = 0;
+  await run('on');
+  assert.deepEqual(calls.map((c) => c[1]), ['II', 'II']);
+});
+
+test('the current local day (forecast hours) is never the heaviest day', async () => {
+  // 02:00 UTC on 14 Oct is 19:00 on 13 Oct in BC (UTC-7): UTC date - 1 would be the local today.
+  const archive = hourlyOf([['2026-10-10', (h) => (h === 1 ? 4 : 0)]]);
+  const forecast = hourlyOf([['2026-10-12', () => 0], ['2026-10-13', () => 50]]);
+  const s = await getStorms({
+    lat: 49.17, lon: -123.14, region: 'pnw', shapeFn: uniform,
+    today: new Date('2026-10-14T02:00:00Z'),
+    fetchFn: pinnedFetch({ archive, forecast, offset: -7 * 3600 }),
+  });
+  assert.equal(s[0].when, '2026-10-10');
+  assert.equal(s[0].totalMm, 4);
+});
+
+test('a throwing shapeFn still yields storms (never throws)', async () => {
+  const bad = () => { throw new Error('boom'); };
+  const warn = console.warn; console.warn = () => {};
+  try {
+    const offline = await getStorms({ lat: 1, lon: 2, fetchFn: async () => { throw new Error('net'); }, shapeFn: bad });
+    assert.equal(offline.length, 3);
+    assert.match(offline[1].source.text, /offline sample/);
+    assert.ok(offline[1].mm.length === 288);
+    const live = await getStorms({ lat: 49.17, lon: -123.14, shapeFn: bad, today: new Date('2026-10-13T12:00:00Z'),
+      fetchFn: pinnedFetch({ archive: hourlyOf([['2026-10-05', (h) => (h === 3 ? 6 : 0)]]), forecast: { time: [], precipitation: [] } }) });
+    assert.equal(live.length, 3);
+  } finally { console.warn = warn; }
+});
