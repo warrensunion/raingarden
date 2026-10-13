@@ -1,0 +1,64 @@
+{
+  "viewports": {
+    "390": {
+      "errors": [],
+      "preloaderTailMs": 3877,
+      "preloaderCachedMs": 3613,
+      "rainIdle": {
+        "state": "on",
+        "opacity": "1"
+      },
+      "overflowX": 0,
+      "fps": {
+        "fps": 134.9,
+        "p95ms": 7.1,
+        "over33ms": 4,
+        "frames": 1214
+      },
+      "reduced": {
+        "wipeVisible": "hidden",
+        "visible": "creek"
+      }
+    },
+    "1440": {
+      "errors": [],
+      "preloaderTailMs": 3621,
+      "preloaderCachedMs": 6462,
+      "rainIdle": {
+        "state": "on",
+        "opacity": "1"
+      },
+      "overflowX": -15,
+      "fps": {
+        "fps": 110.4,
+        "p95ms": 14,
+        "over33ms": 14,
+        "frames": 991
+      },
+      "reduced": {
+        "wipeVisible": "hidden",
+        "visible": "creek"
+      }
+    },
+    "1920": {
+      "errors": [],
+      "preloaderTailMs": 3978,
+      "preloaderCachedMs": 4372,
+      "rainIdle": {
+        "state": "on",
+        "opacity": "1"
+      },
+      "overflowX": -15,
+      "fps": {
+        "fps": 111.4,
+        "p95ms": 13.9,
+        "over33ms": 9,
+        "frames": 1004
+      },
+      "reduced": {
+        "wipeVisible": "hidden",
+        "visible": "creek"
+      }
+    }
+  }
+}

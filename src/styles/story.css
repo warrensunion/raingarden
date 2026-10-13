@@ -1,0 +1,288 @@
+/*
+ * The scroll story. Why every moving thing is absolutely placed and moved by
+ * transform only: the frame loop writes transforms and opacities, never
+ * layout, so a mid-range phone holds 60 fps (brief "Perf").
+ * Stacking inside the stage: layers 0, rain 1 (6 during a wipe), scrim 2,
+ * drop and the garden's labelled cut-away 3, copy 4, wipe 5, frame 7.
+ * Nothing between them makes a stacking context.
+ */
+.story {
+  position: relative;
+  height: calc(var(--scenes, 6) * 160vh);
+}
+.story-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--slate-900);
+}
+.story-snaps { position: absolute; inset: 0; pointer-events: none; }
+.story-snap { position: absolute; left: 0; width: 1px; height: 1px; scroll-snap-align: start; }
+
+.story-scene { position: absolute; inset: 0; pointer-events: none; }
+.story-layers {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  visibility: hidden;
+  overflow: hidden;
+}
+.story-scene.is-visible .story-layers { visibility: visible; }
+.is-active .sl { will-change: transform; }
+
+/* Layers */
+.sl { position: absolute; transform-origin: 50% 50%; user-select: none; -webkit-user-drag: none; }
+.sl-plate {
+  top: -4%;
+  left: -4%;
+  width: 108%;
+  height: 108%;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+.sl-mist {
+  left: -10%;
+  right: -10%;
+  top: 34%;
+  height: 34%;
+  background: radial-gradient(50% 50% at 50% 50%, color-mix(in srgb, var(--rain) 34%, transparent), transparent 100%);
+  opacity: .55;
+}
+.sl-cut { height: auto; }
+.sl-band { left: -15%; width: 130%; height: auto; bottom: -9.1vw; }
+
+/* Garden: the soil cut-away with leader-line labels. It carries text, so it sits above the scrim
+   (z 3, outside .story-layers) and gets the same camera transform as an art layer. */
+.sl-section {
+  z-index: 3;
+  left: clamp(28px, 4.2vw, 64px);
+  bottom: 5vh;
+  height: clamp(260px, 38vh, 440px);
+  aspect-ratio: 874 / 1330;
+}
+.story-scene:not(.is-visible) .sl-section { visibility: hidden; }
+.sl-section-img { width: 100%; height: 100%; filter: drop-shadow(0 16px 22px color-mix(in srgb, var(--asphalt) 55%, transparent)); }
+.sl-labels { position: absolute; inset: 0; }
+.sl-label {
+  position: absolute;
+  left: 78%;
+  top: calc(var(--at) * 100%);
+  display: flex;
+  align-items: center;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+.sl-leader {
+  position: relative;
+  width: clamp(48px, 6vw, 96px);
+  height: 1px;
+  background: var(--paper);
+}
+.sl-leader::before {
+  content: "";
+  position: absolute;
+  left: -3px;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--paper);
+}
+.sl-label-text {
+  padding: 5px 10px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--slate-900) 88%, transparent);
+  font: 400 13px/1.3 var(--font-ui);
+  color: var(--paper);
+}
+
+/* Rain, scrim, drop */
+.story-rain {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--t-mid) var(--ease-ui);
+}
+.story-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--slate-900) 65%, transparent) 0, transparent 150px),
+    linear-gradient(90deg,
+      color-mix(in srgb, var(--slate-900) 80%, transparent) 0%,
+      color-mix(in srgb, var(--slate-900) 64%, transparent) 26%,
+      color-mix(in srgb, var(--slate-900) 26%, transparent) 46%,
+      transparent 62%);
+}
+.story-drop, .story-splash {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  height: auto;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.story-drop { transform-origin: 50% 90%; filter: drop-shadow(0 0 10px color-mix(in srgb, var(--paper) 45%, transparent)); }
+.story-splash { transform-origin: 50% 80%; }
+
+/* Copy: left on the quiet third; lines rise 40 px with the house fast-out, leave instantly. */
+.story-copy {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  bottom: 0;
+  left: clamp(28px, 4.2vw, 64px);
+  width: min(56vw, 900px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: 10vh;
+  pointer-events: none;
+}
+.story-copy.is-in { pointer-events: auto; }
+.story-scene[data-scene="garden"] .story-copy { justify-content: flex-start; padding: 12vh 0 0; }
+.story-scene[data-scene="garden"] .story-h { max-width: min(9ch, 40vw); }
+.story-h {
+  max-width: min(12ch, 44vw);
+  font: 400 clamp(2.5rem, 7.2vw, 8rem)/1 var(--font-display);
+  letter-spacing: -.01em;
+  color: var(--paper);
+  text-wrap: balance;
+}
+.story-line { display: block; }
+.story-line-in {
+  display: inline-block;
+  opacity: 0;
+  transform: translate3d(0, 40px, 0);
+}
+.story-copy.is-in .story-line-in {
+  opacity: 1;
+  transform: none;
+  transition: transform 1s var(--ease-reveal) var(--d), opacity 1s var(--ease-reveal) var(--d);
+}
+.story-body {
+  max-width: 34ch;
+  margin-top: 24px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--paper);
+  opacity: 0;
+}
+.story-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  margin-top: 36px;
+  opacity: 0;
+}
+.story-copy.is-in .story-body,
+.story-copy.is-in .story-actions {
+  opacity: 1;
+  transition: opacity var(--t-slow) ease .7s;
+}
+.story-actions .btn { min-height: 56px; padding: 0 30px; }
+.story-demo {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 2px;
+  font-size: 15px;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+}
+.story-demo:hover { text-decoration-thickness: 2px; }
+
+/* The wipe: the next scene's band twice (mirrored, offset) at the leading edge, a painted veil of
+   its far plate as the body (no flat colour), the band mirrored as the trailing edge. */
+.story-wipe {
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  left: -30%;
+  width: 160%;
+  visibility: hidden;
+  pointer-events: none;
+  will-change: transform;
+}
+.story-wipe-band { position: relative; display: block; width: 100%; height: auto; margin-bottom: -9vw; }
+.story-wipe-band2 { transform: scaleX(-1) translateX(7%); margin-bottom: -20vw; filter: brightness(.82); }
+.story-wipe-tail { transform: scaleY(-1); margin: -9vw 0 0; }
+.story-wipe-body {
+  position: relative;
+  z-index: 1;
+  height: calc(105vh + 18vw);
+  -webkit-mask: linear-gradient(180deg, transparent 0, var(--slate-900) 9vw, var(--slate-900) calc(100% - 9vw), transparent);
+  mask: linear-gradient(180deg, transparent 0, var(--slate-900) 9vw, var(--slate-900) calc(100% - 9vw), transparent);
+}
+.story-wipe-veil { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.story-wipe-body::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(102deg, transparent 0 18px, color-mix(in srgb, var(--paper) 9%, transparent) 18px 19px, transparent 19px 47px),
+    repeating-linear-gradient(102deg, transparent 0 31px, color-mix(in srgb, var(--rain) 14%, transparent) 31px 33px, transparent 33px 83px);
+}
+/* While the curtain passes, the rain falls in front of it. */
+.is-wiping .story-rain { z-index: 6; }
+
+/* Passe-partout: settles 1.04 -> 1 over 1.5 s when the story is uncovered (NOTES #5). */
+.story-frame {
+  position: absolute;
+  z-index: 7;
+  inset: 24px;
+  border: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
+  pointer-events: none;
+  transform: scale(1.04);
+}
+.is-entered .story-frame { transform: none; transition: transform 1.5s var(--ease-frame); }
+
+@media (max-width: 768px) {
+  .sl-plate { object-position: 70% 50%; }
+  .sl-band { bottom: -6vw; }
+  .story-frame { inset: 12px; }
+  .story-scrim {
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--slate-900) 60%, transparent) 0, transparent 110px),
+      linear-gradient(0deg,
+        color-mix(in srgb, var(--slate-900) 94%, transparent) 0%,
+        color-mix(in srgb, var(--slate-900) 80%, transparent) 30%,
+        color-mix(in srgb, var(--slate-900) 30%, transparent) 50%,
+        transparent 64%);
+  }
+  .story-copy {
+    left: 0;
+    width: 100%;
+    justify-content: flex-end;
+    padding: 0 24px calc(40px + env(safe-area-inset-bottom));
+  }
+  .story-scene[data-scene="garden"] .story-copy { justify-content: flex-end; padding: 0 24px calc(40px + env(safe-area-inset-bottom)); }
+  .story-h, .story-scene[data-scene="garden"] .story-h { font-size: clamp(2.5rem, 11vw, 3.5rem); max-width: 12ch; }
+  .story-body { margin-top: 16px; }
+  .story-actions { margin-top: 24px; }
+  .story-actions .btn { width: 100%; }
+  .sl-section { left: 24px; top: 92px; bottom: auto; height: 30vh; }
+  .sl-label-text { font-size: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story-layers { opacity: 0; transition: opacity .5s var(--ease-ui), visibility 0s linear .5s; }
+  .story-scene.is-visible .story-layers { opacity: 1; transition: opacity .5s var(--ease-ui), visibility 0s; }
+  .story-line-in { transform: none; }
+  .story-copy.is-in .story-line-in { transition: opacity .5s var(--ease-ui); }
+  .story-frame, .is-entered .story-frame { transform: none; transition: none; }
+  .sl-section { transition: opacity .5s var(--ease-ui); }
+  .story-scene:not(.is-visible) .sl-section { visibility: visible; opacity: 0; }
+}

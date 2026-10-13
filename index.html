@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Raingarden — design a rain garden for your yard</title>
+  <meta name="description" content="Point your phone at your yard. Raingarden reads the slope, runs a real storm over it and designs a native-plant rain garden that soaks it in.">
+  <meta name="theme-color" content="#26313C">
+  <link rel="icon" href="/art/tex-raindrop.webp" type="image/webp">
+  <link rel="preload" as="image" href="/art/pre-pool.webp" fetchpriority="high">
+  <link rel="preload" as="image" href="/art/pre-drop.webp" fetchpriority="high">
+  <script>
+    // Before first paint: choose preloader or not (?preloader=0 skips it). Mirrored in src/story/preloader.js.
+    document.documentElement.classList.add(/[?&]preloader=0\b/.test(location.search) ? 'pl-skip' : 'pl-on');
+  </script>
+  <style>
+    /* First-paint CSS for the preloader. Token values mirror src/styles/tokens.css (keep in step);
+       the 0.5 s pill step mirrors src/story/preloader.js. */
+    :root { --slate-900: #26313C; --slate-700: #3E4A59; --paper: #ECE6DA; --ease-ui: cubic-bezier(.215,.61,.355,1); }
+    @font-face { font-family: "Young Serif"; src: url("/fonts/young-serif-400.woff2") format("woff2"); font-display: swap; }
+    html, body { margin: 0; background: var(--slate-900); }
+    html.pl-on { overflow: hidden; }
+    html.pl-on .site { clip-path: circle(0 at 50% 50%); }
+    html.pl-skip .pl { display: none; }
+    .pl {
+      position: fixed; inset: 0; z-index: 1;
+      display: grid; place-items: center;
+      background: radial-gradient(70% 60% at 50% 48%, var(--slate-700) 0%, var(--slate-900) 72%);
+    }
+    .pl-stage { position: relative; width: min(60vw, 380px); aspect-ratio: 900 / 514; }
+    .pl-pool { display: block; width: 100%; height: auto; }
+    .pl-drop {
+      position: absolute; left: 50%; width: 13%; height: auto; margin-left: -6.5%;
+      bottom: calc(50% + min(20vh, 170px));
+      transform-origin: 50% 85%;
+      animation: pl-breathe 2.4s ease-in-out infinite alternate;
+    }
+    @keyframes pl-breathe { from { scale: 1 .97; } to { scale: .98 1.03; } }
+    .pl-ring {
+      position: absolute; left: 50%; top: 50%; width: 62%; aspect-ratio: 2.7;
+      border: 1.5px solid var(--paper); border-radius: 50%;
+      transform: translate(-50%, -50%); opacity: 0; pointer-events: none;
+    }
+    .pl-bar {
+      position: absolute; left: calc(100% + 36px); top: 50%;
+      width: 6px; height: min(283px, 32vh); margin-top: calc(min(283px, 32vh) / -2);
+      border-radius: 3px; overflow: hidden;
+      background: color-mix(in srgb, var(--paper) 20%, transparent);
+    }
+    .pl-fill {
+      position: absolute; inset: 0; background: var(--paper);
+      transform: scaleY(0); transform-origin: 50% 100%;
+      transition: transform .5s var(--ease-ui);
+    }
+    .pl-word {
+      position: absolute; top: calc(100% + 24px); left: 0; right: 0;
+      text-align: center; color: var(--paper);
+      font: 400 20px/1 "Young Serif", Georgia, serif;
+    }
+    @media (max-width: 480px) { .pl-bar { left: calc(100% + 20px); } }
+    @media (prefers-reduced-motion: reduce) { .pl-drop { animation: none; } }
+  </style>
+  <noscript><style>html.pl-on { overflow: auto; } html.pl-on .site { clip-path: none; } .pl { display: none; }</style></noscript>
+  <script type="module" src="/src/main.js"></script>
+</head>
+<body>
+  <div class="pl" id="pl">
+    <div class="pl-stage">
+      <img class="pl-pool" src="/art/pre-pool.webp" alt="" width="900" height="514" fetchpriority="high">
+      <img class="pl-drop" src="/art/pre-drop.webp" alt="" width="650" height="867" fetchpriority="high">
+      <div class="pl-ring"></div>
+      <div class="pl-bar" role="progressbar" aria-label="Loading the story" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="pl-fill"></div></div>
+      <p class="pl-word" aria-hidden="true">Raingarden</p>
+    </div>
+  </div>
+
+  <div class="site" id="top">
+    <a class="skip" href="#designer">Skip to the designer</a>
+    <header class="hdr">
+      <a class="hdr-mark" href="#top">Raingarden</a>
+      <nav class="hdr-nav" aria-label="Main">
+        <a class="hdr-link" href="#how">How it works</a>
+        <a class="btn btn-primary" href="#designer" data-design="capture">Design yours</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="story" id="story" aria-label="Where one raindrop goes"></section>
+
+      <section class="designer" id="designer" aria-labelledby="designer-title">
+        <h2 class="vh" id="designer-title">Design your rain garden</h2>
+        <div id="designer-mount"></div>
+      </section>
+
+      <section class="how" id="how" aria-labelledby="how-title">
+        <h2 class="how-title" id="how-title">How it works</h2>
+        <div class="how-track">
+          <svg class="how-stream" viewBox="0 0 1200 200" preserveAspectRatio="none" aria-hidden="true">
+            <path vector-effect="non-scaling-stroke" d="M0 150 C 90 170 150 120 240 118 S 400 160 480 150 S 640 92 720 118 S 880 172 960 146 S 1120 104 1200 122"/>
+            <path vector-effect="non-scaling-stroke" d="M0 150 C 90 170 150 120 240 118 S 400 160 480 150 S 640 92 720 118 S 880 172 960 146 S 1120 104 1200 122"/>
+          </svg>
+          <ol class="how-list">
+          
+          <li class="how-row">
+            <div class="how-art"><img src="/art/ui-phone.webp" alt="A hand holding a phone up to a yard." width="553" height="1000" loading="lazy" decoding="async"></div>
+            <div class="how-text">
+              <div class="how-head"><span class="how-num" aria-hidden="true">1</span><h3>Depth</h3></div>
+              <p>Your phone’s photo goes through a small depth model that runs on the phone. It guesses shape, not size, so you mark something 1 m long and we show how sure we are.</p>
+            </div>
+          </li>
+          <li class="how-row">
+            <div class="how-art"><div class="how-drops" aria-hidden="true">
+              <img src="/art/tex-raindrop.webp" alt="" width="398" height="824" loading="lazy" decoding="async">
+              <img src="/art/tex-raindrop.webp" alt="" width="398" height="824" loading="lazy" decoding="async">
+              <img src="/art/tex-raindrop.webp" alt="" width="398" height="824" loading="lazy" decoding="async">
+            </div></div>
+            <div class="how-text">
+              <div class="how-head"><span class="how-num" aria-hidden="true">2</span><h3>The storm</h3></div>
+              <p>We pull real rain for where you are from Open-Meteo: last month’s wettest day, a typical day, and the 90th-percentile day planners design for.</p>
+            </div>
+          </li>
+          <li class="how-row">
+            <div class="how-art"><img src="/art/soil-section.webp" alt="A cut-away of garden soil: plants, mulch, amended soil, gravel." width="874" height="1330" loading="lazy" decoding="async"></div>
+            <div class="how-text">
+              <div class="how-head"><span class="how-num" aria-hidden="true">3</span><h3>Soaking in</h3></div>
+              <p>Each patch of ground soaks water at a rate set by its soil (the Green-Ampt model). Sand drinks fast, clay barely sips.</p>
+            </div>
+          </li>
+          <li class="how-row">
+            <div class="how-art">
+              <svg viewBox="0 0 220 200" role="img" aria-label="Contour lines of a yard with several trial garden outlines; one is chosen.">
+                <g class="ink-paper" fill="none" stroke-width="1" stroke-opacity=".28">
+                  <path d="M6 40 C 60 20 120 60 214 34"/><path d="M6 76 C 70 56 130 98 214 70"/>
+                  <path d="M6 112 C 70 94 140 134 214 106"/><path d="M6 148 C 80 130 140 170 214 142"/>
+                  <path d="M6 184 C 80 166 150 200 214 178"/>
+                </g>
+                <g fill="none" stroke-width="1.5" stroke-dasharray="4 5">
+                  <ellipse class="ink-fern" cx="58" cy="62" rx="34" ry="18" transform="rotate(-8 58 62)"/>
+                  <ellipse class="ink-fern" cx="164" cy="54" rx="30" ry="16" transform="rotate(10 164 54)"/>
+                  <ellipse class="ink-fern" cx="62" cy="150" rx="28" ry="15"/>
+                  <ellipse class="ink-teal" cx="170" cy="150" rx="26" ry="14" transform="rotate(-12 170 150)"/>
+                </g>
+                <ellipse class="ink-marigold" cx="114" cy="104" rx="42" ry="22" fill="none" stroke-width="2.5" transform="rotate(-6 114 104)"/>
+              </svg>
+            </div>
+            <div class="how-text">
+              <div class="how-head"><span class="how-num" aria-hidden="true">4</span><h3>Trying gardens</h3></div>
+              <p>An optimizer tries hundreds of shapes and spots, at least 3 m from the house and never over a septic field, and keeps the one that catches the most water.</p>
+            </div>
+          </li>
+          <li class="how-row">
+            <div class="how-art">
+              <svg viewBox="0 0 220 200" role="img" aria-label="A slope line with a dashed band showing how unsure the reading is, and a 3 metre gap from the house.">
+                <rect class="ink-paper" x="10" y="44" width="46" height="112" fill="none" stroke-width="1.5" stroke-opacity=".7"/>
+                <path class="ink-paper" d="M10 44 L 33 22 L 56 44" fill="none" stroke-width="1.5" stroke-opacity=".7"/>
+                <path class="ink-teal" d="M56 150 C 110 140 150 160 214 150" fill="none" stroke-width="2.5"/>
+                <path class="ink-teal" d="M56 132 C 110 122 150 142 214 132 M56 168 C 110 158 150 178 214 168" fill="none" stroke-width="1" stroke-dasharray="3 5" stroke-opacity=".8"/>
+                <path class="ink-marigold" d="M60 98 H 150 M60 92 V 104 M150 92 V 104" fill="none" stroke-width="1.5"/>
+                <text class="fill-paper" x="105" y="86" font-size="14" text-anchor="middle" font-family="Atkinson Hyperlegible Next, sans-serif">≥ 3 m</text>
+                <ellipse class="ink-fern" cx="180" cy="98" rx="28" ry="12" fill="none" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <div class="how-text">
+              <div class="how-head"><span class="how-num" aria-hidden="true">5</span><h3>The limits</h3></div>
+              <p>It is guidance, not engineering. A photo can be wrong about slope; we say when. Call before you dig and check your local bylaws.</p>
+            </div>
+          </li>
+        </ol>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="grain" aria-hidden="true"></div>
+</body>
+</html>
