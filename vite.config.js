@@ -12,6 +12,8 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   build: {
     target: 'es2022',
+    // three (~700 kB) is its own lazy chunk, loaded only when the designer opens
+    chunkSizeWarningLimit: 800,
     rollupOptions: {
       output: {
         manualChunks(id) {

@@ -10,7 +10,7 @@
  *
  * Protocol:
  *   in  {type:'run', id, params}
- *   out {type:'frame', id, t, depth: Float32Array}  (depth.buffer transferred)
+ *   out {type:'frame', id, t, depth: Float32Array, ledger}  (depth.buffer transferred; ledger so far)
  *   out {type:'done', id, result: {ledger, drainH, drained, peakStoredL, closure}}
  *   out {type:'error', id, error}
  *   in  {type:'optimize', id, params}  (garden optimizer, src/garden/optimizer.js)
@@ -64,7 +64,8 @@ function runJob(id, params, post) {
   const res = runStorm(sim, rain, stepS, {
     tailH: params.tailH,
     frameEveryS: params.frameEveryS,
-    onFrame: (f) => post({ type: 'frame', id, t: f.t, depth: f.depth }, [f.depth.buffer]),
+    // the ledger so far rides along so the UI can count litres live
+    onFrame: (f) => post({ type: 'frame', id, t: f.t, depth: f.depth, ledger: { ...sim.ledger } }, [f.depth.buffer]),
   });
   post({
     type: 'done',

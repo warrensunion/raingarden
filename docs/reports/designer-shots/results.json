@@ -1,0 +1,282 @@
+{
+  "390": {
+    "errors": [],
+    "logs": [],
+    "slope": {
+      "step": "slope",
+      "confidence": {
+        "slopePct": 19.889764462741137,
+        "lowPct": 9.126392279972746,
+        "highPct": 30.653136645509527,
+        "source": "gravity",
+        "manualSuggested": true,
+        "notes": [
+          "slope band wider than 8 pp"
+        ]
+      },
+      "manual": true,
+      "source": "photo",
+      "backend": "webgpu"
+    },
+    "slopeMs": 20795,
+    "hscroll": 0,
+    "storms": [
+      {
+        "id": "recent",
+        "mm": 24.3,
+        "src": "Open-Meteo (open-meteo.com) hourly precipitation, 2026-09-13"
+      },
+      {
+        "id": "typical",
+        "mm": 7.4,
+        "src": "Open-Meteo (open-meteo.com) archive 2016-2025: median wet-da"
+      },
+      {
+        "id": "design",
+        "mm": 23.3,
+        "src": "Open-Meteo (open-meteo.com) archive 2016-2025: 90th-percenti"
+      }
+    ],
+    "before": {
+      "step": "before",
+      "rainL": 1507.4585699738718,
+      "roofL": 2796.0000000000027,
+      "infiltratedL": 1547.0485912216543,
+      "outL": 2756.409978752276,
+      "storedL": 0,
+      "drainH": 0,
+      "frames": 96
+    },
+    "fpsStorm": 116.59541310702593,
+    "clockBeforeEnd": "next day 1:00 am, dry",
+    "design": {
+      "step": "design",
+      "ok": true,
+      "garden": {
+        "cx": 5.974217877070089,
+        "cy": 3.359618318417634,
+        "lenM": 3.6395181125155895,
+        "widM": 2.8808638693346307,
+        "rot": -0.6670555668331782,
+        "depthM": 0.14830165048759583,
+        "bermM": 0.04660982782553642
+      },
+      "capturedL": 2756.409978752276,
+      "outBeforeL": 2756.409978752276,
+      "outAfterL": 0,
+      "drainH": 41.25,
+      "cost": {
+        "total": 919.1600181404193,
+        "excavation": 223.8738653876228,
+        "soil": 225.89882677556753,
+        "mulch": 98.81838441625875,
+        "plants": 370.5689415609703
+      },
+      "areaM2": 8.234865368021563,
+      "tries": 161
+    },
+    "plant": {
+      "step": "plant",
+      "plants": 26,
+      "species": 10,
+      "warnings": [
+        {
+          "code": "small-garden-few-species",
+          "zone": "middle",
+          "message": "Only 2 species fit the middle zone; a larger garden takes 3-5."
+        },
+        {
+          "code": "small-garden-small-drifts",
+          "zone": "middle",
+          "message": "The middle zone is too small for drifts of 3-7 of one species."
+        }
+      ]
+    },
+    "compare": {
+      "step": "compare",
+      "capturedL": 2756.409978752276,
+      "outBeforeL": 2756.409978752276,
+      "outAfterL": 0,
+      "drainH": 41.25,
+      "simDrainH": 41.083333333333336,
+      "areaM2": 8.234865368021563,
+      "plants": 26
+    },
+    "fpsCompare": 44.79840829483517,
+    "clockCompareEnd": "day 3, 6:00 pm, dry",
+    "plan": {
+      "step": "plan",
+      "pngW": 2480,
+      "pngH": 3508,
+      "pngBytes": 10201544
+    },
+    "png": {
+      "w": 2480,
+      "h": 3508,
+      "format": "png"
+    },
+    "pdf": {
+      "bytes": 1478714,
+      "header": "%PDF-",
+      "eof": "%%EOF"
+    },
+    "hscrollEnd": 0,
+    "escape": {
+      "open": false,
+      "focus": "capture"
+    }
+  },
+  "1440": {
+    "errors": [],
+    "logs": [],
+    "slope": {
+      "step": "slope",
+      "confidence": {
+        "slopePct": 19.889764462741137,
+        "lowPct": 9.126392279972746,
+        "highPct": 30.653136645509527,
+        "source": "gravity",
+        "manualSuggested": true,
+        "notes": [
+          "slope band wider than 8 pp"
+        ]
+      },
+      "manual": true,
+      "source": "photo",
+      "backend": "webgpu"
+    },
+    "slopeMs": 13252,
+    "hscroll": 0,
+    "storms": [
+      {
+        "id": "recent",
+        "mm": 24.3,
+        "src": "Open-Meteo (open-meteo.com) hourly precipitation, 2026-09-13"
+      },
+      {
+        "id": "typical",
+        "mm": 7.4,
+        "src": "Open-Meteo (open-meteo.com) archive 2016-2025: median wet-da"
+      },
+      {
+        "id": "design",
+        "mm": 23.3,
+        "src": "Open-Meteo (open-meteo.com) archive 2016-2025: 90th-percenti"
+      }
+    ],
+    "before": {
+      "step": "before",
+      "rainL": 1507.4585699738718,
+      "roofL": 2796.0000000000027,
+      "infiltratedL": 1547.0485912216543,
+      "outL": 2756.409978752276,
+      "storedL": 0,
+      "drainH": 0,
+      "frames": 96
+    },
+    "fpsStorm": 132.0810091128808,
+    "clockBeforeEnd": "next day 1:00 am, dry",
+    "design": {
+      "step": "design",
+      "ok": true,
+      "garden": {
+        "cx": 5.974217877070089,
+        "cy": 3.359618318417634,
+        "lenM": 3.6395181125155895,
+        "widM": 2.8808638693346307,
+        "rot": -0.6670555668331782,
+        "depthM": 0.14830165048759583,
+        "bermM": 0.04660982782553642
+      },
+      "capturedL": 2756.409978752276,
+      "outBeforeL": 2756.409978752276,
+      "outAfterL": 0,
+      "drainH": 41.25,
+      "cost": {
+        "total": 919.1600181404193,
+        "excavation": 223.8738653876228,
+        "soil": 225.89882677556753,
+        "mulch": 98.81838441625875,
+        "plants": 370.5689415609703
+      },
+      "areaM2": 8.234865368021563,
+      "tries": 161
+    },
+    "plant": {
+      "step": "plant",
+      "plants": 26,
+      "species": 10,
+      "warnings": [
+        {
+          "code": "small-garden-few-species",
+          "zone": "middle",
+          "message": "Only 2 species fit the middle zone; a larger garden takes 3-5."
+        },
+        {
+          "code": "small-garden-small-drifts",
+          "zone": "middle",
+          "message": "The middle zone is too small for drifts of 3-7 of one species."
+        }
+      ]
+    },
+    "compare": {
+      "step": "compare",
+      "capturedL": 2756.409978752276,
+      "outBeforeL": 2756.409978752276,
+      "outAfterL": 0,
+      "drainH": 41.25,
+      "simDrainH": 41.083333333333336,
+      "areaM2": 8.234865368021563,
+      "plants": 26
+    },
+    "fpsCompare": 136.30168042411069,
+    "clockCompareEnd": "day 3, 6:00 pm, dry",
+    "plan": {
+      "step": "plan",
+      "pngW": 2480,
+      "pngH": 3508,
+      "pngBytes": 10201544
+    },
+    "png": {
+      "w": 2480,
+      "h": 3508,
+      "format": "png"
+    },
+    "pdf": {
+      "bytes": 1478714,
+      "header": "%PDF-",
+      "eof": "%%EOF"
+    },
+    "hscrollEnd": 0,
+    "escape": {
+      "open": false,
+      "focus": "capture"
+    }
+  },
+  "camera": {
+    "errors": [],
+    "logs": [],
+    "photo": {
+      "w": 1272,
+      "h": 848,
+      "source": "camera"
+    },
+    "slope": {
+      "step": "slope",
+      "confidence": {
+        "slopePct": 33.90917834589967,
+        "lowPct": 12.466100709719882,
+        "highPct": 55.352255982079456,
+        "source": "wall",
+        "manualSuggested": true,
+        "notes": [
+          "no shift puts the camera at the assumed height",
+          "slope band wider than 8 pp"
+        ]
+      },
+      "manual": true,
+      "source": "photo",
+      "backend": "webgpu"
+    }
+  }
+}

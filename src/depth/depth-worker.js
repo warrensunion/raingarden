@@ -104,8 +104,10 @@ async function load(force) {
       ort.env.wasm.wasmPaths = { wasm: '/ort/ort-wasm-simd-threaded.jsep.wasm' };
       const isolated = self.crossOriginIsolated === true;
       ort.env.wasm.numThreads = isolated ? Math.min(4, self.navigator?.hardwareConcurrency || 1) : 1;
+      // ORT prints its node-placement warnings through console.error; only real errors should reach the console
+      ort.env.logLevel = 'error';
       post({ type: 'progress', phase: 'init', loaded: 0, total: 1, fraction: 1 });
-      const session = await ort.InferenceSession.create(bytes, { executionProviders: [backend], graphOptimizationLevel: 'all' });
+      const session = await ort.InferenceSession.create(bytes, { executionProviders: [backend], graphOptimizationLevel: 'all', logSeverityLevel: 3 });
       return { ort, session, backend, size: SIZE[backend] };
     } catch (err) {
       tried.push(`${backend}: ${err.message || err}`);

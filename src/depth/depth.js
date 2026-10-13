@@ -113,6 +113,11 @@ function makeEstimate(info) {
   };
 }
 
+/** Stop sending load progress to fn (a step that closes mid-load). */
+export function removeProgressListener(fn) {
+  listeners.delete(fn);
+}
+
 /**
  * @param {{ onProgress?: (p: { phase: 'download'|'init', loaded: number, total: number, fraction: number }) => void,
  *           backend?: 'webgpu'|'wasm' }} [opts] backend forces one (testing only; only the first load's choice counts)
@@ -134,6 +139,10 @@ export function loadDepth({ onProgress, backend } = {}) {
           worker = null;
           loading = null;
           listeners.clear();
+          // nothing may hang on a disposed model: in-flight estimates reject
+          const err = codeError('backend', 'depth: disposed');
+          for (const p of pending.values()) p.reject(err);
+          pending.clear();
         },
       }))
       .catch((err) => {
