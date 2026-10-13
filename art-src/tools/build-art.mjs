@@ -14,7 +14,7 @@
  * cutout.mjs loads images over http, so this serves the repo root itself (a
  * few lines of node:http - no dev server or index.html needed).
  */
-import { execFileSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -60,7 +60,7 @@ try {
     }
     if (it.cutout) {
       const base = out.replace(/\.webp$/, '');
-      execFileSync(process.execPath, ['art-src/tools/cutout.mjs', `http://127.0.0.1:${PORT}`, src.replaceAll('\\', '/'), base, '--max', String(max), '--q', '0.86', '--islands'], { stdio: 'inherit' });
+      await run(['art-src/tools/cutout.mjs', `http://127.0.0.1:${PORT}`, src.replaceAll('\\', '/'), base, '--max', String(max), '--q', '0.86', '--islands']); // async: the server above lives in this process, so a sync child would deadlock it
       fs.rmSync(`${base}.png`, { force: true }); // cutout.mjs also writes the cleaned PNG; the original in gen/ is the source of truth
     } else {
       await sharp(src).resize({ width: max, height: max, fit: 'inside', withoutEnlargement: true }).webp({ quality: 84 }).toFile(out);
@@ -86,4 +86,11 @@ async function placeholder(it, out, max) {
   </svg>`;
   await sharp(Buffer.from(svg)).webp({ quality: 80 }).toFile(out);
   console.log('PLACEHOLDER', out);
+}
+
+function run(argv) {
+  return new Promise((resolve, reject) => {
+    const p = spawn(process.execPath, argv, { stdio: 'inherit' });
+    p.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`cutout failed (${code}): ${argv[2]}`))));
+  });
 }
