@@ -128,7 +128,7 @@ function thinPlate(pts) {
  * Gauss-Jordan elimination with partial pivoting on an augmented matrix
  * (rows of length size + 1). Returns the solution or null if singular.
  */
-export function solve(A, size) {
+function solve(A, size) {
   for (let c = 0; c < size; c++) {
     let p = c;
     for (let r = c + 1; r < size; r++) if (Math.abs(A[r][c]) > Math.abs(A[p][c])) p = r;

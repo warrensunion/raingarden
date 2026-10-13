@@ -154,9 +154,38 @@ test('no gravity, no wall: level-assumed with a wide band', () => {
   const r = toHeightfield({ depth: sc.depth, yard: YARD, scale: { a, b, meters: 1 } });
   const c = r.confidence;
   assert.equal(c.source, 'level-assumed');
-  assert.ok(c.highPct - c.slopePct >= Math.abs(c.slopePct) + 3 - 1e-9);
+  // ruling: [0, max(|slope| + 3, 12)] pp
+  assert.equal(c.lowPct, 0);
+  assert.ok(Math.abs(c.highPct - Math.max(Math.abs(c.slopePct) + 3, 12)) < 1e-9, `high ${c.highPct}`);
   assert.ok(c.manualSuggested);
   assert.ok(allFinite(r.terrain));
+});
+
+test('level-assumed with collinear wall taps: the true 5% lies inside the band, wall flagged unusable', () => {
+  const sc = scene({ pitchDeg: 25, gy: -0.05, wallY: 9 });
+  const a = sc.project(sc.ground(-0.5, 4));
+  const b = sc.project(sc.ground(0.5, 4));
+  const wallPts = [sc.project([-2, 9, 1.2]), sc.project([0, 9, 1.2]), sc.project([2, 9, 1.2])];
+  const yard = [[0.05, 0.35], [0.95, 0.35], [0.98, 0.97], [0.02, 0.97]];
+  const r = toHeightfield({ depth: sc.depth, gravity: null, wallPts, yard, scale: { a, b, meters: 1 } });
+  const c = r.confidence;
+  assert.equal(c.source, 'level-assumed');
+  assert.ok(c.lowPct <= 5 && 5 <= c.highPct, `band ${c.lowPct}..${c.highPct}`);
+  assert.ok(c.notes.some((s) => /wall unusable/.test(s)), c.notes.join('; '));
+});
+
+test('terrain.mask marks the in-yard cells', () => {
+  const sc = scene({ gy: -0.05 });
+  const a = sc.project(sc.ground(-0.5, 4));
+  const b = sc.project(sc.ground(0.5, 4));
+  const r = toHeightfield({ depth: sc.depth, gravity: sc.gravity, yard: [[0.3, 0.5], [0.7, 0.5], [0.5, 0.95]], scale: { a, b, meters: 1 }, n: 48 });
+  const { mask, nx, ny } = r.terrain;
+  assert.ok(mask instanceof Uint8Array);
+  assert.equal(mask.length, nx * ny);
+  let on = 0;
+  for (const v of mask) on += v;
+  // a triangle covers about half its bounding box
+  assert.ok(on / (nx * ny) > 0.3 && on / (nx * ny) < 0.7, `${on} of ${nx * ny}`);
 });
 
 test('noise depth: finite terrain, wider band than clean, manual fallback suggested', () => {

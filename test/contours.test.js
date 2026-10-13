@@ -45,6 +45,22 @@ test('a cone gives closed rings at the expected radius', () => {
   }
 });
 
+test('saddle: 2x2 [1,0;0,1] at 0.5 gives two segments', () => {
+  const t = { nx: 2, ny: 2, cell: 1, z: Float64Array.from([1, 0, 0, 1]) };
+  const out = contours(t, 0.5);
+  assert.equal(out.length, 1);
+  assert.equal(out[0].level, 0.5);
+  assert.equal(out[0].segs.length, 8);
+  // every endpoint is an edge midpoint (z goes 1 -> 0 along each edge)
+  for (let i = 0; i < 8; i += 2) {
+    const x = out[0].segs[i];
+    const y = out[0].segs[i + 1];
+    const near = (p, q) => Math.abs(p - q) < 1e-6;
+    const onEdge = (near(x, 1) && (near(y, 0.5) || near(y, 1.5))) || (near(y, 1) && (near(x, 0.5) || near(x, 1.5)));
+    assert.ok(onEdge, `${x},${y}`);
+  }
+});
+
 test('flat terrain and bad intervals give no contours, never throw', () => {
   const flat = plane(8, 8, 1, () => 0);
   assert.deepEqual(contours(flat, 0.5), []);

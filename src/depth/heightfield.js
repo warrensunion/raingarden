@@ -24,7 +24,8 @@
  * camera roll, so gravity is perpendicular to both the wall normal and the
  * camera's x axis) -> source 'wall'; else 'level-assumed': the fitted ground
  * plane is declared level, only the residual relief is real, and the band is
- * +/-(|slope| + 3) pp wide.
+ * [0, max(|slope| + 3, 12)] pp. Wall taps that are collinear, singular or give
+ * |g| ~ 0 are dropped with a "wall unusable" note.
  *
  * Conventions (all documented here, used everywhere in src/depth):
  *   - Image coords (u, v) in 0..1, u right, v down; depth.data is row-major
@@ -40,7 +41,8 @@
  *     the yard's bounding box, so terrain cell (i, j) covers
  *     x in [i*cell, (i+1)*cell), y in [j*cell, (j+1)*cell); heights are sampled
  *     at cell centres. Grid row 0 is the NEAREST edge. index = y * nx + x.
- *   - Heights are relative: the lowest cell is 0.
+ *   - Heights are relative: the lowest cell is 0. terrain.mask (Uint8Array,
+ *     same indexing) is 1 for cells whose centre falls inside the yard polygon.
  *
  * Relief: each grid cell is projected into the photo through the fitted plane,
  * and the height offset of the depth-model point on that same ray is added
@@ -56,7 +58,9 @@
  *                                          counting at most 64 independent samples
  *                                          (residuals are spatially correlated)
  *              + camera-height spread      only when the height prior was used
- *   level-assumed: half-width = |slope| + 3 + 2 * SE.
+ *   level-assumed: the band is [0, max(|slope| + 3, 12)] pp; the fitted tilt is
+ *   unknown without gravity, and 12% is the steepest slope rain-garden guides
+ *   allow, so the band says "somewhere between level and too steep".
  *   lowPct is clamped at 0. manualSuggested is set when the band is wider than
  *   8 pp, the yard is under 4 m^2, the scale line or polygon is degenerate, or
  *   gravity had to be assumed: the UI then offers manualTerrain().
@@ -124,7 +128,20 @@ export function toHeightfield({ depth, fovYDeg = 65, gravity = null, wallPts = n
         wd.push(norm(d));
       }
     }
-    if (wr.length >= 3) b = leastSquares3(wr, wd);
+    if (wr.length < 3) flags.push('wall unusable: fewer than 3 taps with depth');
+    else if (collinear(wallPts.filter((p) => p && Number.isFinite(p[0]) && Number.isFinite(p[1])))) {
+      flags.push('wall unusable: taps are (nearly) on one line, so they do not define a plane');
+    } else {
+      b = leastSquares3(wr, wd);
+      if (!b || !b.every(Number.isFinite)) {
+        b = null;
+        flags.push('wall unusable: singular wall plane');
+      } else if (Math.hypot(b[0], b[1]) < 1e-6 * (Math.abs(b[2]) + 1)) {
+        // a wall seen square-on with no depth gradient carries no direction
+        b = null;
+        flags.push('wall unusable: no depth gradient across the taps');
+      }
+    }
   }
 
   let g0 = null;
@@ -133,6 +150,7 @@ export function toHeightfield({ depth, fovYDeg = 65, gravity = null, wallPts = n
     if (L > 1e-9) g0 = gravity.map((v) => v / L);
   }
   const source = g0 ? 'gravity' : b ? 'wall' : 'level-assumed';
+  let wallGravityFailed = false;
 
   // scale line rays
   const sa = scale && Array.isArray(scale.a) ? ray(scale.a) : null;
@@ -165,9 +183,15 @@ export function toHeightfield({ depth, fovYDeg = 65, gravity = null, wallPts = n
     else if (b) {
       const w = [b[0], b[1], b[2] + tau];
       g = [0, w[2], -w[1]]; // perpendicular to the wall normal and to camera x (no roll)
-      const gl = Math.hypot(...g) || 1;
-      g = g.map((v) => v / gl);
-      if (dot(g, m) < 0 || (dot(g, m) === 0 && g[1] < 0)) g = g.map((v) => -v);
+      const gl = Math.hypot(...g);
+      if (!(gl > 1e-9 * (Math.hypot(...w) + 1e-12))) {
+        // wall normal along camera x: gravity undefined for this shift; read it as level
+        wallGravityFailed = true;
+        g = m.map((v) => v / (mLen || 1));
+      } else {
+        g = g.map((v) => v / gl);
+        if (dot(g, m) < 0 || (dot(g, m) === 0 && g[1] < 0)) g = g.map((v) => -v);
+      }
     } else g = m.map((v) => v / (mLen || 1));
     // metres per unscaled unit, from the marked line on the plane
     let k = NaN;
@@ -357,14 +381,22 @@ export function toHeightfield({ depth, fovYDeg = 65, gravity = null, wallPts = n
   // --- 6. confidence -----------------------------------------------------------
   const fit = planeFit(z, inYard, nx, ny, cell);
   const slopePct = 100 * Math.hypot(fit.gx, fit.gy);
-  let half;
-  if (source === 'level-assumed') half = Math.abs(slopePct) + 3 + 2 * fit.se;
-  else half = 0.5 * Math.abs(slopePct) + 2 * fit.se + heightSpread;
+  if (wallGravityFailed) flags.push('wall unusable: |g| ~ 0 for some shifts (wall normal along the camera x axis)');
+  let half = 0.5 * Math.abs(slopePct) + 2 * fit.se + heightSpread;
   if (source === 'wall') half += 1; // the no-roll assumption
+  let lowPct = Math.max(0, slopePct - half);
+  let highPct = slopePct + half;
+  if (source === 'level-assumed') {
+    // With no gravity the fitted plane's tilt is unknown, so the reading says
+    // nothing about the overall slope: anything from 0 up to the steepest a
+    // rain garden is sited on (12%, the guides' limit) is possible.
+    lowPct = 0;
+    highPct = Math.max(Math.abs(slopePct) + 3, 12);
+  }
   const confidence = {
     slopePct: finite(slopePct),
-    lowPct: finite(Math.max(0, slopePct - half)),
-    highPct: finite(slopePct + half),
+    lowPct: finite(lowPct),
+    highPct: finite(highPct),
     source,
     manualSuggested: false,
   };
@@ -376,7 +408,7 @@ export function toHeightfield({ depth, fovYDeg = 65, gravity = null, wallPts = n
   confidence.notes = flags;
 
   return {
-    terrain: { nx, ny, cell, z },
+    terrain: { nx, ny, cell, z, mask: inYard },
     confidence,
     toGround,
     toImage,
@@ -439,6 +471,28 @@ function medianAround(data, w, h, u, v) {
   if (!vals.length) return NaN;
   vals.sort((p, q) => p - q);
   return quantile(vals, 0.5);
+}
+
+/** True when the taps span (almost) no area: the 2-D spread's minor axis is < 2% of its major. */
+function collinear(pts) {
+  if (pts.length < 3) return true;
+  const n = pts.length;
+  const mx = pts.reduce((s, p) => s + p[0], 0) / n;
+  const my = pts.reduce((s, p) => s + p[1], 0) / n;
+  let sxx = 0;
+  let syy = 0;
+  let sxy = 0;
+  for (const [x, y] of pts) {
+    sxx += (x - mx) ** 2;
+    syy += (y - my) ** 2;
+    sxy += (x - mx) * (y - my);
+  }
+  const tr = sxx + syy;
+  const det = sxx * syy - sxy * sxy;
+  const disc = Math.sqrt(Math.max(0, (tr * tr) / 4 - det));
+  const big = tr / 2 + disc;
+  const small = Math.max(0, tr / 2 - disc);
+  return !(big > 1e-12) || Math.sqrt(small / big) < 0.02;
 }
 
 function polyArea(p) {
