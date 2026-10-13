@@ -1,0 +1,46 @@
+{
+  "place": "Richmond, BC",
+  "lat": 49.17,
+  "lon": -123.14,
+  "generated": "2026-10-13",
+  "years": "2016-2025",
+  "recent": {
+    "date": "2026-09-29",
+    "totalMm": 24.3,
+    "hourlyMm": [
+      3.6,
+      3.9,
+      2.8,
+      3.6,
+      4.3,
+      1.5,
+      1.7,
+      1.3,
+      1,
+      0.3,
+      0.2,
+      0.1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "url": "https://archive-api.open-meteo.com/v1/archive?latitude=49.17&longitude=-123.14&start_date=2026-09-13&end_date=2026-10-12&hourly=precipitation&timezone=auto"
+  },
+  "typical": {
+    "totalMm": 7.4,
+    "url": "https://archive-api.open-meteo.com/v1/archive?latitude=49.17&longitude=-123.14&start_date=2016-01-01&end_date=2025-12-31&daily=precipitation_sum&timezone=auto"
+  },
+  "design": {
+    "totalMm": 23.3,
+    "url": "https://archive-api.open-meteo.com/v1/archive?latitude=49.17&longitude=-123.14&start_date=2016-01-01&end_date=2025-12-31&daily=precipitation_sum&timezone=auto"
+  }
+}
