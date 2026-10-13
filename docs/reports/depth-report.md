@@ -97,7 +97,7 @@ Tests:
 1. **`npm test` is broken on Node 24.** `node --test test/` fails with "Cannot find module …\test". `node --test "test/*.test.js"` works. I left package.json alone to avoid merge conflicts; it is a one-line fix.
 2. Gravity-only slope depends on the camera-height prior (see the table). Wall taps are the real fix, and the capture UI should ask for them.
 3. **The DeviceOrientation/DeviceMotion → camera-space gravity conversion is not implemented.** It is the capture step's job. Expected convention: down vector, camera x right / y down / z forward. Beware the iOS vs Android sign conventions for `accelerationIncludingGravity`.
-4. Not run on a real photo or in a browser. `depth.js` passes `node --check` only; the esbuild bundle check was still running at the time of writing.
+4. Not run on a real photo or in a browser. `depth.js` passes `node --check` only; an esbuild bundle check hung for more than 25 min on the loaded machine and was killed, so the `onnxruntime-web/webgpu` and `/wasm` import specifiers are not yet verified by a bundler.
    - Real Depth Anything errors are not exactly affine (especially wall vs ground), so the wall closed form may be less exact on real photos than in the synthetic tests.
    - `depth.js` imports `onnxruntime-web/webgpu` or `onnxruntime-web/wasm` (the smaller WASM-only build) and sets `wasmPaths = '/ort/'`. Under a non-root Vite `base`, those absolute `/models/` and `/ort/` paths would need `import.meta.env.BASE_URL`.
 5. A `fetch-models` npm script and DECISIONS.md lines were not added (to avoid conflicts). Suggested DECISIONS line: "Depth shift (affine t) is unobservable from planarity; fixed by gravity + wall taps, else a 1.4 m camera-height prior with a 1.2-1.6 m band."
