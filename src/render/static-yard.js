@@ -294,6 +294,11 @@ export function createStaticYard(canvas, { terrain, photo = null, toImage = null
       if (!(x >= 0 && x <= W && y >= 0 && y <= D)) return null;
       return [x, y];
     },
+    /** Ground metres -> client px (same contract as the WebGL scene's project). */
+    project(x, y) {
+      const r = canvas.getBoundingClientRect();
+      return [r.left + sx(x), r.top + sy(y)];
+    },
     fps() { return 60; },
     resize() { draw(); },
     destroy() {

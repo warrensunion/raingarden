@@ -568,6 +568,18 @@ export async function createYardScene(canvas, { terrain, photo = null, toImage =
         const { origin: o, direction: d } = raycaster.ray;
         return marchPick(frame, h, [o.x, o.y, o.z], [d.x, d.y, d.z], hMin - gardenU.b[2], hMax + gardenU.b[3]);
       },
+      /**
+       * Ground metres (x, y) -> client px [x, y] at the current camera, for 2D
+       * overlays drawn over the canvas (the optimizer's ghost gardens, the split
+       * handle). Height from the displayed (carved) ground; null behind the camera.
+       */
+      project(x, y) {
+        const r = canvas.getBoundingClientRect();
+        const w = toWorld(x, y, h(x, y));
+        const v = new THREE.Vector3(w[0], w[1], w[2]).project(camera);
+        if (!(v.z < 1)) return null;
+        return [r.left + ((v.x + 1) / 2) * r.width, r.top + ((1 - v.y) / 2) * r.height];
+      },
       fps() {
         if (!fcount) return 0;
         let s = 0;
