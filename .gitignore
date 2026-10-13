@@ -1,0 +1,9 @@
+node_modules/
+dist/
+public/models/
+public/ort/
+*.log
+.vite/
+design-reference/**/*.webm
+design-reference/**/*.mp4
+art-src/.vendor/

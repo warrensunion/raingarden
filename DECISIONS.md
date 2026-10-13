@@ -1,0 +1,22 @@
+# Decisions
+
+One line each: the decision, and why. Newest at the bottom.
+
+- Project path is architectural (new project), so it gets the full spec -> plan -> subagents path; I answer the brainstorming questions myself, as the brief asks.
+- Skills `design-taste-frontend`, `image-to-code` and `web-design-guidelines` are not installed in this session, so I use `frontend-design` for art direction, generate one design image per section through ChatGPT myself (image-to-code's method), and do the final audit by hand against the Vercel Web Interface Guidelines checklist.
+- Tools copied from BTTRURSLF-v2 (read-only): cutout.mjs, sheet-boxes.mjs, optimize-images.mjs, under art-src/tools/.
+- Metric units and litres only, English only: both target regions are Canadian; imperial would double the copy for little gain.
+- No server, accounts or analytics; the only network calls are the app's own files and Open-Meteo (coordinates rounded to 2 dp).
+- One page: scroll story -> one continuous designer scene -> How it works; hash anchors, no router.
+- Virtual smooth scroll is a lerp on the native scroll position (not wheel hijacking), so keyboard, touch and screen readers still scroll natively.
+- Story scenes are layered DOM WebP cut-outs moved by translate3d plus one shared WebGL rain canvas: crisp and cheap on phones, and the static fallback is the same DOM without motion.
+- Hydrology core is pure JS on the CPU (128x128, 96x96 on low-end) in a Web Worker; WebGL only renders. One codebase for tests and app; 128^2 pipe steps cost well under a frame.
+- Two flow models: D8 accumulation (overlay arrows + optimizer candidates) and virtual-pipes shallow water (the animated storm, exactly volume-conserving).
+- Infiltration is Green-Ampt per cell with Rawls 1983 parameters; Horton appears only as the comparison in How it works.
+- Depth via onnxruntime-web directly (not transformers.js): smaller bundle, and we only need one model. fp16 on WebGPU, int8 on WASM.
+- Metric heights from relative depth by pinhole back-projection (65 deg vFOV assumed) + plane-plus-smooth-residual fit, scaled by the user's marked length; confidence band from fit residual plus a fixed +/-50% relief uncertainty.
+- Storms: heaviest day in the last 30 days, median wet day (typical), 90th-percentile wet day (design, the LID capture criterion) over 10 years from Open-Meteo, shaped by NRCS Type IA (PNW) / Type II (Ontario); bundled Richmond BC numbers as offline fallback.
+- Optimizer is simulated annealing (not CMA-ES): mixed constraints are easy as rejected moves, and ~150 coarse sims fit in a few seconds.
+- PDF export is a hand-written single-page PDF writer (JPEG + text): no dependency for one page.
+- Region auto-picked from longitude (west of -100 -> PNW, else Southern Ontario), switchable.
+- Fonts: Fraunces (display) + Inter Tight (UI), self-hosted variable woff2, both SIL OFL.
