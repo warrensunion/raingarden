@@ -434,3 +434,77 @@ export function polygonMask(terrain, poly) {
   for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) m[j * nx + i] = inPolygon((i + 0.5) * cell, (j + 0.5) * cell, poly) ? 1 : 0;
   return m;
 }
+
+/** Clip segment [[x0, y0], [x1, y1]] to [0, W] x [0, D] (Liang-Barsky); null when it misses. */
+export function clipSegment(seg, W, D) {
+  const [[x0, y0], [x1, y1]] = seg;
+  const dx = x1 - x0;
+  const dy = y1 - y0;
+  let t0 = 0;
+  let t1 = 1;
+  const edges = [[-dx, x0], [dx, W - x0], [-dy, y0], [dy, D - y0]];
+  for (const [p, q] of edges) {
+    if (p === 0) { if (q < 0) return null; continue; }
+    const r = q / p;
+    if (p < 0) { if (r > t1) return null; if (r > t0) t0 = r; } else { if (r < t0) return null; if (r < t1) t1 = r; }
+  }
+  const f = (v) => Math.round(v * 1e9) / 1e9;
+  return [[f(x0 + t0 * dx), f(y0 + t0 * dy)], [f(x0 + t1 * dx), f(y0 + t1 * dy)]];
+}
+
+/** Ground marks for the yard view ({ kind, pts }, see src/render/overlays.js). */
+export function rendererMarks(gm, site, W, D) {
+  const out = [];
+  if (site && site.wall) {
+    const w = clipSegment(site.wall, W, D);
+    if (w) out.push({ kind: 'wall', pts: w });
+  }
+  if (gm.septic && gm.septic.length >= 3) out.push({ kind: 'septic', pts: gm.septic });
+  if (gm.scale && gm.scale.a && gm.scale.b) out.push({ kind: 'scale', pts: [gm.scale.a, gm.scale.b] });
+  if (gm.outlet) out.push({ kind: 'outlet', pts: [gm.outlet] });
+  if (gm.downspout) out.push({ kind: 'downspout', pts: [gm.downspout] });
+  return out;
+}
+
+/** Contour interval (m) from a round set, aiming at about 8 lines over the height range. */
+export function niceInterval(rangeM) {
+  if (!(rangeM > 0)) return 0.05;
+  const steps = [0.01, 0.02, 0.025, 0.05, 0.1, 0.2, 0.25, 0.5, 1];
+  for (const s of steps) if (rangeM / s <= 10) return s;
+  return 1;
+}
+
+const LEDGER_KEYS = ['rainL', 'roofL', 'infiltratedL', 'outL', 'storedL'];
+
+/** Running water ledger at time t: zero at t = 0, linear up to the first frame, then between frames. */
+export function ledgerAt(frames, t) {
+  const out = {};
+  for (const key of LEDGER_KEYS) out[key] = 0;
+  if (!frames.length) return out;
+  const f0 = frames[0];
+  if (t < f0.t) {
+    const k = Math.max(0, t) / f0.t;
+    for (const key of LEDGER_KEYS) out[key] = (f0.ledger[key] || 0) * k;
+    return out;
+  }
+  const { i, k } = frameIndexAt(frames, t);
+  const a = frames[i].ledger;
+  const b = frames[Math.min(frames.length - 1, i + 1)].ledger;
+  for (const key of LEDGER_KEYS) out[key] = (a[key] || 0) + ((b[key] || 0) - (a[key] || 0)) * k;
+  return out;
+}
+
+/** The optimizer's { ok: false, reason } in plain words, with what to try next. */
+export function failureWords(reason) {
+  const r = String(reason || '');
+  if (/budget/.test(r)) return { say: 'Your budget won’t cover even the smallest garden.', tips: ['Raise the budget a little.', 'Plant plugs instead of pots to keep plant costs down.'] };
+  if (/area limit/.test(r)) return { say: 'The area limit is smaller than the smallest garden we can draw.', tips: ['Raise the maximum area to at least 1 m².'] };
+  if (/within .* of the house/.test(r)) {
+    const m = r.match(/within ([\d.]+) m/);
+    return { say: `Every open spot in the yard is within ${m ? m[1] : 3} m of the house.`, tips: ['Check the yard outline reaches the far side of the lawn.', 'Mark the downspout and wall again if they moved.', 'Ask about a planter box against the house instead.'] };
+  }
+  if (/septic/.test(r)) return { say: 'The septic field’s safety buffer covers the rest of the yard.', tips: ['Check the septic outline is drawn where the field really is.', 'Ask a septic installer before digging near it.'] };
+  if (/drains within/.test(r)) return { say: 'Your soil drains too slowly for any garden here to empty within 48 hours.', tips: ['Try Loam if a jar test says it is not really clay.', 'Ask a landscaper about an underdrain or a lined planter.'] };
+  if (/too small/.test(r)) return { say: 'The yard is too small for a garden with a berm and a 0.5 m gap from the fence.', tips: ['Outline the yard again, including all of the lawn.'] };
+  return { say: 'We couldn’t find a garden that fits these limits.', tips: ['Raise the budget or the maximum area.', 'Check the yard outline.'] };
+}

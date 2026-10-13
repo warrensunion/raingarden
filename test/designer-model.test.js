@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   regionFromLon, round2, gravityFromOrientation, flatDepth, groundMarks, wallLine, houseMask,
   outletMask, snapCell, siteInputs, plantRows, fmtL, fmtHours, fmtNum, slopeSentence, directionWords,
-  clockLabel, rainRateAt, lerpFrames, frameIndexAt, wrapText, sparkPath, gardenDims, manualDir, polyAreaM2,
+  clockLabel, rainRateAt, lerpFrames, frameIndexAt, wrapText, sparkPath, gardenDims, manualDir, polyAreaM2, clipSegment, rendererMarks, niceInterval, ledgerAt, failureWords,
 } from '../src/designer/model.js';
 import { toHeightfield } from '../src/depth/heightfield.js';
 import { manualTerrain } from '../src/depth/manualTerrain.js';
@@ -210,4 +210,47 @@ test('manualDir: downhill from the downspout toward the outlet, default away fro
 test('polyAreaM2 is the absolute shoelace area', () => {
   assert.equal(polyAreaM2([[0, 0], [2, 0], [2, 3], [0, 3]]), 6);
   assert.equal(polyAreaM2([[0, 0], [0, 3], [2, 3], [2, 0]]), 6);
+});
+
+test('clipSegment clips a long wall line to the ground rectangle', () => {
+  const s = clipSegment([[-5, 4], [15, 4]], 10, 8);
+  assert.deepEqual(s, [[0, 4], [10, 4]]);
+  assert.equal(clipSegment([[-5, -1], [15, -1]], 10, 8), null);
+});
+
+test('rendererMarks: downspout, outlet, wall (clipped), scale and septic for the yard view', () => {
+  const gm = { downspout: [1, 2], outlet: [9, 3], scale: { a: [2, 1], b: [3, 1], meters: 1 }, septic: [[5, 5], [6, 5], [6, 6]], yard: [], wallPts: [] };
+  const marks = rendererMarks(gm, { wall: [[1, -20], [1, 20]] }, 10, 8);
+  const kinds = marks.map((m) => m.kind).sort();
+  assert.deepEqual(kinds, ['downspout', 'outlet', 'scale', 'septic', 'wall']);
+  const wall = marks.find((m) => m.kind === 'wall');
+  assert.deepEqual(wall.pts, [[1, 0], [1, 8]]);
+});
+
+test('niceInterval picks a round contour step giving about 4 to 12 lines', () => {
+  assert.equal(niceInterval(0.8), 0.1);
+  assert.equal(niceInterval(2.1), 0.25);
+  assert.equal(niceInterval(0.05), 0.01);
+  assert.equal(niceInterval(0), 0.05);
+});
+
+test('ledgerAt ramps from zero before the first frame and blends between frames', () => {
+  const frames = [
+    { t: 900, ledger: { rainL: 10, roofL: 20, infiltratedL: 5, outL: 1, storedL: 0 } },
+    { t: 1800, ledger: { rainL: 30, roofL: 40, infiltratedL: 15, outL: 11, storedL: 2 } },
+  ];
+  assert.deepEqual(ledgerAt(frames, 450), { rainL: 5, roofL: 10, infiltratedL: 2.5, outL: 0.5, storedL: 0 });
+  assert.deepEqual(ledgerAt(frames, 1350), { rainL: 20, roofL: 30, infiltratedL: 10, outL: 6, storedL: 1 });
+  assert.deepEqual(ledgerAt(frames, 1e9), frames[1].ledger);
+  assert.deepEqual(ledgerAt([], 10), { rainL: 0, roofL: 0, infiltratedL: 0, outL: 0, storedL: 0 });
+});
+
+test('optimizer failures in plain words, each with suggestions', () => {
+  for (const r of ['budget too small for the smallest garden', 'the area limit is below the smallest garden (0.28 m²)', 'the yard is too small',
+    'everything is within 3 m of the house', 'the septic buffer covers the yard', 'no garden here drains within 48 h (the soil is too slow)', 'something new']) {
+    const w = failureWords(r);
+    assert.ok(w.say.length > 10 && /[.]$/.test(w.say), r);
+    assert.ok(Array.isArray(w.tips) && w.tips.length >= 1, r);
+  }
+  assert.match(failureWords('everything is within 3 m of the house').say, /3 m/);
 });
