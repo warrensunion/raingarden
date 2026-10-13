@@ -42,7 +42,9 @@ const story = startStory(document.getElementById('story'), { onDesign: openDesig
 
 const scene1 = document.querySelector('.story-scene');
 runPreloader({
-  assets: [...sceneImages(0), '/art/tex-raindrop.webp', '/fonts/young-serif-400.woff2', '/fonts/atkinson-next-var.woff2'],
-  decode: () => Promise.all([...scene1.querySelectorAll('img')].map((img) => img.decode().catch(() => {}))),
+  images: [...sceneImages(0), '/art/tex-raindrop.webp'],
+  onBlobs: (blobs) => story.adopt(blobs),
+  decode: () => Promise.all([...scene1.querySelectorAll('.story-layers img')].map((img) => img.decode().catch(() => {}))),
+  fonts: ['20px "Young Serif"', '16px "Atkinson Hyperlegible Next"'],
   onReveal: () => { settleScroll(); story.enter(); },
 });

@@ -2,14 +2,14 @@
   "viewports": {
     "390": {
       "errors": [],
-      "preloaderTailMs": 3479,
-      "preloaderCachedMs": 1633,
+      "preloaderTailMs": 3522,
+      "preloaderCachedMs": 2706,
       "overflowX": 0,
       "fps": {
-        "fps": 143.7,
+        "fps": 130.7,
         "p95ms": 7.1,
-        "over33ms": 0,
-        "frames": 1294
+        "over33ms": 7,
+        "frames": 1177
       },
       "reduced": {
         "wipeVisible": "hidden",
@@ -18,14 +18,14 @@
     },
     "1440": {
       "errors": [],
-      "preloaderTailMs": 3853,
-      "preloaderCachedMs": 1507,
+      "preloaderTailMs": 3463,
+      "preloaderCachedMs": 3597,
       "overflowX": -15,
       "fps": {
-        "fps": 143.2,
-        "p95ms": 7,
-        "over33ms": 0,
-        "frames": 1289
+        "fps": 128.4,
+        "p95ms": 7.1,
+        "over33ms": 10,
+        "frames": 1154
       },
       "reduced": {
         "wipeVisible": "hidden",
@@ -34,14 +34,14 @@
     },
     "1920": {
       "errors": [],
-      "preloaderTailMs": 3130,
-      "preloaderCachedMs": 1641,
+      "preloaderTailMs": 3848,
+      "preloaderCachedMs": 2661,
       "overflowX": -15,
       "fps": {
-        "fps": 139.9,
-        "p95ms": 7.1,
-        "over33ms": 0,
-        "frames": 1259
+        "fps": 119,
+        "p95ms": 14,
+        "over33ms": 8,
+        "frames": 1072
       },
       "reduced": {
         "wipeVisible": "hidden",

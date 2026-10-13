@@ -85,6 +85,9 @@ for (const vp of VIEWPORTS) {
   await scrollToScene(page, 1 + 0.7 + 0.3 * 0.42);
   await sleep(1800);
   await page.screenshot({ path: `${out}/${vp.name}-wipe.png` });
+  await scrollToScene(page, 1 + 0.7 + 0.3 * 0.5);
+  await sleep(1800);
+  await page.screenshot({ path: `${out}/${vp.name}-wipe-mid.png` });
   await scrollToScene(page, 3 + 0.7 + 0.3 * 0.25);
   await sleep(1800);
   await page.screenshot({ path: `${out}/${vp.name}-wipe-early.png` });

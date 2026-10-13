@@ -89,3 +89,60 @@ Landmarks: `header`, `nav[aria-label=Main]`, `main`; `#story` section (aria-labe
 - **Cached preloader** finishes ≈ 1.4 s after navigation rather than < 1 s: about 0.3–0.45 s of that is image decode + font readiness on this (loaded) machine, which the reveal must wait for to avoid uncovering a half-painted frame.
 - **Test hook**: `data-snap="off"` on `<html>` disables the scroll-idle settle so the verify script can hold a mid-wipe frame.
 - **Wheel clamp (±120)** not applied: we don't intercept wheel events (native scroll per the brief).
+
+---
+
+## Fix round 1 (review findings and rulings)
+
+Where this section and the text above disagree, this section is current.
+
+### Changes
+
+1. **Garden labels above the scrim.** `.sl-section` (soil cut-away + labels) is no longer inside `.story-layers` (z 0, under the z 2 scrim). story.js appends it to the scene wrapper at z 3 and still drives it with the same camera transform (z 0.8). It is hidden with its scene, and cross-fades under reduced motion. The slate halo is gone. The cut-out is larger (`clamp(260px, 38vh, 440px)`, was 34vh) with a lighter drop shadow. Garden copy starts at 12vh so the two don't collide at 900 or 1080 px tall. The phone headline is back to 12ch (the desktop 9ch rule was leaking to phones). Labels: 13 px paper on slate-900 at 88 %.
+2. **`check-story-contrast.mjs` now measures rendered glyphs.** Each scene is shot with its text and again with the text colour transparent; backgrounds and scrims stay, and rain is hidden. Pixels that differ are the glyphs. Their rendered luminance (90th percentile) is compared with the box's background without text (95th percentile), so text dimmed by anything painted over it fails. `INJECT_CSS` reproduces a regression on purpose: with `INJECT_CSS='.sl-section{z-index:0 !important}'` (the labels back under the scrim) the garden labels measure **2.04–2.61:1 FAIL** at 1440/1920, matching the review's 2.2–2.6. The old assumed-paper version had reported 9.8+.
+3. **Painted wipe curtain.** `split-plates.mjs` also writes `plate-<scene>-veil.webp`: the far plate at 1100 px, 2.2 px blur, brightness 0.6, saturation 0.85, 9–20 kB each. The wipe is now:
+   - the next band twice at the leading edge (the second mirrored, offset 7 %, brightness 0.82);
+   - the next scene's veil as the body, so the curtain is a rain-soaked preview of where the drop is going, with the 12° streak overlay kept;
+   - the band mirrored as the tail.
+   The body's slate gradient is gone. While wiping, the stage gets `.is-wiping` and the rain canvas moves above the curtain (z 6, frame z 7), with intensity `max(lerp(a, b, w), sin(πw))`, so it is 1.0 at the swap. Flat rows measured (per-row luminance SD < 4 levels) in the wipe-early / wipe / wipe-mid frames: **0.0 % at 1440 and 1920; 0.8 % and 0.0 % at 390 for wipe and wipe-mid**. The 390 wipe-early frame's 8.1 % is the scene's own phone copy scrim behind the headline (rows 594–758); the curtain had only just entered at the bottom.
+4. **Ruling: `--ease-wipe` = cubic-bezier(.76,0,.24,1)** (Power3/quart) in tokens.css and ease.js. DECISIONS.md is updated with an appended line.
+5. **Ruling: foreground at the measured −5 px/100 px.** `parallax.js` derives `FORE_Z = 1 / (1 − FORE_SHIFT / K_X)` with FORE_SHIFT = −0.05 and K_X = 0.039, giving **z = 0.438**. Bands use it and so does the wipe's horizontal parallax; the back plate stays at +2.6. Per 100 px of mouse at 1440: back +2.6, mist +2.3, pivot 0, mid −1.7, band **−5.0**. Scroll crane on the band is now −0.095 × vh across a scene, from −0.30.
+6. **Ruling: preloader motion is always full length.** The drop falls for 0.6 s and the flood runs 1.2 s on every path. When the bytes return in under 0.3 s, the hold is skipped and the fall starts immediately, overlapping decode and font readiness. The flood waits for both.
+7. **Minors:**
+   - The wipe's band and veil sources are set as soon as the scene before is current (`setWipeScene(min(i+1, n−1))` every frame, equality-guarded), so a wipe never starts band-less.
+   - The skip link only jumps to `#designer` (no `data-design`, no camera prompt).
+   - The frame loop skips all writes when settled, using a key of smoothed scroll, camera, pointer, viewport, reduced-motion and entered state. It skips everything and zeroes the rain once the story is fully scrolled past.
+   - The rain clears once and then idles when its intensity is 0.
+   - Rain context loss calls `logFallback('rain overlay', 'WebGL context lost')`.
+   - The vite.config.js comment now says what manualChunks actually does: it names the chunks but can't stop a static import, so the check is the build output.
+   - **Scene 1 downloads once.** Scene-1 `<img>`s (and the drop) start with `data-src` only. The preloader streams the bytes, keeps them as Blobs and hands them over through `story.adopt()` as object URLs. Fonts are no longer fetched by the preloader: each counts 5 % when `document.fonts.load()` resolves from its single @font-face download. Request count on a cold load: plate-roof-far 1, plate-roof-near 1, band-roof 1, both woff2 1 each. tex-raindrop shows 2 because the favicon is the same file.
+
+### Commands and outputs (machine at 100 % CPU from other agents during this round; Win32 LoadPercentage = 100)
+
+- `node scripts/split-plates.mjs` produced the six far, near and veil sets.
+- `npx vite build`: `✓ built`, no warnings. Entry `index-*.js` 21.7 kB, `rain-overlay` 3.9 kB, `designer` 0.2 kB. `THREE:0 ort:0` in every chunk.
+- `npm test`: 92 pass, 0 fail.
+- `node scripts/verify-story.mjs http://localhost:5181 docs/reports/story-shots`: 0 console errors at all three viewports; overflowX 0 at 390; reduced motion leaves the wipe hidden and cross-fades.
+
+| Viewport | fps (auto-scroll, loaded machine) | p95 | frames > 33 ms |
+|---|---|---|---|
+| 1440×900 | 128.4 | 7.1 ms | 10 |
+| 1920×1080 | 119.0 | 14.0 ms | 8 |
+| 390×844 | 130.7 | 7.1 ms | 7 |
+
+(The previous round's 140+ fps were taken on a quieter machine. A mid-round run at peak load measured 94–103 fps.)
+
+- `node scripts/check-story-contrast.mjs http://localhost:5181`: exit 0. Garden labels **6.67–7.60:1** at 1440/1920 and **4.87–5.36:1** at 390. Headline lines ≥ 3.39:1 (large text). Body and links ≥ 5.04:1.
+- Preloader on the production build (`vite preview`), cached reload, marks in ms after navigation start:
+
+| run | pl:bytes | pl:ready | pl:flood (fall done + ready) | pl:gone |
+|---|---|---|---|---|
+| 1 | 268 | 782 | 1456 | 2756 |
+| 2 | 218 | 425 | 966 | 2266 |
+| 3 | 238 | 467 | 1179 | 2490 |
+
+**Cached load time (bytes + decode + fonts) is 0.43–0.78 s, under 1 s.** The total including the full 0.6 s fall and 1.2 s flood is 2.3–2.8 s on this loaded machine.
+
+### Shots read this round
+
+`1440-5-garden.png`: labels crisp above the scrim, larger cut-away. `1440-wipe.png` and `1440-wipe-mid.png`: double band leading edge, then the rain-soaked painted drain scene with rain in front. `390-5-garden.png`: headline "Or your yard / drinks it.", labels legible. `390-wipe.png` and `390-wipe-mid.png`: painted curtain, no slate panel.

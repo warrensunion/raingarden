@@ -2,8 +2,9 @@
  * The scroll story. Why every moving thing is absolutely placed and moved by
  * transform only: the frame loop writes transforms and opacities, never
  * layout, so a mid-range phone holds 60 fps (brief "Perf").
- * Stacking inside the stage: layers 0, rain 1, scrim 2, drop 3, copy 4,
- * wipe 5, frame 6. Nothing between them makes a stacking context.
+ * Stacking inside the stage: layers 0, rain 1 (6 during a wipe), scrim 2,
+ * drop and the garden's labelled cut-away 3, copy 4, wipe 5, frame 7.
+ * Nothing between them makes a stacking context.
  */
 .story {
   position: relative;
@@ -52,21 +53,17 @@
 .sl-cut { height: auto; }
 .sl-band { left: -15%; width: 130%; height: auto; bottom: -9.1vw; }
 
-/* Garden: the soil cut-away with leader-line labels, under the copy on the quiet left. */
+/* Garden: the soil cut-away with leader-line labels. It carries text, so it sits above the scrim
+   (z 3, outside .story-layers) and gets the same camera transform as an art layer. */
 .sl-section {
+  z-index: 3;
   left: clamp(28px, 4.2vw, 64px);
-  bottom: 7vh;
-  height: 34vh;
+  bottom: 5vh;
+  height: clamp(260px, 38vh, 440px);
   aspect-ratio: 874 / 1330;
 }
-.sl-section::before {
-  content: "";
-  position: absolute;
-  inset: -25% -120% -20% -40%;
-  z-index: -1;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--slate-900) 88%, transparent) 35%, transparent);
-}
-.sl-section-img { width: 100%; height: 100%; filter: drop-shadow(0 20px 30px color-mix(in srgb, var(--asphalt) 70%, transparent)); }
+.story-scene:not(.is-visible) .sl-section { visibility: hidden; }
+.sl-section-img { width: 100%; height: 100%; filter: drop-shadow(0 16px 22px color-mix(in srgb, var(--asphalt) 55%, transparent)); }
 .sl-labels { position: absolute; inset: 0; }
 .sl-label {
   position: absolute;
@@ -96,7 +93,7 @@
 .sl-label-text {
   padding: 5px 10px;
   border-radius: 4px;
-  background: color-mix(in srgb, var(--slate-900) 82%, transparent);
+  background: color-mix(in srgb, var(--slate-900) 88%, transparent);
   font: 400 13px/1.3 var(--font-ui);
   color: var(--paper);
 }
@@ -153,7 +150,7 @@
   pointer-events: none;
 }
 .story-copy.is-in { pointer-events: auto; }
-.story-scene[data-scene="garden"] .story-copy { justify-content: flex-start; padding: 15vh 0 0; }
+.story-scene[data-scene="garden"] .story-copy { justify-content: flex-start; padding: 12vh 0 0; }
 .story-scene[data-scene="garden"] .story-h { max-width: min(9ch, 40vw); }
 .story-h {
   max-width: min(12ch, 44vw);
@@ -207,7 +204,8 @@
 }
 .story-demo:hover { text-decoration-thickness: 2px; }
 
-/* The wipe: next scene's foreground band at 1.6x, over a rain curtain, with a ragged tail. */
+/* The wipe: the next scene's band twice (mirrored, offset) at the leading edge, a painted veil of
+   its far plate as the body (no flat colour), the band mirrored as the trailing edge. */
 .story-wipe {
   position: absolute;
   z-index: 5;
@@ -218,25 +216,32 @@
   pointer-events: none;
   will-change: transform;
 }
-.story-wipe-band { position: relative; width: 100%; height: auto; margin-bottom: -9vw; }
+.story-wipe-band { position: relative; display: block; width: 100%; height: auto; margin-bottom: -9vw; }
+.story-wipe-band2 { transform: scaleX(-1) translateX(7%); margin-bottom: -20vw; filter: brightness(.82); }
 .story-wipe-tail { transform: scaleY(-1); margin: -9vw 0 0; }
-/* Rain curtain between the bands: fades in over the band's straight lower edge, streaked at the rain's 12°. */
 .story-wipe-body {
   position: relative;
   z-index: 1;
-  height: calc(110vh + 18vw);
-  background:
-    repeating-linear-gradient(102deg, transparent 0 18px, color-mix(in srgb, var(--paper) 9%, transparent) 18px 19px, transparent 19px 47px),
-    repeating-linear-gradient(102deg, transparent 0 31px, color-mix(in srgb, var(--rain) 14%, transparent) 31px 33px, transparent 33px 83px),
-    linear-gradient(180deg, transparent 0, var(--asphalt) 9vw, var(--slate-700) 45%, var(--asphalt) calc(100% - 9vw), transparent);
+  height: calc(105vh + 18vw);
   -webkit-mask: linear-gradient(180deg, transparent 0, var(--slate-900) 9vw, var(--slate-900) calc(100% - 9vw), transparent);
   mask: linear-gradient(180deg, transparent 0, var(--slate-900) 9vw, var(--slate-900) calc(100% - 9vw), transparent);
 }
+.story-wipe-veil { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.story-wipe-body::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(102deg, transparent 0 18px, color-mix(in srgb, var(--paper) 9%, transparent) 18px 19px, transparent 19px 47px),
+    repeating-linear-gradient(102deg, transparent 0 31px, color-mix(in srgb, var(--rain) 14%, transparent) 31px 33px, transparent 33px 83px);
+}
+/* While the curtain passes, the rain falls in front of it. */
+.is-wiping .story-rain { z-index: 6; }
 
 /* Passe-partout: settles 1.04 -> 1 over 1.5 s when the story is uncovered (NOTES #5). */
 .story-frame {
   position: absolute;
-  z-index: 6;
+  z-index: 7;
   inset: 24px;
   border: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
   pointer-events: none;
@@ -264,7 +269,7 @@
     padding: 0 24px calc(40px + env(safe-area-inset-bottom));
   }
   .story-scene[data-scene="garden"] .story-copy { justify-content: flex-end; padding: 0 24px calc(40px + env(safe-area-inset-bottom)); }
-  .story-h { font-size: clamp(2.5rem, 11vw, 3.5rem); max-width: 12ch; }
+  .story-h, .story-scene[data-scene="garden"] .story-h { font-size: clamp(2.5rem, 11vw, 3.5rem); max-width: 12ch; }
   .story-body { margin-top: 16px; }
   .story-actions { margin-top: 24px; }
   .story-actions .btn { width: 100%; }
@@ -278,4 +283,6 @@
   .story-line-in { transform: none; }
   .story-copy.is-in .story-line-in { transition: opacity .5s var(--ease-ui); }
   .story-frame, .is-entered .story-frame { transform: none; transition: none; }
+  .sl-section { transition: opacity .5s var(--ease-ui); }
+  .story-scene:not(.is-visible) .sl-section { visibility: visible; opacity: 0; }
 }

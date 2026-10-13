@@ -124,7 +124,13 @@ export function startRain(canvas) {
   window.addEventListener('resize', resize);
 
   let intensity = 0, shown = 0, velocity = 0, speed = 1, time = 0, lost = false;
-  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); lost = true; });
+  let cleared = false;
+  canvas.addEventListener('webglcontextlost', (e) => {
+    e.preventDefault();
+    lost = true;
+    canvas.style.opacity = '0';
+    logFallback('rain overlay', 'WebGL context lost');
+  });
 
   const off = onFrame((dt) => {
     if (lost) return;
@@ -133,10 +139,14 @@ export function startRain(canvas) {
     speed += (1 + Math.min(Math.abs(velocity) / 4000, 0.5) - speed) * follow(dt, 0.3);
     time += dt * speed;
     const n = Math.round(MAX * shown);
+    // Nothing to draw: clear once, then leave the GPU alone.
+    if (n <= 0) {
+      if (!cleared) { gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); canvas.style.opacity = '0'; cleared = true; }
+      return;
+    }
+    if (cleared) { canvas.style.opacity = '1'; cleared = false; }
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    canvas.style.opacity = n > 0 ? '1' : '0';
-    if (n <= 0) return;
     gl.uniform1f(uTime, time);
     gl.uniform1f(uSpeed, 1);
     gl.uniform2f(uRes, canvas.width, canvas.height);

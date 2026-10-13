@@ -51,7 +51,8 @@ function splashAt(m, pt) {
 export function createDrop(stage, scenes) {
   const drop = document.createElement('img');
   drop.className = 'story-drop';
-  drop.src = '/art/tex-raindrop.webp';
+  // src arrives via story.adopt(): the preloader already fetched these bytes.
+  drop.dataset.src = '/art/tex-raindrop.webp';
   drop.alt = '';
   drop.decoding = 'async';
   const splash = document.createElement('img');

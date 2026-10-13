@@ -40,8 +40,8 @@ export function bezier(x1, y1, x2, y2) {
 export const easeUi = bezier(0.215, 0.61, 0.355, 1);
 /** --ease-reveal: the reference's "fast-out" CustomEase fit (1.0 s reveals). */
 export const easeReveal = bezier(0.05, 0.75, 0.1, 1);
-/** --ease-wipe: scene-change wipe (reference camera flight). */
-export const easeWipe = bezier(0.65, 0, 0.35, 1);
+/** --ease-wipe: scene-change wipe; the reference's camera flight, Power3.easeInOut (quart). */
+export const easeWipe = bezier(0.76, 0, 0.24, 1);
 /** Power4.easeInOut (GSAP Power4 = quint): passe-partout frame zoom. */
 export const easeFrame = bezier(0.83, 0, 0.17, 1);
 /** easeInCubic: the preloader drop falling into the pool. */
