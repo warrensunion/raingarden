@@ -52,3 +52,315 @@ A design comp: a full website screen mockup, landscape, for one section of an aw
 ### comp-garden (1536x1024)
 
 A design comp: a full website screen mockup, landscape, for one section of an award-winning scroll-story website called "Raingarden" (designs rain gardens of native plants from a photo of your yard). Here the STYLE's "no text" rule is relaxed for the UI only: headline type is a warm old-style serif in paper colour, UI type a clean legible sans; one marigold action colour. Scene 5: a rain garden in a front yard in cut-away cross-section: a shallow planted basin with sedges, rushes and flowering native perennials, a downspout pipe feeding it, below the surface clear soil layers (mulch, amended soil, gravel) with roots reaching down and water soaking in; headline "Or your yard drinks it." Cinematic, layered depth, lots of negative space.
+
+### comp-stream (1536x1024)
+
+A design comp: a full website screen mockup, landscape, for one section of an award-winning scroll-story website called "Raingarden" (designs rain gardens of native plants from a photo of your yard). Here the STYLE's "no text" rule is relaxed for the UI only: headline type is a warm old-style serif in paper colour, UI type a clean legible sans; one marigold action colour. Scene 6: a healthy clear stream with ferns and alders, a fish swimming upstream, soft light breaking through clouds; headline "Design yours." with a big marigold button "Point your phone at your yard" and a quieter link "Try a demo yard". Cinematic, layered depth, lots of negative space.
+
+### comp-designer-capture (1536x1024)
+
+A design comp: a full website screen mockup, landscape, for one section of an award-winning scroll-story website called "Raingarden" (designs rain gardens of native plants from a photo of your yard). Here the STYLE's "no text" rule is relaxed for the UI only: headline type is a warm old-style serif in paper colour, UI type a clean legible sans; one marigold action colour. The designer tool on a phone-sized centred panel over a dark storm-slate scene: a photo of a back yard with thin teal contour lines drawn over it, a small chip "Stays on your phone", three marker pins (downspout, house wall, where water leaves), and a bottom sheet with a step title "Mark something 1 m long" and a marigold "Next" button; the rest of the screen shows the yard in 3D receding softly. Cinematic, layered depth, lots of negative space.
+
+### comp-designer-compare (1536x1024)
+
+A design comp: a full website screen mockup, landscape, for one section of an award-winning scroll-story website called "Raingarden" (designs rain gardens of native plants from a photo of your yard). Here the STYLE's "no text" rule is relaxed for the UI only: headline type is a warm old-style serif in paper colour, UI type a clean legible sans; one marigold action colour. The designer tool: a 3D yard terrain seen from above at an angle, split by a vertical swipe divider: left "Before" with water pooling and streaming off the yard in teal, right "After" with a planted rain garden basin capturing it; a row of three big numbers in the sans: "1,840 L captured", "120 L leaves the yard", "18 h standing water"; a marigold "Get my plan" button. Cinematic, layered depth, lots of negative space.
+
+### comp-how (1536x1024)
+
+A design comp: a full website screen mockup, landscape, for one section of an award-winning scroll-story website called "Raingarden" (designs rain gardens of native plants from a photo of your yard). Here the STYLE's "no text" rule is relaxed for the UI only: headline type is a warm old-style serif in paper colour, UI type a clean legible sans; one marigold action colour. The "How it works" section: five illustrated vignettes laid along a gentle stream line: a phone reading depth, raindrops on a terrain grid, water soaking into soil layers, many little garden outlines being tried, a finished garden; each with a short heading and two lines of plain text in the sans; generous whitespace on storm slate. Cinematic, layered depth, lots of negative space.
+
+### comp-plan (1536x1024)
+
+A design comp: a full website screen mockup, landscape, for one section of an award-winning scroll-story website called "Raingarden" (designs rain gardens of native plants from a photo of your yard). Here the STYLE's "no text" rule is relaxed for the UI only: headline type is a warm old-style serif in paper colour, UI type a clean legible sans; one marigold action colour. A printable one-page rain garden plan on paper colour (portrait inside the landscape frame): a top-down drawing of the garden with dimensions, planted zones in fern, moss and teal rings with small plant symbols, a plant list table with quantities, a soil mix diagram, numbered build steps, and a boxed safety note "Call before you dig". Cinematic, layered depth, lots of negative space.
+
+### roof-sky (1536x1024)
+
+A wide empty overcast dusk sky, layered soft rain clouds in storm slate and rain blue-grey, a faint warm glow low on the horizon; no ground, no buildings, no rain streaks. Full-bleed background plate.
+
+### roof-far (1536x1024)
+
+A wide horizontal band of misty far scenery: tall Pacific Northwest conifers and a few distant pitched rooftops, pale blue-grey and low contrast as if seen through rain; flat bottom edge.
+
++ CUTOUT line
+
+### roof-house (1536x1024)
+
+The upper part of a small West Coast wooden house: a pitched shingle roof slick with rain, a metal gutter along its eave, and a downspout running down the corner; warm light in one small attic window. Seen from slightly below and to the side.
+
++ CUTOUT line
+
+### roof-gutter (1536x1024)
+
+Very close foreground: the end of a metal roof gutter overflowing, water spilling over its lip in a glassy sheet and drops; seen from very close, large in frame.
+
++ CUTOUT line
+
+### drive-back (1536x1024)
+
+A wide rainy suburban street scene for a background plate: houses with lit windows, wet front lawns, conifers in mist, a grey sky; no driveway in the centre foreground (keep the lower half fairly simple and dark).
+
+### drive-asphalt (1536x1024)
+
+A steep wet asphalt driveway seen at an angle, running diagonally from upper left to lower right, glossy with rain, a thin rushing stream of rainwater racing down its middle toward the bottom; the lawn edges along both sides.
+
++ CUTOUT line
+
+### drive-bike (1024x1024)
+
+A child's bicycle leaning on its kickstand, wet with rain, painted in moss and marigold.
+
++ CUTOUT line
+
+### drive-curb (1536x1024)
+
+Close foreground: a concrete curb edge and gutter with a fast stream of rainwater flowing along it, a few fallen leaves riding the flow; horizontal composition.
+
++ CUTOUT line
+
+### drain-back (1536x1024)
+
+A wide background plate low at street level: wet dark asphalt road receding, reflections of street lamps and lit windows smeared on the wet road, rain, misty trees.
+
+### drain-grate (1536x1024)
+
+A cast-iron storm drain grate set into a concrete curb and gutter, water pouring into it with an oily rainbow sheen on the surface, seen from a low three-quarter angle.
+
++ CUTOUT line
+
+### drain-litter (1024x1024)
+
+A small cluster of wet street debris: a crushed paper coffee cup, two soggy maple leaves and a cigarette butt, lying together.
+
++ CUTOUT line
+
+### drain-leaves (1536x1024)
+
+Very close foreground: a loose scatter of large wet fallen leaves (maple and alder) along a horizontal band, out of focus feeling.
+
++ CUTOUT line
+
+### creek-back (1536x1024)
+
+A wide background plate: an urban creek in a cut-away view, the upper half the banks and a concrete culvert under a road with houses behind, the lower half murky brown-green water with silt clouds, low light.
+
+### creek-bank (1536x1024)
+
+An eroded creek bank in cross-section: bare undercut soil, exposed tree roots, a slumped clump of grass, wide horizontal composition.
+
++ CUTOUT line
+
+### creek-fish (1024x1024)
+
+A small juvenile coho salmon swimming, side view, slightly dull and tired-looking colours.
+
++ CUTOUT line
+
+### creek-reeds (1536x1024)
+
+Close foreground: a few tall reeds and a broken branch poking out of water, horizontal band, dark and soft.
+
++ CUTOUT line
+
+### garden-back (1536x1024)
+
+A wide background plate: a quiet front yard after rain, a small house with a downspout on the left, a lawn, a cedar hedge and misty trees behind, clouds starting to break with soft light.
+
+### garden-basin (1536x1024)
+
+A rain garden in a front yard, shown in cut-away cross-section: a shallow planted basin with sedges, rushes and flowering native perennials (pink, purple, marigold blooms) above, and below the surface the soil profile — a brown mulch layer, a thick amended soil layer, and a gravel layer — with roots reaching down and blue water soaking into the soil; a downspout pipe feeding the basin from the left.
+
++ CUTOUT line
+
+### garden-front (1536x1024)
+
+Close foreground: a soft band of native rain-garden plants (sedge tufts, a fern, a few flowering stems) along the bottom, horizontal composition.
+
++ CUTOUT line
+
+### stream-back (1536x1024)
+
+A wide background plate: a healthy clear forest stream with clean pebbles visible under the water, sword ferns, red alders and cedars, light breaking through clouds in soft beams.
+
+### stream-fish (1024x1024)
+
+A healthy adult coho salmon swimming strongly, side view, bright silver and soft red tones.
+
++ CUTOUT line
+
+### stream-ferns (1536x1024)
+
+Close foreground: sword fern fronds and moss-covered stones along a horizontal band.
+
++ CUTOUT line
+
+### soil-section (1024x1536)
+
+A clean educational cross-section slice of a rain garden soil profile, a tall rectangular block: from top, a thin layer of shredded bark mulch, a thick layer of amended soil (sandy loam mixed with dark compost), a layer of washed round gravel, then native subsoil; a few plant roots growing down through it and water drops percolating down. Edges cut straight like a cake slice.
+
++ CUTOUT line
+
+### tex-puddle (1536x1024)
+
+A single shallow rain puddle seen from a low angle, irregular organic outline, reflecting a grey sky, with two concentric ripple rings.
+
++ CUTOUT line
+
+### tex-splash (1024x1024)
+
+A small crown splash of a raindrop hitting water, translucent blue-grey.
+
++ CUTOUT line
+
+### tex-paper (1024x1024)
+
+A seamless tileable texture of matte watercolour paper with very fine risograph grain, uniform storm slate colour #26313C, no features, perfectly even.
+
+### tex-paper-light (1024x1024)
+
+A seamless tileable texture of matte watercolour paper with fine grain, uniform paper colour #ECE6DA, perfectly even, no features.
+
+### tex-mulch (1024x1024)
+
+A seamless tileable top-down texture of shredded cedar bark mulch, even lighting, no shadows from outside.
+
+### tex-lawn (1024x1024)
+
+A seamless tileable top-down texture of a slightly patchy suburban lawn, even lighting.
+
+### pre-drop (1024x1024)
+
+A single large round raindrop seen just as it detaches, glassy with a soft marigold highlight and cool refractions, for a preloader.
+
++ CUTOUT line
+
+### pre-pool (1536x1024)
+
+A small round still pool of water seen from a low three-quarter angle, an ellipse with soft mossy stone edges, a faint reflection of a grey sky.
+
++ CUTOUT line
+
+### ui-phone (1024x1536)
+
+A hand holding a smartphone up, pointing its camera at something ahead, seen from behind the hand; simple, friendly.
+
++ CUTOUT line
+
+### demo-yard (1536x1024)
+
+EXCEPTION to the style: this one is a realistic smartphone PHOTO, not an illustration. A suburban Metro Vancouver back yard photographed from the back porch steps at standing height, overcast daylight: a lawn sloping gently away and to the right, the house wall with a downspout visible at the left edge, a cedar fence at the back, a low spot near the back right corner, a few shrubs along the fence. Natural colours, sharp, wide-angle phone lens.
+
+### plate-roof (2560x1440)
+
+A full-bleed background painting for a wide website scene, 16:9, nothing cut off awkwardly, no text: the pitched shingle roof of a small West Coast wooden house in the right half, rain sheeting off it, a metal gutter and a downspout at its corner, misty conifers and far rooftops and a grey inlet behind, overcast dusk sky with a faint warm glow; the left third is calmer misty sky and distant hills. Leave the left third visually quiet (soft sky, mist or shadow) so a headline can sit there.
+
+### comp-preloader (1536x1024)
+
+A design comp: a full website screen mockup, landscape, for one section of an award-winning scroll-story website called "Raingarden" (designs rain gardens of native plants from a photo of your yard). Here the STYLE's "no text" rule is relaxed for the UI only: headline type is a warm old-style serif in paper colour, UI type a clean legible sans; one marigold action colour. The preloader: a deep storm-slate screen, a single painted raindrop forming at the centre above a small round pool, a thin paper-coloured progress arc around the pool, the small wordmark "Raingarden" beneath. Cinematic, layered depth, lots of negative space.
+
+### stream-back (1536x1024)
+
+A wide background plate: a healthy clear forest stream with clean pebbles visible under the water, sword ferns, red alders and cedars, light breaking through clouds in soft beams.
+
+### plate-drive (2560x1440)
+
+A full-bleed background painting for a wide website scene, 16:9, nothing cut off awkwardly, no text: a steep wet asphalt driveway running from a garage at upper right diagonally down to the street at lower left, a thin rushing stream of rainwater racing down it, lawns on both sides, a parked bicycle, houses and conifers in mist behind. Leave the left third visually quiet (soft sky, mist or shadow) so a headline can sit there.
+
+### plate-drain (2560x1440)
+
+A full-bleed background painting for a wide website scene, 16:9, nothing cut off awkwardly, no text: very low at street level beside a concrete curb: a cast-iron storm drain grate swallowing a fast stream of water with an oily rainbow sheen, wet leaves, a crushed cup, the wet road receding into misty lamplight. Leave the left third visually quiet (soft sky, mist or shadow) so a headline can sit there.
+
+### plate-creek (2560x1440)
+
+A full-bleed background painting for a wide website scene, 16:9, nothing cut off awkwardly, no text: an urban creek in cut-away view, half above and half below the waterline: eroded bare banks with exposed roots, a concrete culvert pouring murky water in, houses behind, brown-green silty water below with a lone tired small fish. Leave the left third visually quiet (soft sky, mist or shadow) so a headline can sit there.
+
+### plate-garden (2560x1440)
+
+A full-bleed background painting for a wide website scene, 16:9, nothing cut off awkwardly, no text: a front-yard rain garden shown in cut-away cross-section: a shallow planted basin of sedges, rushes and flowering native perennials fed by a downspout, below the surface mulch, amended soil and gravel layers with roots reaching down and water soaking in; clouds breaking with soft light. Leave the left third visually quiet (soft sky, mist or shadow) so a headline can sit there.
+
+### plate-stream (2560x1440)
+
+A full-bleed background painting for a wide website scene, 16:9, nothing cut off awkwardly, no text: a healthy clear forest stream over clean pebbles with sword ferns, red alders and cedars, a salmon swimming upstream, soft light beams breaking through the clouds. Leave the left third visually quiet (soft sky, mist or shadow) so a headline can sit there.
+
+### band-roof (2560x1440)
+
+A foreground parallax layer for a wide website scene: a horizontal band of dripping wet dark foliage of a vine maple and cedar sprigs with raindrops, running across the FULL WIDTH of the image and continuing off both the left and right edges (cut straight by the frame edges), sitting along the bottom edge, taking up the lower quarter of the frame; everything above it fully transparent.
+
++ CUTOUT line
+
+### band-drive (2560x1440)
+
+A foreground parallax layer for a wide website scene: a horizontal band of a concrete curb and gutter with a fast stream of rainwater and a few fallen leaves, running across the FULL WIDTH of the image and continuing off both the left and right edges (cut straight by the frame edges), sitting along the bottom edge, taking up the lower quarter of the frame; everything above it fully transparent.
+
++ CUTOUT line
+
+### band-drain (2560x1440)
+
+A foreground parallax layer for a wide website scene: a horizontal band of a loose scatter of large wet fallen maple and alder leaves and pebbles, running across the FULL WIDTH of the image and continuing off both the left and right edges (cut straight by the frame edges), sitting along the bottom edge, taking up the lower quarter of the frame; everything above it fully transparent.
+
++ CUTOUT line
+
+### band-creek (2560x1440)
+
+A foreground parallax layer for a wide website scene: a horizontal band of reeds, a broken branch and dark wet stones at the water edge, running across the FULL WIDTH of the image and continuing off both the left and right edges (cut straight by the frame edges), sitting along the bottom edge, taking up the lower quarter of the frame; everything above it fully transparent.
+
++ CUTOUT line
+
+### band-garden (2560x1440)
+
+A foreground parallax layer for a wide website scene: a horizontal band of native rain-garden plants: sedge tufts, a sword fern, flowering stems in marigold and violet, running across the FULL WIDTH of the image and continuing off both the left and right edges (cut straight by the frame edges), sitting along the bottom edge, taking up the lower quarter of the frame; everything above it fully transparent.
+
++ CUTOUT line
+
+### band-stream (2560x1440)
+
+A foreground parallax layer for a wide website scene: a horizontal band of sword fern fronds and moss-covered stones, running across the FULL WIDTH of the image and continuing off both the left and right edges (cut straight by the frame edges), sitting along the bottom edge, taking up the lower quarter of the frame; everything above it fully transparent.
+
++ CUTOUT line
+
+### pre-pool (1536x1024)
+
+A small round still pool of water seen from a low three-quarter angle, an ellipse with soft mossy stone edges, a faint reflection of a grey sky.
+
++ CUTOUT line
+
+### plant-slough-sedge (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Slough sedge (Carex obnupta) plant, whole plant from the base, seen from the side at eye level, in bloom (glossy green; dark spikes); WSU zones 1–2, evergreen. Excellent soil binder that can spread rapidly. WSU gives width as "to 48 in., spreading".
+
++ CUTOUT line
+
+### plant-dagger-leaf-rush (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Dagger-leaf rush (Juncus ensifolius) plant, whole plant from the base, seen from the side at eye level, in bloom (dark brown pom-pom flowers); WSU zone 1. Iris-like flattened stems with yellow-orange fall colour.
+
++ CUTOUT line
+
+### plant-taper-tipped-rush (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Taper-tipped rush (Juncus acuminatus) plant, whole plant from the base, seen from the side at eye level, in bloom (purple to reddish-brown flowers); WSU zone 1. A delicate rush with open flower clusters. Sun: WSU uses it in its "sunny area" sample plans (pp. 52, 54); LBJWC rates it "Part Shade". It is not in King County GoNative.
+
++ CUTOUT line
+
+### plant-small-fruited-bulrush (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Small-fruited bulrush (Scirpus microcarpus) plant, whole plant from the base, seen from the side at eye level, in bloom (green; round seed clusters); WSU zone 1. Good soil binder that spreads aggressively. Its seed heads persist over winter.
+
++ CUTOUT line
+
+### plant-lady-fern (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Lady fern (Athyrium filix-femina) plant, whole plant from the base, seen from the side at eye level, foliage fine bright-green fronds; WSU zones 1–3, deciduous. Tolerates shallow flooding and takes sun in wet soil, but prefers shade.
+
++ CUTOUT line
+
+### plant-red-twig-dogwood (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Red-twig dogwood (Cornus sericea) plant, whole plant from the base, seen from the side at eye level, in bloom (white flowers; red winter stems); WSU zones 1–3. Adaptable to many soils. Its red stems give winter colour. Width is printed as 12 ft (spreading).
+
++ CUTOUT line
+
+### plant-douglas-spirea (1024x1536)
+
+A botanically accurate illustrated cut-out of one mature Douglas spirea (hardhack) (Spiraea douglasii) plant, whole plant from the base, seen from the side at eye level, in bloom (rosy-pink flower spikes); WSU zones 1–2. Great for butterflies, but can spread and crowd out other plants in constantly wet soil.
+
++ CUTOUT line

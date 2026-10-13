@@ -31,11 +31,12 @@ await page.goto('https://2019.makemepulse.com/', { waitUntil: 'domcontentloaded'
 await page.waitForFunction(() => { const l = document.querySelector('.loader'); return l && /hide/.test(l.className); }, null, { timeout: 120000 });
 await wait(2500);
 await page.mouse.move(W / 2 - 200, H / 2); await wait(300); await page.mouse.move(W / 2, H / 2); await wait(800);
-await page.mouse.click(W / 2, H / 2); await wait(4500);
+await page.mouse.click(W / 2, H / 2);
+await page.waitForFunction(() => { const b = document.querySelector('.landing__button'); return b && !b.classList.contains('is-hidden'); }, null, { timeout: 60000 }); await wait(2500);
 const sb = await page.locator('.landing__button').boundingBox();
 await page.mouse.move(sb.x + sb.width / 2, sb.y + sb.height / 2); await wait(600);
 await page.mouse.click(sb.x + sb.width / 2, sb.y + sb.height / 2);
-await wait(5000);
+await page.waitForFunction(() => window.GLXP && GLXP.chapters._currentChapter === 0 && !GLXP.chapters.homeIsEnabled, null, { timeout: 60000 }); await wait(5000);
 
 // fps of the page's rAF
 await ev(() => { window.__sampleFn = () => ({}); window.__samples = []; }); await wait(2000);
