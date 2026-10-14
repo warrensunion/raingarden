@@ -89,7 +89,7 @@ export function createPlantLayer(THREE, { onChange }) {
   function sprite(id) {
     if (!art.has(id)) {
       art.set(id, new Promise((resolve) => {
-        loader.load(`/art/plants/${encodeURIComponent(id)}.webp`, (t) => {
+        loader.load(`${import.meta.env.BASE_URL}art/plants/${encodeURIComponent(id)}.webp`, (t) => {
           t.anisotropy = 4;
           t.colorSpace = THREE.SRGBColorSpace;
           resolve(t);

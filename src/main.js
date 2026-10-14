@@ -42,7 +42,7 @@ const story = startStory(document.getElementById('story'), { onDesign: openDesig
 
 const scene1 = document.querySelector('.story-scene');
 runPreloader({
-  images: [...sceneImages(0), '/art/tex-raindrop.webp'],
+  images: [...sceneImages(0), `${import.meta.env.BASE_URL}art/tex-raindrop.webp`],
   onBlobs: (blobs) => story.adopt(blobs),
   decode: () => Promise.all([...scene1.querySelectorAll('.story-layers img')].map((img) => img.decode().catch(() => {}))),
   fonts: ['20px "Young Serif"', '16px "Atkinson Hyperlegible Next"'],

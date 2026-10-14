@@ -9,7 +9,10 @@
  */
 import { defineConfig } from 'vite';
 
+// GitHub Pages serves the site under /raingarden/; the Pages workflow sets GITHUB_PAGES=true.
+// Local dev, preview and scripts/shoot.mjs keep the root base.
 export default defineConfig({
+  base: process.env.GITHUB_PAGES ? '/raingarden/' : '/',
   build: {
     target: 'es2022',
     // three (~700 kB) is its own lazy chunk, loaded only when the designer opens

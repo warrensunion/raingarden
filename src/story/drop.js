@@ -52,12 +52,12 @@ export function createDrop(stage, scenes) {
   const drop = document.createElement('img');
   drop.className = 'story-drop';
   // src arrives via story.adopt(): the preloader already fetched these bytes.
-  drop.dataset.src = '/art/tex-raindrop.webp';
+  drop.dataset.src = `${import.meta.env.BASE_URL}art/tex-raindrop.webp`;
   drop.alt = '';
   drop.decoding = 'async';
   const splash = document.createElement('img');
   splash.className = 'story-splash';
-  splash.src = '/art/tex-splash.webp';
+  splash.src = `${import.meta.env.BASE_URL}art/tex-splash.webp`;
   splash.alt = '';
   splash.decoding = 'async';
   splash.loading = 'lazy';

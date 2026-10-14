@@ -254,7 +254,7 @@ export async function createYardScene(canvas, { terrain, photo = null, toImage =
 
     let groundVersion = 1;
     const lawnLoad = new THREE.TextureLoader();
-    lawnLoad.load('/art/tex-lawn.webp', (t) => {
+    lawnLoad.load(`${import.meta.env.BASE_URL}art/tex-lawn.webp`, (t) => {
       if (tornDown) { t.dispose(); return; }
       own(t);
       t.wrapS = t.wrapT = THREE.RepeatWrapping;

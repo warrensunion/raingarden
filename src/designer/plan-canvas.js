@@ -216,7 +216,7 @@ export async function drawPlan(d, canvas = document.createElement('canvas')) {
   canvas.height = PLAN_H;
   const ctx = canvas.getContext('2d');
   const ids = [...new Set(d.plants.map((p) => p.id))];
-  const [paperTex, ...imgs] = await Promise.all([loadImg('/art/tex-paper-light.webp'), ...ids.map((id) => loadImg(`/art/plants/${id}.webp`))]);
+  const [paperTex, ...imgs] = await Promise.all([loadImg(`${import.meta.env.BASE_URL}art/tex-paper-light.webp`), ...ids.map((id) => loadImg(`${import.meta.env.BASE_URL}art/plants/${id}.webp`))]);
   // only real cut-outs (transparent corners); a labelled placeholder gets the plain symbol
   const IMG = new Map(ids.map((id, i) => [id, isCutout(imgs[i]) ? imgs[i] : null]));
   await ensureFonts();

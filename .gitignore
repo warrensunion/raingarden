@@ -9,3 +9,10 @@ design-reference/**/*.mp4
 art-src/.vendor/
 .superpowers/
 docs/reports/demo-yard.y4m
+*.onnx
+.env
+.env.*
+.cache/
+test-results/
+playwright-report/
+*.y4m

@@ -101,7 +101,7 @@ async function load(force) {
       // of onnxruntime-web/webgpu and /wasm inline their Emscripten .mjs glue;
       // giving wasmPaths a directory would make ORT import /ort/*.mjs, which the
       // Vite dev server refuses for files in public/ (found in the browser check).
-      ort.env.wasm.wasmPaths = { wasm: '/ort/ort-wasm-simd-threaded.jsep.wasm' };
+      ort.env.wasm.wasmPaths = { wasm: `${import.meta.env.BASE_URL}ort/ort-wasm-simd-threaded.jsep.wasm` };
       const isolated = self.crossOriginIsolated === true;
       ort.env.wasm.numThreads = isolated ? Math.min(4, self.navigator?.hardwareConcurrency || 1) : 1;
       // ORT prints its node-placement warnings through console.error; only real errors should reach the console

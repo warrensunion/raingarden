@@ -236,10 +236,10 @@ export function startStory(root, { onDesign } = {}) {
   function setWipeScene(i) {
     if (i === wipeFor) return;
     wipeFor = i;
-    const src = `/art/band-${scenes[i].id}.webp`;
+    const src = `${import.meta.env.BASE_URL}art/band-${scenes[i].id}.webp`;
     for (const b of wipeBands) b.src = src;
     wipeTail.src = src;
-    wipeVeil.src = `/art/story/plate-${scenes[i].id}-veil.webp`;
+    wipeVeil.src = `${import.meta.env.BASE_URL}art/story/plate-${scenes[i].id}-veil.webp`;
   }
 
   let lastKey = '';

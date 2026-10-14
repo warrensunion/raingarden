@@ -326,7 +326,7 @@ export function openDesigner(root, { mode = 'capture' } = {}) {
 
   async function startDemo() {
     const demoData = (await import('../data/demo-yard.json')).default;
-    const blob = await (await fetch(demoData.image)).blob();
+    const blob = await (await fetch(import.meta.env.BASE_URL + demoData.image.replace(/^\//, ''))).blob();
     const bitmap = await createImageBitmap(blob);
     if (destroyed) return;
     if (state.photo?.url) URL.revokeObjectURL(state.photo.url);

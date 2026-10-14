@@ -17,7 +17,8 @@
  * Pure module: no DOM.
  */
 
-export const MODEL_BASE = '/models/depth-anything-v2-small/';
+// BASE_URL is the deploy base (/raingarden/ on GitHub Pages); Node (tests, fetch-models) has no import.meta.env.
+export const MODEL_BASE = `${import.meta.env?.BASE_URL ?? '/'}models/depth-anything-v2-small/`;
 
 export const MODEL_FILES = {
   wasm: {

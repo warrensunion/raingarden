@@ -30,8 +30,8 @@ const ROOF_M2 = 150;
 const runoffL = Math.round((ROOF_M2 * storms.design.totalMm) / 100) * 100;
 const litres = runoffL.toLocaleString('en-CA');
 
-const art = (name) => `/art/${name}.webp`;
-const split = (scene, part) => `/art/story/plate-${scene}-${part}.webp`;
+const art = (name) => `${import.meta.env.BASE_URL}art/${name}.webp`;
+const split = (scene, part) => `${import.meta.env.BASE_URL}art/story/plate-${scene}-${part}.webp`;
 
 const plates = (scene, alt) => [
   { kind: 'plate', src: split(scene, 'far'), z: 3.0, alt: '' },

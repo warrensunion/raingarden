@@ -38,7 +38,7 @@ export default function plant(sheet, ctx) {
       const zr = rows.filter((r) => r.zone === z);
       return `<section class="dz-zone dz-zone-${z}"><h3><span class="dz-zone-key" aria-hidden="true"></span>${name} <span class="dz-muted">· ${say}</span></h3>
         ${zr.length ? `<ul>${zr.map((r) => `<li class="dz-plant">
-          <img src="/art/plants/${r.id}.webp" alt="" width="56" height="56" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'">
+          <img src="${import.meta.env.BASE_URL}art/plants/${r.id}.webp" alt="" width="56" height="56" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'">
           <div><p class="dz-plant-name">${r.common} <span class="dz-qty">× ${r.qty}</span></p>
           <p class="dz-plant-latin">${r.latin}</p>
           <p class="dz-plant-meta">${size(r)}, ${r.spreadM[1] < 1 ? `${Math.round(r.spreadM[1] * 100)} cm` : `${r.spreadM[1].toFixed(1)} m`} wide · ${r.sources.slice(0, 1).map((s) => SOURCES[s] ? `<a href="${SOURCES[s].url}" target="_blank" rel="noopener">source</a>` : '').join('')}</p></div></li>`).join('')}</ul>`
